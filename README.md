@@ -51,4 +51,18 @@ En tant qu'imposteur, le joueur doit éviter de se faire éliminer par vote pend
 
 ## Démarrage du projet
 
-- ?
+- Installer les dependences
+
+```
+yarn install
+```
+
+- Demarrer le serveur de developpement
+
+```
+docker-compose up -d
+```
+
+- Acceder a l'api : [http://localhost:3000](http://localhost:3000)
+- Acceder a mongo express : [http://localhost:3001](http://localhost:3001)
+
