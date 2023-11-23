@@ -1,0 +1,42 @@
+name: "Deployment"
+on:
+  release:
+    types:
+      - created
+env:
+    BACK_ARTIFACT: build-backend #Name of back artifact
+    PREPARED_FOLDER: gamerhub #Temp folder in server VPS
+    DESTINATION_FOLDER: /var/gamerhub #Folder where app is in server VPS
+    FALLBACK_LOCALE: en
+    LOCALE: fr
+jobs:
+  build-back:
+    name: Build Back
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+            fetch-depth: 0
+     # Same as PR.yml 
+  dev:
+    runs-on: dev-server
+    environment: Development
+    needs: [
+      build-back
+    ]
+    steps:
+    - uses: actions/download-artifact@v3
+      name: Download backend build
+      with:
+        name: ${{ env.BACK_ARTIFACT }}
+        path: ${{ env.PREPARED_FOLDER }}
+
+    # A revoir selon l'environnement du serveur 
+    - run: sudo rm -rf ${{ env.DESTINATION_FOLDER }}/*
+      name: Remove files in destination folder
+    - run: mv ${{ env.PREPARED_FOLDER }}/* ${{ env.DESTINATION_FOLDER }}
+      name: Move files to destination folder
+    - run: sudo systemctl restart kestrel-gamerhub.service
+      name: Restart kestrel service
+    - run: sudo systemctl restart apache2.service
+      name: Restart apache service
