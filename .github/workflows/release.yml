@@ -1,4 +1,6 @@
-name: "Release"
+name: "Create Release"
+permissions:
+  contents: write
 on:
   push:
     tags:
@@ -10,39 +12,4 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    # Build le projet et nous sort l'executable
-    - name: Build 
-      uses: actions/setup-go@v3
-      with:
-        go-version-file: go.mod
-
-    - name: Fetch required Go modules
-      run:  go mod download
-
-    - name: Build
-      run:  go build -v ./
-    # Archive l'executable en artifact github
-    - name: Archiver l'exécutable
-      uses: actions/upload-artifact@v3
-      with:
-        name: docker-gs-ping
-        path: ./docker-gs-ping
-
-  release:
-    runs-on: self-hosted
-    permissions:
-      contents: write
-
-    needs: build # doit attendre l'étape build (précedente) avant de se lancer
-
-    steps: 
-    - run: rm ./docker-gs-ping 
-    # dowload l'artifact, le zip, et l'upload le fichier .zip sur la derniere release (optionnel)
-    - uses: actions/download-artifact@v3
-      with:
-        name: docker-gs-ping
-        path: ./docker-gs-ping
-    - run: zip -r docker-gs-ping.zip ./docker-gs-ping/
     - uses: ncipollo/release-action@v1
-      with:
-        artifacts: "docker-gs-ping.zip"
