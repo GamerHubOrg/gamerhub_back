@@ -3,21 +3,16 @@ on:
   pull_request:
     branches: [ develop ]
 jobs:
-  docker:
+  build:
     runs-on: self-hosted
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      - name: Build and export
-        uses: docker/build-push-action@v5
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v3
         with:
-          context: .
-          tags: gamerhub-api:latest
-          outputs: type=docker,dest=/tmp/gamerhub-api.tar
-      - name: Upload artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: gamerhub-api
-          path: /tmp/gamerhub-api.tar
+          node-version: 18
+      - run: yarn
+        name: yarn
+      - run: yarn build --mode production
+        name: yarn build
+      - run: yarn test:unit --passWithNoTests
+        name: yarn test
