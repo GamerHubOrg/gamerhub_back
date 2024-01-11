@@ -1,11 +1,9 @@
 import { Router } from 'express';
-
-// Example :
-// import usersRoutes from '../modules/users/users.routes';
+import authenticated from '../middlewares/authenticated';
+import gamesRoutes from '../modules/games/games.routes';
 
 const router = Router();
 
-// Example :
-// router.use('/users', usersRoutes);
+router.use('/games', authenticated, gamesRoutes);
 
 export default router;
