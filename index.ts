@@ -6,6 +6,8 @@ import cors from 'cors';
 import database from './services/database';
 import router from './router';
 import config from './config';
+import { Server } from 'socket.io';
+import SocketConnectionHandler from './socket';
 
 dotenv.config();
 
@@ -26,6 +28,13 @@ app.use('/api', router);
 const server = http.createServer(app);
 
 database.connect();
+
+const io = new Server(server, {
+  cors: {
+    origin: process.env.ORIGIN
+  }
+});
+io.on("connection", (socket) => SocketConnectionHandler(io, socket));
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`[server] Running on port ${PORT}`));
