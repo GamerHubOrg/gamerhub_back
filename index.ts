@@ -9,6 +9,8 @@ import router from './router';
 import config from './config';
 import { getLogger } from './shared/tools/logger';
 import { logError, logResponseTime } from './middlewares/logs';
+import { Server } from 'socket.io';
+import SocketConnectionHandler from './socket';
 
 const logger = getLogger();
 
@@ -46,6 +48,13 @@ app.use(logError);
 const server = http.createServer(app);
 
 database.connect();
+
+const io = new Server(server, {
+  cors: {
+    origin: process.env.ORIGIN
+  }
+});
+io.on("connection", (socket) => SocketConnectionHandler(io, socket));
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => logger.info(`[server] Running on port ${PORT}`));
