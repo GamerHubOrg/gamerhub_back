@@ -69,8 +69,11 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     socket.leave(roomId);
     const roomData = roomsDataMap.get(roomId);
     if (!roomData) return socket.emit("room:not-found", roomId);
-    // filters users to remove it
-    roomData.users = roomData.users.filter(({ socket_id }) => socket_id !== socket.id)
+
+    const index = roomData.users.findIndex(({ socket_id }) => socket_id !== socket.id)
+    const leavingUser = roomData.users.splice(index, 1)[0]
+    if (leavingUser.isOwner) roomData.users.splice(0, 1, { ...roomData.users[0], isOwner: true });
+
     io.in(roomId).emit("room:update", roomData)
     socket.emit("room:left")
   }
