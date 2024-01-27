@@ -53,7 +53,7 @@ database.connect();
 
 const io = new Server(server, {
   cors: {
-    origin: process.env.ORIGIN,
+    origin: config.origin,
   },
 });
 io.on("connection", (socket) => SocketConnectionHandler(io, socket));
