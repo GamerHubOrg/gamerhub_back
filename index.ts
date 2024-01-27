@@ -11,7 +11,6 @@ import router from "./router";
 import config from "./config";
 import { Server } from "socket.io";
 import SocketConnectionHandler from "./socket";
-import { verifyAuth } from "./middlewares/authenticated";
 
 const logger = getLogger();
 
@@ -56,15 +55,6 @@ const io = new Server(server, {
   cors: {
     origin: process.env.ORIGIN,
   },
-});
-io.use((socket, next) => {
-  console.log(socket.request.headers);
-  
-  const token = socket.request.headers["Authorization"];
-  verifyAuth(token as string)
-    .then((user) => console.log(user))
-    .catch((err) => console.log(err));
-  next();
 });
 io.on("connection", (socket) => SocketConnectionHandler(io, socket));
 
