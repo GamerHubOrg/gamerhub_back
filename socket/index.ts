@@ -9,7 +9,7 @@ const SocketConnectionHandler = (io: IoType, socket: SocketType) => {
   console.log("user connected");
 
   RoomHandler(io, socket);
-  socket.on("disconnect", onDisconnect);
+  socket.on("disconnect", () => onDisconnect());
 };
 
 export default SocketConnectionHandler;
