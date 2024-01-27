@@ -72,15 +72,27 @@ const handler: RequestHandler = async (
 ) => {
   const token = req.header("Authorization");
 
-  verifyAuth(token)
-    .then((user) => {
-      req.user = user;
-      next();
-    })
-    .catch((err) => {
-      console.log("[auth]: error " + err);
-      res.status(401).send();
-    });
+  if (!token) {
+    return res.status(401).send();
+  }
+
+  const isTokenSessionValid = await verifyKeycloakSession(token);
+
+  if (!isTokenSessionValid) {
+    return res.status(401).send();
+  }
+
+  const decoded = jwt.decode(token) as KeycloakToken;
+
+  req.user = {
+    email: decoded.email,
+    firstname: decoded.given_name,
+    lastname: decoded.family_name,
+    username: decoded.preferred_username,
+    roles: decoded.realm_access.roles,
+  };
+
+  next();
 };
 
 export default handler;
