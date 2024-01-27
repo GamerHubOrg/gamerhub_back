@@ -1,5 +1,5 @@
 import RoomHandler from "./room-handler";
-import { IoType, SocketType } from "../shared/types/socket.types";
+import { IoType, SocketType } from "./types";
 
 const onDisconnect = () => {
   console.log("user disconnected");
