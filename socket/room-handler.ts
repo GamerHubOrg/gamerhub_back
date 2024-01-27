@@ -13,7 +13,11 @@ const generateRoomId = (io: IoType, game: string): string => {
 };
 
 const RoomHandler = (io: IoType, socket: SocketType) => {
-  const onRoomCreate = (user: User, game: string) => {
+  const onRoomCreate = (game: string, user: User) => {
+    console.log("room create : ", game);
+    console.log("owner : ", user);
+
+    if (!user) return socket.emit("user:not-auth");
     const roomId = generateRoomId(io, game);
     const data = { users: [{ ...user, socket_id: socket.id, isOwner: true }] }
     roomsDataMap.set(roomId, data);
@@ -22,6 +26,9 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
   };
 
   const onRoomJoin = (roomId: string, user: User) => {
+    console.log("room join :", roomId);
+    console.log("user :", user);
+    if (!user) return socket.emit("user:not-auth");
     const roomData = roomsDataMap.get(roomId);
     if (!roomData) return socket.emit("room:not-found", roomId);
 
@@ -31,12 +38,14 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
   }
 
   const onRoomStart = (roomId: string, config: IRoomConfig) => {
+    console.log("room start");
     console.log(`La partie ${roomId} a été lancée avec les configs suivantes : `);
     console.log(config);
     socket.in(roomId).emit("room:started", config)
   };
 
   const onRoomDelete = (roomId: string) => {
+    console.log("room delete");
     const roomData = roomsDataMap.get(roomId);
     if (!roomData) return socket.emit("room:not-found", roomId);
 
@@ -50,6 +59,7 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
   }
 
   const onRoomLeave = (roomId: string) => {
+    console.log("room leave");
     socket.leave(roomId);
   }
 
