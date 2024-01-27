@@ -1,5 +1,5 @@
 import { User } from "shared/types/express";
-import { IRoomConfig, IRoomData, IoType, SocketType } from "./types";
+import { IRoomConfig, IRoomData, IoType, SocketType, SocketUser } from "./types";
 import { generateRandomString } from "../utils/functions";
 
 export const roomsDataMap: Map<string, IRoomData> = new Map();
@@ -11,6 +11,12 @@ const generateRoomId = (io: IoType, game: string): string => {
   if (sameRoomIdExists) return generateRandomString();
   return roomId;
 };
+
+const addUserToRoom = (roomData: IRoomData, user: SocketUser) => {
+  const index = roomData.users.findIndex(({ email }) => email === user.email);
+  if (index < 0) roomData.users.push(user);
+  else roomData.users[index] = { ...roomData.users[index], socket_id: user.socket_id }
+}
 
 const RoomHandler = (io: IoType, socket: SocketType) => {
   const onRoomCreate = (game: string, user: User) => {
@@ -32,10 +38,8 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     const roomData = roomsDataMap.get(roomId);
     if (!roomData) return socket.emit("room:not-found", roomId);
 
-    // Update socket id if user already exist
-    roomData.users = [...roomData.users, { ...user, socket_id: socket.id }]
+    addUserToRoom(roomData, { ...user, socket_id: socket.id })
     socket.join(roomId);
-
     io.in(roomId).emit("room:joined", roomId, roomData)
   }
 
@@ -64,9 +68,11 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     console.log("room leave");
     socket.leave(roomId);
     const roomData = roomsDataMap.get(roomId);
+    if (!roomData) return socket.emit("room:not-found", roomId);
     // filters users to remove it
-    io.in(roomId).emit("room:leaved", roomId, roomData)
-    socket.emit("room:leaved", "", {})
+    roomData.users = roomData.users.filter(({ socket_id }) => socket_id !== socket.id)
+    io.in(roomId).emit("room:update", roomData)
+    socket.emit("room:left")
   }
 
   socket.on("room:create", onRoomCreate);
