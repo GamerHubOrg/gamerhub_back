@@ -18,6 +18,16 @@ const addUserToRoom = (roomData: IRoomData, user: SocketUser) => {
   else roomData.users[index] = { ...roomData.users[index], socket_id: user.socket_id }
 }
 
+const removeUserFromRoom = (roomData: IRoomData, socket_id: string) => {
+  const newUsers = [...roomData.users];
+  const index = newUsers.findIndex((e) => e.socket_id === socket_id)
+  const leavingUser = newUsers.splice(index, 1)[0]
+  console.log("leaving user", leavingUser);
+  
+  if (leavingUser.isOwner) newUsers.splice(0, 1, { ...newUsers[0], isOwner: true });
+  roomData.users = newUsers;
+}
+
 const RoomHandler = (io: IoType, socket: SocketType) => {
   const onRoomCreate = (game: string, user: User) => {
     console.log("room create : ", game);
@@ -51,7 +61,6 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
   };
 
   const onRoomDelete = (roomId: string) => {
-    console.log("room delete");
     const roomData = roomsDataMap.get(roomId);
     if (!roomData) return socket.emit("room:not-found", roomId);
 
@@ -65,17 +74,16 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
   }
 
   const onRoomLeave = (roomId: string) => {
-    console.log("room leave");
+    console.log("room leave", roomId);
+    
     socket.leave(roomId);
+
     const roomData = roomsDataMap.get(roomId);
     if (!roomData) return socket.emit("room:not-found", roomId);
 
-    const index = roomData.users.findIndex(({ socket_id }) => socket_id !== socket.id)
-    const leavingUser = roomData.users.splice(index, 1)[0]
-    if (leavingUser.isOwner) roomData.users.splice(0, 1, { ...roomData.users[0], isOwner: true });
+    removeUserFromRoom(roomData, socket.id)
 
-    io.in(roomId).emit("room:update", roomData)
-    socket.emit("room:left")
+    io.to(roomId).emit("room:update", roomData)
   }
 
   socket.on("room:create", onRoomCreate);
