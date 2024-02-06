@@ -20,9 +20,18 @@ export interface SocketUser extends User {
     isOwner?: boolean;
 }
 
+export type GameState = "started" | "lobby";
+
+export interface IRoomLog {
+    date: Date;
+    message: string;
+}
+
 export interface IRoomData {
     users: SocketUser[];
+    gameState: GameState;
     config?: IRoomConfig;
+    logs: IRoomLog[]
 }
 
 export interface IRoomConfig {
