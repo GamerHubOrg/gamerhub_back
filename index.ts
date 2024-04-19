@@ -1,4 +1,4 @@
-import express, { Application } from 'express';
+import express, { Application, Request, Response, NextFunction } from 'express';
 import dotenv from 'dotenv';
 import http from 'http';
 import cors from 'cors';
@@ -16,13 +16,20 @@ register.setDefaultLabels({
 });
 promClient.collectDefaultMetrics({ register });
 
-new promClient.Histogram({
+const httpRequestDurationMicroseconds = new promClient.Histogram({
   name: 'http_request_duration_seconds',
   help: 'Duration of HTTP requests in microseconds',
   labelNames: ['method', 'route', 'code'],
-  buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 7, 10],
-  registers: [register]
+  buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 7, 10]
 });
+
+register.registerMetric(httpRequestDurationMicroseconds);
+
+async function initCustomMetrics(req: Request, res: Response, next: NextFunction) {
+  const end = httpRequestDurationMicroseconds.startTimer();
+  await next();
+  end({ route: req.path, code: res.statusCode, method: req.method });
+}
 
 const app: Application = express();
 
@@ -43,7 +50,7 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome on GamerHub API' });
 });
 
-app.use('/api', router);
+app.use('/api', initCustomMetrics, router);
 
 const server = http.createServer(app);
 
