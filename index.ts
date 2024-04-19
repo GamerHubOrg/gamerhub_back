@@ -34,6 +34,11 @@ app.use(cors({
   credentials: true
 }));
 
+app.use((req, res) => {
+  const end = httpRequestDurationMicroseconds.startTimer();
+  end({ route: req.path, code: res.statusCode, method: req.method });
+});
+
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome on GamerHub API' });
 });
