@@ -2,6 +2,7 @@ import express, { Application } from 'express';
 import dotenv from 'dotenv';
 import http from 'http';
 import cors from 'cors';
+import promClient from 'prom-client';
 
 import database from './services/database';
 import router from './router';
@@ -10,6 +11,7 @@ import config from './config';
 dotenv.config();
 
 const app: Application = express();
+
 app.use(express.json());
 app.use(cors({
   origin: [config.origin],
@@ -24,6 +26,22 @@ app.get('/', (req, res) => {
 app.use('/api', router);
 
 const server = http.createServer(app);
+
+const register = new promClient.Registry();
+promClient.collectDefaultMetrics({ 
+  register, 
+  labels: { app: 'gamerhub_api' },
+  prefix: 'gamerhub_api_' 
+});
+
+const httpRequestDurationMicroseconds = new promClient.Histogram({
+  name: 'http_request_duration_seconds',
+  help: 'Duration of HTTP requests in microseconds',
+  labelNames: ['method', 'route', 'code'],
+  buckets: [0.1, 0.3, 0.5, 0.7, 1, 3, 5, 7, 10]
+});
+
+register.registerMetric(httpRequestDurationMicroseconds);
 
 database.connect();
 
