@@ -34,9 +34,10 @@ app.use(cors({
   credentials: true
 }));
 
-app.get('/metrics', (req, res) => {
+app.get('/metrics', async (req, res) => {
   res.setHeader('Content-Type', register.contentType);
-  res.end(register.metrics());
+  const metrics = await register.metrics();
+  res.end(metrics);
 });
 
 app.get('/', (req, res) => {
