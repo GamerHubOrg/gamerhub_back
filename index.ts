@@ -34,11 +34,6 @@ app.use(cors({
   credentials: true
 }));
 
-app.use((req, res) => {
-  const end = httpRequestDurationMicroseconds.startTimer();
-  end({ route: req.path, code: res.statusCode, method: req.method });
-});
-
 app.get('/metrics', (req, res) => {
   res.setHeader('Content-Type', register.contentType);
   res.end(register.metrics());
