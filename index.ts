@@ -34,10 +34,18 @@ app.use(cors({
   credentials: true
 }));
 
-app.get('/metrics', async (req, res) => {
-  res.setHeader('Content-Type', register.contentType);
-  const metrics = await register.metrics();
-  res.end(metrics);
+app.use(async (req, res) => {
+  const end = httpRequestDurationMicroseconds.startTimer();
+
+  const route = req.path;
+  
+  if (route === '/metrics') {
+    res.setHeader('Content-Type', register.contentType);
+    const metrics = await register.metrics();
+    res.end(metrics);
+  }
+  
+  end({ route, code: res.statusCode, method: req.method });
 });
 
 app.get('/', (req, res) => {
@@ -46,10 +54,7 @@ app.get('/', (req, res) => {
 
 app.use('/api', router);
 
-const server = http.createServer((req, res) => {
-  const end = httpRequestDurationMicroseconds.startTimer();
-  end({ route: new URL(req.url || '').pathname, code: res.statusCode, method: req.method });
-});
+const server = http.createServer(app);
 
 database.connect();
 
