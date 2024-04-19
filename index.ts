@@ -39,6 +39,11 @@ app.use((req, res) => {
   end({ route: req.path, code: res.statusCode, method: req.method });
 });
 
+app.get('/metrics', (req, res) => {
+  res.setHeader('Content-Type', register.contentType);
+  res.end(register.metrics());
+});
+
 app.get('/', (req, res) => {
   res.json({ message: 'Welcome on GamerHub API' });
 });
