@@ -7,7 +7,7 @@ export const logResponseTime = (req: Request, res: Response, time: number) => {
   const url = req.url;
   const status = res.statusCode;
 
-  logger.info({ message: `method=${method} url=${url} status=${status} duration=${time}ms`, labels: { 'origin': 'api', method, status, responseTime: time } });
+  logger.info({ message: `method=${method} url=${url} status=${status} duration=${time}ms`, labels: { url, 'origin': 'api', method, status, responseTime: time } });
 };
 
 export const logError = (err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -16,6 +16,6 @@ export const logError = (err: Error, req: Request, res: Response, next: NextFunc
   const status = res.statusCode;
 
   const logger = getLogger();
-  logger.error({ message: `method=${method} url=${url} status=${status} error=${err.stack}`, labels: { 'origin': 'api', method, status } });
+  logger.error({ message: `method=${method} url=${url} status=${status} error=${err.stack}`, labels: { url, 'origin': 'api', method, status } });
   next();
 };
