@@ -1,0 +1,148 @@
+import { User } from "shared/types/express";
+import {
+  IRoomConfig,
+  IRoomData,
+  IoType,
+  SocketType,
+  SocketUser,
+} from "./types";
+import { generateRandomString } from "../utils/functions";
+import RoomLogger from "./logs-handler";
+
+export const roomsDataMap: Map<string, IRoomData> = new Map();
+
+// Room data functions
+const generateRoomId = (io: IoType, game: string): string => {
+  const randomString = generateRandomString(8);
+  const roomId = `room-${game}-${randomString}`;
+  const sameRoomIdExists = io.sockets.adapter.rooms.has(roomId);
+  if (sameRoomIdExists) return generateRandomString();
+  return roomId;
+};
+
+const addUserToRoom = (roomData: IRoomData, user: SocketUser) => {
+  const index = roomData.users.findIndex(({ email }) => email === user.email);
+  if (index < 0) roomData.users.push(user);
+  else
+    roomData.users[index] = {
+      ...roomData.users[index],
+      socket_id: user.socket_id,
+    };
+};
+
+const deleteRoom = (roomId: string) => {
+  roomsDataMap.delete(roomId);
+};
+
+const removeUserFromRoom = (
+  roomId: string,
+  roomData: IRoomData,
+  socket_id: string
+): SocketUser | undefined => {
+  const newUsers = [...roomData.users];
+
+  const index = newUsers.findIndex((e) => e.socket_id === socket_id);
+  if (index < 0) return;
+  const leavingUser = newUsers.splice(index, 1)[0];
+
+  if (newUsers.length === 0) {
+    deleteRoom(roomId);
+    return leavingUser;
+  }
+
+  if (leavingUser.isOwner)
+    newUsers.splice(0, 1, { ...newUsers[0], isOwner: true });
+
+  roomData.users = newUsers;
+
+  return leavingUser;
+};
+
+// Socket handlers
+const RoomHandler = (io: IoType, socket: SocketType) => {
+  const roomLogger = new RoomLogger();
+
+  const onRoomCreate = (game: string, user: User) => {
+    if (!user) return socket.emit("user:not-auth");
+
+    const roomId = generateRoomId(io, game);
+    const socketUser = { ...user, socket_id: socket.id, isOwner: true };
+    const data: IRoomData = {
+      users: [socketUser],
+      logs: roomLogger.onRoomCreate(roomId, socketUser),
+      gameState: "lobby",
+    };
+    roomsDataMap.set(roomId, data);
+
+    socket.join(roomId);
+    socket.emit("room:created", roomId, data);
+  };
+
+  const onRoomJoin = (roomId: string, user: User) => {
+    if (!user) return socket.emit("user:not-auth");
+    const roomData = roomsDataMap.get(roomId);
+    if (!roomData) return socket.emit("room:not-found", roomId);
+
+    const socketUser = { ...user, socket_id: socket.id };
+    addUserToRoom(roomData, socketUser);
+    roomLogger.onRoomJoin(roomData, socketUser);
+
+    socket.join(roomId);
+    io.in(roomId).emit("room:joined", roomId, roomData);
+  };
+
+  const onRoomStart = (roomId: string, config: IRoomConfig) => {
+    console.log("room start");
+    console.log(
+      `La partie ${roomId} a été lancée avec les configs suivantes : `
+    );
+    console.log(config);
+    io.in(roomId).emit("room:started", config);
+  };
+
+  const onRoomDelete = (roomId: string) => {
+    const roomData = roomsDataMap.get(roomId);
+    if (!roomData) return socket.emit("room:not-found", roomId);
+
+    const { users } = roomData;
+    for (const { socket_id } of users) {
+      io.to(socket_id).emit("room:deleted", roomId);
+    }
+
+    deleteRoom(roomId);
+    io.sockets.adapter.rooms.delete(roomId);
+  };
+
+  const onRoomLeave = (roomId: string) => {
+    socket.leave(roomId);
+
+    const roomData = roomsDataMap.get(roomId);
+    if (!roomData) return socket.emit("room:not-found", roomId);
+
+    const leavingUser = removeUserFromRoom(roomId, roomData, socket.id);
+    if (leavingUser) roomLogger.onRoomLeave(roomData, leavingUser);
+
+    io.to(roomId).emit("room:updated", roomData);
+  };
+
+  const onRoomUpdate = (roomId: string, config: IRoomConfig) => {
+    console.log("room update", config);
+    
+    const roomData = roomsDataMap.get(roomId);
+    if (!roomData) return socket.emit("room:not-found", roomId);
+
+    roomData.config = config;
+    roomLogger.onRoomUpdate(roomData);
+
+    io.in(roomId).emit("room:updated", roomData);
+  };
+
+  socket.on("room:create", onRoomCreate);
+  socket.on("room:join", onRoomJoin);
+  socket.on("room:start", onRoomStart);
+  socket.on("room:delete", onRoomDelete);
+  socket.on("room:leave", onRoomLeave);
+  socket.on("room:update", onRoomUpdate);
+};
+
+export default RoomHandler;
