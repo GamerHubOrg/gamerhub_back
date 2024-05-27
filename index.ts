@@ -11,7 +11,7 @@ import router from "./router";
 import config from "./config";
 import { Server } from "socket.io";
 import SocketConnectionHandler from "./socket";
-import { verifyAuth } from 'middlewares/authenticated';
+import { verifyAuth } from './middlewares/authenticated';
 
 const logger = getLogger();
 

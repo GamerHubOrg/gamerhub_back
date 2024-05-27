@@ -1,4 +1,4 @@
-import { User } from "shared/types/express";
+import { User } from "../../shared/types/express";
 import { roomsDataMap } from "../room-handler";
 import { ITestGameData, IoType, SocketType } from "../types";
 
@@ -18,7 +18,7 @@ const TestHandler = (io: IoType, socket: SocketType) => {
     io.in(roomId).emit("game:test:data", { data: gameData });
   };
 
-  const onSaveAnswer = (roomId: string, user: User) => {
+  const onSaveAnswer = (roomId: string) => {
     const roomData = roomsDataMap.get(roomId);
     if (!roomData) return socket.emit("room:not-found", roomId);
   };

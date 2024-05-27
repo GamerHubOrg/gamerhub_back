@@ -1,4 +1,4 @@
-import { User } from "shared/types/express";
+import { User } from "../shared/types/express";
 import {
   IRoomConfig,
   IRoomData,
@@ -22,7 +22,7 @@ const generateRoomId = (io: IoType, game: string): string => {
 };
 
 const addUserToRoom = (roomData: IRoomData, user: SocketUser) => {
-  const index = roomData.users.findIndex(({ email }) => email === user.email);
+  const index = roomData.users.findIndex(({ email }: any) => email === user.email);
   if (index < 0) roomData.users.push(user);
   else
     roomData.users[index] = {

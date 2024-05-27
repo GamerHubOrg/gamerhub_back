@@ -16,8 +16,10 @@ export type SocketType = Socket<
 >;
 
 export interface SocketUser extends User {
+  username: string;
   socket_id: string;
   isOwner?: boolean;
+  email?: string;
 }
 
 export type GameState = "lobby" | "started" | "results";

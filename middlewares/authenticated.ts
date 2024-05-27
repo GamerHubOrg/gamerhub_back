@@ -1,7 +1,7 @@
 import { Response, NextFunction, RequestHandler } from "express";
 import jwt from "jsonwebtoken";
 import { KeycloakToken } from "../shared/types/keycloak";
-import { CustomRequest, User } from "shared/types/express";
+import { CustomRequest, User } from "../shared/types/express";
 import { verifyKeycloakSession } from "../services/keycloak";
 
 
