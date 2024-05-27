@@ -1,4 +1,4 @@
-import { User } from "shared/types/express";
+import { User } from "../shared/types/express";
 import { Server, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 
@@ -19,7 +19,6 @@ export interface SocketUser extends User {
   username: string;
   socket_id: string;
   isOwner?: boolean;
-  email?: string;
 }
 
 export type GameState = "lobby" | "started" | "results";
