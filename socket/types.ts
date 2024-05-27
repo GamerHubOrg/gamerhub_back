@@ -3,37 +3,53 @@ import { Server, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 
 export type IoType = Server<
-    DefaultEventsMap,
-    DefaultEventsMap,
-    DefaultEventsMap,
-    any
+  DefaultEventsMap,
+  DefaultEventsMap,
+  DefaultEventsMap,
+  any
 >;
 export type SocketType = Socket<
-    DefaultEventsMap,
-    DefaultEventsMap,
-    DefaultEventsMap,
-    any
+  DefaultEventsMap,
+  DefaultEventsMap,
+  DefaultEventsMap,
+  any
 >;
 
 export interface SocketUser extends User {
-    socket_id: string;
-    isOwner?: boolean;
+  username: string;
+  socket_id: string;
+  isOwner?: boolean;
+  email?: string;
 }
 
-export type GameState = "started" | "lobby";
+export type GameState = "lobby" | "started" | "results";
 
 export interface IRoomLog {
-    date: Date;
-    message: string;
+  date: Date;
+  message: string;
 }
 
 export interface IRoomData {
-    users: SocketUser[];
-    gameState: GameState;
-    config?: IRoomConfig;
-    logs: IRoomLog[]
+  users: SocketUser[];
+  config?: IRoomConfig;
+  logs: IRoomLog[];
+  gameState: GameState;
+  gameData?: IGameData;
 }
 
 export interface IRoomConfig {
-    maxPlayers: number;
+  maxPlayers: number;
+}
+
+export interface IGameData {}
+
+export interface IPlayerData {
+  playerId: number;
+  answer: any;
+  points: number;
+}
+
+export interface ITestGameData extends IGameData {
+  rounds?: number[];
+  playersData?: IPlayerData[];
 }

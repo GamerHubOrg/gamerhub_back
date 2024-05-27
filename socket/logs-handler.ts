@@ -41,4 +41,14 @@ export default class RoomLogger {
       },
     ];
   }
+
+  public onRoomStart(roomData: IRoomData) {
+    roomData.logs = [
+      ...roomData.logs,
+      {
+        date: new Date(),
+        message: `The game has been started.`,
+      },
+    ];
+  }
 }
