@@ -1,5 +1,4 @@
 import express, { Application } from 'express';
-import dotenv from 'dotenv';
 import http from 'http';
 import cors from 'cors';
 import promClient from 'prom-client';
@@ -10,8 +9,6 @@ import router from './router';
 import config from './config';
 import { getLogger } from './shared/tools/logger';
 import { logError, logResponseTime } from './middlewares/logs';
-
-dotenv.config();
 
 const logger = getLogger();
 
