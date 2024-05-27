@@ -1,5 +1,5 @@
 import { roomsDataMap } from "../../room-handler";
-import { IoType, SocketType } from "../../types";
+import { IoType, SocketType, SocketUser } from "../../types";
 import { IUndercoverGameData, IUndercoverSendWord } from "./types";
 
 // Socket handlers
@@ -23,7 +23,8 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
 
     const gameData: IUndercoverGameData = roomData.gameData || {};
     const words = (gameData as IUndercoverGameData).words || [];
-    const randomPlayer = roomData.users[0].id;
+    const currentPlayerIndex = roomData.users.findIndex((u: SocketUser) => u.id === userId);
+    const randomPlayer = roomData.users[currentPlayerIndex] ? roomData.users[currentPlayerIndex].id : roomData.users[0].id;
 
     words.push({
         playerId: userId,
