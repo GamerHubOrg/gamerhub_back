@@ -15,7 +15,8 @@ export const roomsDataMap: Map<string, IRoomData> = new Map();
 const generateRoomId = (io: IoType, game: string): string => {
   const randomString = generateRandomString(8);
   const roomId = `room-${game}-${randomString}`;
-  const sameRoomIdExists = io.sockets.adapter.rooms.has(roomId);
+  const sameRoomIdExists =
+    io.sockets.adapter.rooms.has(roomId) || roomsDataMap.has(roomId);
   if (sameRoomIdExists) return generateRandomString();
   return roomId;
 };
@@ -72,6 +73,7 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
       logs: roomLogger.onRoomCreate(roomId, socketUser),
       gameState: "lobby",
     };
+
     roomsDataMap.set(roomId, data);
 
     socket.join(roomId);
@@ -91,13 +93,13 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     io.in(roomId).emit("room:joined", roomId, roomData);
   };
 
-  const onRoomStart = (roomId: string, config: IRoomConfig) => {
-    console.log("room start");
-    console.log(
-      `La partie ${roomId} a été lancée avec les configs suivantes : `
-    );
-    console.log(config);
-    io.in(roomId).emit("room:started", config);
+  const onRoomStart = (roomId: string) => {
+    const roomData = roomsDataMap.get(roomId);
+    if (!roomData) return socket.emit("room:not-found", roomId);
+    roomLogger.onRoomStart(roomData);
+    roomData.gameState = "started";
+    roomData.gameData = {};
+    io.in(roomId).emit("room:started", roomData);
   };
 
   const onRoomDelete = (roomId: string) => {
@@ -126,8 +128,6 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
   };
 
   const onRoomUpdate = (roomId: string, config: IRoomConfig) => {
-    console.log("room update", config);
-    
     const roomData = roomsDataMap.get(roomId);
     if (!roomData) return socket.emit("room:not-found", roomId);
 
