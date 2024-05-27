@@ -1,4 +1,3 @@
-import { User } from "../../shared/types/express";
 import { roomsDataMap } from "../room-handler";
 import { ITestGameData, IoType, SocketType } from "../types";
 

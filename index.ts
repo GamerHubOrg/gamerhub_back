@@ -58,9 +58,7 @@ const io = new Server(server, {
   },
 });
 
-io.use((socket, next) => {
-  console.log(socket.request.headers);
-  
+io.use((socket, next) => {  
   const token = socket.request.headers["Authorization"];
   verifyAuth(token as string)
     .then((user) => console.log(user))
