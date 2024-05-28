@@ -14,7 +14,7 @@ export const roomsDataMap: Map<string, IRoomData> = new Map();
 // Room data functions
 const generateRoomId = (io: IoType, game: string): string => {
   const randomString = generateRandomString(8);
-  const roomId = `room-${game}-${randomString}`;
+  const roomId = `${game}-${randomString}`;
   const sameRoomIdExists =
     io.sockets.adapter.rooms.has(roomId) || roomsDataMap.has(roomId);
   if (sameRoomIdExists) return generateRandomString();
