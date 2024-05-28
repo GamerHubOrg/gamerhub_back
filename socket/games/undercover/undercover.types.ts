@@ -23,6 +23,7 @@ export interface IUndercoverGameData extends IGameData {
     spyWord?: string;
     undercoverPlayerIds?: string[];
     campWin?: IUndercoverCamp;
+    turn: number;
 }
 
 export interface IUndercoverSendWord {
@@ -51,4 +52,4 @@ export interface IUndercoverConfig extends IRoomConfig {
     wordsPerTurn: number;
 }
 
-export const defaultUndercoverGameData: IUndercoverGameData = { state: 'words', votes: [] };
+export const defaultUndercoverGameData: IUndercoverGameData = { state: 'words', votes: [], turn: 1 };

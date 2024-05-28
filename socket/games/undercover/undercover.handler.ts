@@ -33,6 +33,7 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
 
     const gameData = roomData.gameData || defaultUndercoverGameData;
     const gameConfig = roomData.config || { wordsPerTurn: 3 };
+    const gameTurn = gameData.turn || 1;
     const words = gameData.words || [];
     const usersThatCanPlay = roomData.users.filter((u) => !u.isEliminated);
 
@@ -42,7 +43,8 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     })
 
     const validWords = words.filter((w) => usersThatCanPlay.some((u) => u.id === w.playerId))
-    if (validWords.length % usersThatCanPlay.length === usersThatCanPlay.length % gameConfig.wordsPerTurn) {
+    console.log(gameConfig.wordsPerTurn * usersThatCanPlay.length, validWords.length / gameTurn)
+    if (gameConfig.wordsPerTurn * usersThatCanPlay.length === validWords.length / gameTurn) {
       gameData.state = 'vote';
       io.in(roomId).emit("game:undercover:data", { data: gameData });
       return
@@ -63,6 +65,7 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     const gameData = roomData.gameData || defaultUndercoverGameData;
     const votes = gameData.votes || [];
     const users = roomData.users || [];
+    const gameTurn = gameData.turn || 1;
     const usersThatCanPlay = roomData.users.filter((u) => !u.isEliminated);
 
     votes.push({ playerId: userId, vote })
@@ -118,6 +121,7 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
 
     gameData.playerTurn = randomPlayer;
     gameData.state = 'words';
+    gameData.turn = gameTurn + 1;
     gameData.votes = [];
     io.in(roomId).emit("game:undercover:data", { data: gameData });
     io.in(roomId).emit("room:updated", roomData);
