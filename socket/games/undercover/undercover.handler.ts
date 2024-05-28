@@ -1,7 +1,8 @@
+import { getRandomIndex } from "../../../utils/functions";
 import { roomsDataMap } from "../../room-handler";
 import { IoType, SocketType, SocketUser } from "../../types";
-import { IUndercoverRoomData, IUndercoverSendVote, IUndercoverSendWord, IUndercoverVote, defaultUndercoverGameData } from "./types";
-import WordsDatabase from './words.json';
+import { getGameWords } from "./undercover.functions";
+import { IUndercoverRoomData, IUndercoverSendVote, IUndercoverSendWord, IUndercoverVote, defaultUndercoverGameData } from "./undercover.types";
 
 // Socket handlers
 const UndercoverHandler = (io: IoType, socket: SocketType) => {
@@ -11,20 +12,17 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
 
     const gameData = roomData.gameData || defaultUndercoverGameData;
     const words = gameData.words || [];
-    const randomPlayer = roomData.users[0].id;
+    const randomPlayerTurn = getRandomIndex(roomData.users);
+    const playerTurn = roomData.users[randomPlayerTurn].id;
 
-    const randomCategory = Math.floor(Math.random() * WordsDatabase.length);
-    const wordCategory = WordsDatabase[randomCategory];
-    const randomPair = Math.floor(Math.random() * wordCategory.length);
-    const wordsPair = wordCategory[randomPair];
-    const randomSpyWord = Math.floor(Math.random() * 2);
-
-    const randomUser = Math.floor(Math.random() * roomData.users.length);
+    const wordsPair = getGameWords();
+    const randomSpyWord = getRandomIndex(Array(2));
+    const randomUser = getRandomIndex(roomData.users);
 
     gameData.undercoverPlayerIds = [roomData.users[randomUser].id];
     gameData.civilianWord = wordsPair[1 - randomSpyWord];
     gameData.spyWord = wordsPair[randomSpyWord];
-    gameData.playerTurn = randomPlayer;
+    gameData.playerTurn = playerTurn;
     gameData.words = words;
     io.in(roomId).emit("game:undercover:data", { data: gameData });
   };
@@ -43,14 +41,12 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
         word
     })
 
-
     const validWords = words.filter((w) => usersThatCanPlay.some((u) => u.id === w.playerId))
     if (validWords.length % usersThatCanPlay.length === usersThatCanPlay.length % gameConfig.wordsPerTurn) {
       gameData.state = 'vote';
       io.in(roomId).emit("game:undercover:data", { data: gameData });
       return
     }
-
 
     const currentPlayerIndex = usersThatCanPlay.findIndex((u: SocketUser) => u.id === userId);
     const randomPlayer = usersThatCanPlay[currentPlayerIndex + 1] ? usersThatCanPlay[currentPlayerIndex + 1].id : usersThatCanPlay[0].id;

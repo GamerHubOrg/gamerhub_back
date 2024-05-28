@@ -10,3 +10,7 @@ export const generateRandomString = (numberOfDigit = 6) : string => {
 
     return randomString;
 }
+
+export const getRandomIndex = (list: Array<any>): number => {
+  return Math.floor(Math.random() * list.length);
+}
