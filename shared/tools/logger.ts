@@ -4,7 +4,7 @@ import LokiTransport from "winston-loki";
 let logger: Logger;
 
 const initializeLogger = () => {
-  if (logger  || process.env.ENVIRONNEMENT !== "prod") {
+  if (logger  || process.env.ENVIRONNEMENT !== "production") {
     return;
   }
 

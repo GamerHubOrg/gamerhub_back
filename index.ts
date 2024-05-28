@@ -35,7 +35,9 @@ app.use((req, res, next) =>{
   next()
 })
 
-app.use(responseTime(logResponseTime));
+if (logger) {
+  app.use(responseTime(logResponseTime));
+}
 
 app.get("/metrics", async (req, res) => {
   res.setHeader("Content-Type", register.contentType);
@@ -49,7 +51,9 @@ app.get("/", (req, res) => {
 
 app.use("/api", router);
 
-app.use(logError);
+if (logger) {
+  app.use(logError);
+}
 
 const server = http.createServer(app);
 
@@ -71,5 +75,4 @@ io.use((socket, next) => {
 io.on("connection", (socket) => SocketConnectionHandler(io, socket));
 
 const PORT = process.env.PORT || 3000;
-const log = logger ?? console;
-server.listen(PORT, () => log.info(`[server] Running on port ${PORT}`));
+server.listen(PORT, () => logger ? logger.info(`[server] Running on port ${PORT}`) : console.log(`[server] Running on port ${PORT}`));
