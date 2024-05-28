@@ -4,7 +4,6 @@ import { KeycloakToken } from "../shared/types/keycloak";
 import { CustomRequest, User } from "../shared/types/express";
 import { verifyKeycloakSession } from "../services/keycloak";
 
-
 // const handler: RequestHandler = async (
 //   req: CustomRequest,
 //   res: Response,
