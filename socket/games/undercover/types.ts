@@ -1,13 +1,28 @@
-import { IGameData, IRoomConfig } from "../../types";
+import { IGameData, IRoomConfig, IRoomData, SocketUser } from "../../types";
 
 export type IUndercoverGameState = 'vote' | 'words';
+
+export type IUndercoverCamp = 'undercover' | 'civilian'; 
+
+export interface IUndercoverPlayer extends SocketUser {
+    isEliminated?: boolean
+}
+
+export interface IUndercoverRoomData extends IRoomData {
+    users: IUndercoverPlayer[];
+    config?: IUndercoverConfig;
+    gameData?: IUndercoverGameData;
+}
 
 export interface IUndercoverGameData extends IGameData {
     words?: IUndercoverWords[];
     votes: IUndercoverVote[],
     playerTurn?: string;
     state: IUndercoverGameState;
-    turn: number;
+    civilianWord?: string;
+    spyWord?: string;
+    undercoverPlayerIds?: string[];
+    campWin?: IUndercoverCamp;
 }
 
 export interface IUndercoverSendWord {
@@ -30,11 +45,10 @@ export interface IUndercoverSendVote {
 export interface IUndercoverVote {
     playerId: string;
     vote: string;
-    turn: number;
 }
 
 export interface IUndercoverConfig extends IRoomConfig {
     wordsPerTurn: number;
 }
 
-export const defaultUndercoverGameData: IUndercoverGameData = { state: 'words', turn: 1, votes: [] };
+export const defaultUndercoverGameData: IUndercoverGameData = { state: 'words', votes: [] };
