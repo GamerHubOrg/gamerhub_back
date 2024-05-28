@@ -34,7 +34,7 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     if (!roomData) return socket.emit("room:not-found", roomId);
 
     const gameData = roomData.gameData || defaultUndercoverGameData;
-    const gameConfig = roomData.config || { wordsPerTurn: 1 };
+    const gameConfig = roomData.config || { wordsPerTurn: 3 };
     const words = gameData.words || [];
     const usersThatCanPlay = roomData.users.filter((u) => !u.isEliminated);
 
