@@ -14,7 +14,7 @@ export const roomsDataMap: Map<string, IRoomData> = new Map();
 // Room data functions
 const generateRoomId = (io: IoType, game: string): string => {
   const randomString = generateRandomString(8);
-  const roomId = `room-${game}-${randomString}`;
+  const roomId = `${game}-${randomString}`;
   const sameRoomIdExists =
     io.sockets.adapter.rooms.has(roomId) || roomsDataMap.has(roomId);
   if (sameRoomIdExists) return generateRandomString();
@@ -22,7 +22,9 @@ const generateRoomId = (io: IoType, game: string): string => {
 };
 
 const addUserToRoom = (roomData: IRoomData, user: SocketUser) => {
-  const index = roomData.users.findIndex(({ email }: any) => email === user.email);
+  const index = roomData.users.findIndex(
+    ({ email }: any) => email === user.email
+  );
   if (index < 0) roomData.users.push(user);
   else
     roomData.users[index] = {
@@ -72,6 +74,7 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
       users: [socketUser],
       logs: roomLogger.onRoomCreate(roomId, socketUser),
       gameState: "lobby",
+      gameName: game,
     };
 
     roomsDataMap.set(roomId, data);
@@ -137,12 +140,23 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     io.in(roomId).emit("room:updated", roomData);
   };
 
+  const onRoomChangeGame = (roomId: string, game: string) => {
+    const roomData = roomsDataMap.get(roomId);
+    if (!roomData) return socket.emit("room:not-found", roomId);
+
+    roomData.gameName = game;
+    roomLogger.onGameChange(roomData);
+
+    io.in(roomId).emit("room:updated", roomData);
+  };
+
   socket.on("room:create", onRoomCreate);
   socket.on("room:join", onRoomJoin);
   socket.on("room:start", onRoomStart);
   socket.on("room:delete", onRoomDelete);
   socket.on("room:leave", onRoomLeave);
   socket.on("room:update", onRoomUpdate);
+  socket.on("room:change-game", onRoomChangeGame);
 };
 
 export default RoomHandler;

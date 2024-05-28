@@ -51,4 +51,14 @@ export default class RoomLogger {
       },
     ];
   }
+
+  public onGameChange(roomData: IRoomData) {
+    roomData.logs = [
+      ...roomData.logs,
+      {
+        date: new Date(),
+        message: `The game has changed to ${roomData.gameName}.`,
+      },
+    ];
+  }
 }
