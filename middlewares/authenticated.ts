@@ -50,6 +50,7 @@ export const verifyAuth = (token?: string) => {
         const decoded = jwt.decode(token) as KeycloakToken;
 
         const user = {
+          id: decoded.sub,
           email: decoded.email,
           firstname: decoded.given_name,
           lastname: decoded.family_name,
@@ -85,6 +86,7 @@ const handler: RequestHandler = async (
   const decoded = jwt.decode(token) as KeycloakToken;
 
   req.user = {
+    id: decoded.sub,
     email: decoded.email,
     firstname: decoded.given_name,
     lastname: decoded.family_name,

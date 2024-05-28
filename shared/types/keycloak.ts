@@ -1,4 +1,5 @@
 export type KeycloakToken = {
+  sub: string,
   exp: number,
   email: string,
   preferred_username: string,
