@@ -21,13 +21,14 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
 
     const randomSpies = getRandomElement(roomData.users, config.spyCount);
 
-    gameData.undercoverPlayerIds = config.spyCount > roomData.users.length 
-      ? [randomSpies]
+    gameData.undercoverPlayerIds = config.spyCount === 1 || config.spyCount > roomData.users.length 
+      ? [randomSpies.id]
       : randomSpies.map((u: IUndercoverPlayer) => u.id)
     gameData.civilianWord = randomOrderWords[0];
     gameData.spyWord = randomOrderWords[1];
     gameData.playerTurn = playerTurn;
     gameData.words = words;
+
     io.in(roomId).emit("game:undercover:data", { data: gameData });
   };
 
@@ -36,7 +37,7 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     if (!roomData) return socket.emit("room:not-found", roomId);
 
     const gameData = roomData.gameData || defaultUndercoverGameData;
-    const gameConfig = roomData.config || { wordsPerTurn: 3 };
+    const gameConfig = roomData.config || defaultUndercoverConfig;
     const gameTurn = gameData.turn || 1;
     const words = gameData.words || [];
     const usersThatCanPlay = roomData.users.filter((u) => !u.isEliminated);
@@ -47,7 +48,6 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     })
 
     const validWords = words.filter((w) => usersThatCanPlay.some((u) => u.id === w.playerId))
-    console.log(gameConfig.wordsPerTurn * usersThatCanPlay.length, validWords.length / gameTurn)
     if (gameConfig.wordsPerTurn * usersThatCanPlay.length === validWords.length / gameTurn) {
       gameData.state = 'vote';
       io.in(roomId).emit("game:undercover:data", { data: gameData });
@@ -131,9 +131,16 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     io.in(roomId).emit("room:updated", roomData);
   };
 
+  const onGetData = (roomId: string) => {
+    const roomData = (roomsDataMap.get(roomId) as IUndercoverRoomData);
+    const gameData = roomData.gameData || defaultUndercoverGameData;
+    io.in(roomId).emit("game:undercover:data", { data: gameData });
+  }
+
   socket.on("game:undercover:initialize", onInitialize);
   socket.on("game:undercover:send-word", onSendWord);
   socket.on("game:undercover:vote", onVote);
+  socket.on("game:undercover:get-data", onGetData);
 };
 
 export default UndercoverHandler;
