@@ -1,8 +1,8 @@
-import { getRandomIndex } from "../../../utils/functions";
+import { getRandomElement } from "../../../utils/functions";
 import { roomsDataMap } from "../../room-handler";
 import { IoType, SocketType, SocketUser } from "../../types";
 import { getGameWords } from "./undercover.functions";
-import { IUndercoverRoomData, IUndercoverSendVote, IUndercoverSendWord, IUndercoverVote, defaultUndercoverGameData } from "./undercover.types";
+import { IUndercoverRoomData, IUndercoverSendVote, IUndercoverSendWord, IUndercoverVote, defaultUndercoverGameData, defaultUndercoverConfig, IUndercoverPlayer } from "./undercover.types";
 
 // Socket handlers
 const UndercoverHandler = (io: IoType, socket: SocketType) => {
@@ -11,17 +11,21 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     if (!roomData) return socket.emit("room:not-found", roomId);
 
     const gameData = roomData.gameData || defaultUndercoverGameData;
+    const config = roomData.config || defaultUndercoverConfig;
     const words = gameData.words || [];
-    const randomPlayerTurn = getRandomIndex(roomData.users);
-    const playerTurn = roomData.users[randomPlayerTurn].id;
+    const randomPlayerTurn = getRandomElement(roomData.users);
+    const playerTurn = randomPlayerTurn.id;
 
     const wordsPair = getGameWords();
-    const randomSpyWord = getRandomIndex(Array(2));
-    const randomUser = getRandomIndex(roomData.users);
+    const randomOrderWords = getRandomElement(wordsPair, wordsPair.length);
 
-    gameData.undercoverPlayerIds = [roomData.users[randomUser].id];
-    gameData.civilianWord = wordsPair[1 - randomSpyWord];
-    gameData.spyWord = wordsPair[randomSpyWord];
+    const randomSpies = getRandomElement(roomData.users, config.spyCount);
+
+    gameData.undercoverPlayerIds = config.spyCount > roomData.users.length 
+      ? [randomSpies]
+      : randomSpies.map((u: IUndercoverPlayer) => u.id)
+    gameData.civilianWord = randomOrderWords[0];
+    gameData.spyWord = randomOrderWords[1];
     gameData.playerTurn = playerTurn;
     gameData.words = words;
     io.in(roomId).emit("game:undercover:data", { data: gameData });

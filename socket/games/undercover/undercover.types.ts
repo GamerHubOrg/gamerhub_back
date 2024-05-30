@@ -48,8 +48,18 @@ export interface IUndercoverVote {
     vote: string;
 }
 
+export type UndercoverTheme = 'classic';
+
+export type UndercoverMode = 'words';
+
 export interface IUndercoverConfig extends IRoomConfig {
-    wordsPerTurn: number;
+  mode: UndercoverMode;
+  theme: UndercoverTheme;
+  spyCount: number;
+  wordsPerTurn: number;
+  anonymousMode: boolean;
 }
+
+export const defaultUndercoverConfig: IUndercoverConfig = { maxPlayers: 6, mode: 'words', theme: 'classic', spyCount: 1, wordsPerTurn: 3, anonymousMode: true }
 
 export const defaultUndercoverGameData: IUndercoverGameData = { state: 'words', votes: [], turn: 1 };

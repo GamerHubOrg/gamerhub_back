@@ -12,9 +12,8 @@ import RoomLogger from "./logs-handler";
 export const roomsDataMap: Map<string, IRoomData> = new Map();
 
 // Room data functions
-const generateRoomId = (io: IoType, game: string): string => {
-  const randomString = generateRandomString(8);
-  const roomId = `${game}-${randomString}`;
+const generateRoomId = (io: IoType): string => {
+  const roomId = generateRandomString(8);
   const sameRoomIdExists =
     io.sockets.adapter.rooms.has(roomId) || roomsDataMap.has(roomId);
   if (sameRoomIdExists) return generateRandomString();
@@ -68,7 +67,7 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
   const onRoomCreate = (game: string, user: User) => {
     if (!user) return socket.emit("user:not-auth");
 
-    const roomId = generateRoomId(io, game);
+    const roomId = generateRoomId(io);
     const socketUser = { ...user, socket_id: socket.id, isOwner: true };
     const data: IRoomData = {
       users: [socketUser],
