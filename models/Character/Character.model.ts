@@ -3,7 +3,7 @@ import LolSchema from "./Lol.model";
 
 const options = { discriminatorKey: "dataType", _id: false };
 
-const WordSchema = new Schema(
+const CharacterSchema = new Schema(
   {
     name: { type: String, required: true },
     lang: {
@@ -22,8 +22,8 @@ const WordSchema = new Schema(
   { timestamps: true }
 );
 
-const WordModel = mongoose.model("Word", WordSchema);
+const CharacterModel = mongoose.model("Character", CharacterSchema);
 
-WordModel.discriminator("Lol", new Schema(LolSchema, options));
+CharacterModel.discriminator("Lol", new Schema(LolSchema, options));
 
-export default WordModel;
+export default CharacterModel;

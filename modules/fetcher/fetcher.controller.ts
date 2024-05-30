@@ -1,6 +1,6 @@
 import axios from "axios";
 import { NextFunction, Request, Response } from "express";
-import { ILolWord } from "../../types/model.types";
+import { ILolCharacter } from "../../types/model.types";
 import {
   ILolApiChampion,
   ILolApiChampionStats,
@@ -8,7 +8,7 @@ import {
   ILolChampionRate,
   ILolChampionRatesResponse,
 } from "./types/lol-fetcher.types";
-import WordModel from "../../models/Word/Word.model";
+import CharacterModel from "../../models/Character/Character.model";
 
 const getGenderFromLore = (name: string, lore: string) => {
   switch (name.toLowerCase()) {
@@ -92,7 +92,7 @@ const getChampionPosition = (rates: ILolChampionRate) => {
 const formatChampion = (
   data: ILolApiChampion,
   rates: ILolChampionRatesResponse
-): ILolWord => {
+): ILolCharacter => {
   const { key, name, lore, title, tags, stats, partype } = data;
   const championRates = rates.data[key];
 
@@ -131,13 +131,13 @@ const fetchLolApi = async (req: Request, res: Response, next: NextFunction) => {
         `https://cdn.merakianalytics.com/riot/lol/resources/latest/en-US/championrates.json`
       );
 
-    const formattedDatas: Partial<ILolWord>[] = Object.values(
+    const formattedDatas: Partial<ILolCharacter>[] = Object.values(
       lolResponse.data
     ).map((data) => {
       return formatChampion(data, positionData);
     });
 
-    await WordModel.bulkWrite(
+    await CharacterModel.bulkWrite(
       formattedDatas.map((data) => ({
         updateOne: {
           filter: { apiId: data.apiId },

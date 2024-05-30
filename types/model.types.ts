@@ -10,13 +10,13 @@ export interface ILolData {
   position: string[];
 }
 
-export interface IWord {
+export interface ICharacter {
   name: string;
   lang: string;
   apiId?: string;
   data: Record<any, any>;
 }
 
-export interface ILolWord extends IWord {
+export interface ILolCharacter extends ICharacter {
   data: ILolData;
 }
