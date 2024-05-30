@@ -3,8 +3,6 @@ import LolSchema from "./Lol.model";
 
 const options = { discriminatorKey: "dataType", _id: false };
 
-const WordDataSchema = new Schema({}, options);
-
 const WordSchema = new Schema(
   {
     name: { type: String, required: true },
@@ -18,7 +16,7 @@ const WordSchema = new Schema(
       immutable: true,
     },
     data: {
-      type: WordDataSchema,
+      type: Schema.Types.Mixed,
     },
   },
   { timestamps: true }

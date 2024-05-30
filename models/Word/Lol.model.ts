@@ -1,8 +1,5 @@
 import { Schema } from "mongoose";
 
-// Image : https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/splash/{Nomduperso}_0.jpg
-// Sprite : https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/Aatrox.png
-
 const LolSchema = new Schema(
   {
     // Splash Art
