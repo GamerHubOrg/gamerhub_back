@@ -12,6 +12,7 @@ import { Server } from "socket.io";
 import SocketConnectionHandler from "./socket";
 import { verifyAuth } from "./middlewares/authenticated";
 import cookieParser from 'cookie-parser';
+import { errorHandler } from "./middlewares/errorHandler";
 
 const logger = getLogger();
 
@@ -32,10 +33,10 @@ app.use(
     credentials: true,
   })
 );
-app.use((req, res, next) =>{
-  console.log(req.originalUrl)
-  next()
-})
+app.use((req, res, next) => {
+  console.log(req.originalUrl);
+  next();
+});
 
 if (logger) {
   app.use(responseTime(logResponseTime));
@@ -52,6 +53,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api", router);
+app.use(errorHandler);
 
 if (logger) {
   app.use(logError);
@@ -77,4 +79,8 @@ io.use((socket, next) => {
 io.on("connection", (socket) => SocketConnectionHandler(io, socket));
 
 const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => logger ? logger.info(`[server] Running on port ${PORT}`) : console.log(`[server] Running on port ${PORT}`));
+server.listen(PORT, () =>
+  logger
+    ? logger.info(`[server] Running on port ${PORT}`)
+    : console.log(`[server] Running on port ${PORT}`)
+);
