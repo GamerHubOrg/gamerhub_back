@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose, { ObjectId } from "mongoose";
 
 const { Schema } = mongoose;
 
@@ -14,12 +14,18 @@ export interface IGameConfigProperties {
 
 export interface IStoredGameConfig {
     game: string;
+    name: string;
     upvotes: number;
-    options: Partial<IGameConfigProperties>
+    options: Partial<IGameConfigProperties>,
+    userId: ObjectId;
 }
 
 const ConfigSchema = new Schema<IStoredGameConfig>({
     game: {
+        type: String,
+        required: true,
+    },
+    name: {
         type: String,
         required: true,
     },
@@ -28,7 +34,12 @@ const ConfigSchema = new Schema<IStoredGameConfig>({
         default: 0
     },
     options: {
-        type: Array,
+        type: Object,
         required: true,
+    },
+    userId: {
+        type: Schema.Types.ObjectId,
     }
-})
+}, { timestamps: true })
+
+export default mongoose.model('Configs', ConfigSchema);

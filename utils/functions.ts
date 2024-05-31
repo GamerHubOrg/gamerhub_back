@@ -19,3 +19,27 @@ export const getRandomElement = (list: Array<any>, count: number = 1): any => {
   const selected = shuffled.slice(0, count);
   return count === 1 ? selected[0] : selected;
 }
+
+export function convertObjectValuesToNumbers(obj: any) {
+  const newObj: any = {};
+  for (const key in obj) {
+    if (typeof obj[key] === 'string' && !isNaN(Number(obj[key]))) {
+      newObj[key] = Number(obj[key]);
+    } else {
+      newObj[key] = obj[key];
+    }
+  }
+  return newObj;
+}
+
+export function convertObjectValuesToMongooseQuery(obj: any) {
+  const newObj: any = {};
+  for (const key in obj) {
+    if (Array.isArray(obj[key])) {
+      newObj[key] = { $in: obj[key] };
+    } else {
+      newObj[key] = obj[key];
+    }
+  }
+  return newObj;
+}

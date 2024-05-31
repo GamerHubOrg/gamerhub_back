@@ -1,0 +1,42 @@
+services:
+  node:
+    image: node:21-alpine3.17
+    working_dir: /app
+    volumes:
+      - ./:/app
+    env_file:
+      - .env
+    ports:
+      - "3000:3000"
+    command: "yarn dev"
+
+  postgres:
+    image: postgres:15.3
+    environment:
+      - PGID=1000
+      - POSTGRES_DB=keycloak
+      - POSTGRES_PASSWORD=casaos
+      - POSTGRES_USER=casaos
+      - PUID=1000
+      - TZ=Europe/Paris
+    ports:
+      - 5432:5432
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    environment:
+      - KC_DB=postgres
+      - KC_DB_PASSWORD=casaos
+      - KC_DB_URL=jdbc:postgresql://postgres/keycloak
+      - KC_DB_USERNAME=casaos
+      # - KC_HOSTNAME=keycloak.lucashost.fr
+      # - KC_PROXY=edge
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - WEBHOOK_URI=http://node:3000/api/webhooks/keycloak
+    ports:
+      - 8443:8080
+    volumes:
+      - ./providers:/opt/keycloak/providers
+    command:
+      - start-dev
