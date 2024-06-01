@@ -30,7 +30,6 @@ export async function getConfigs({ filters, sort, skip, limit }: IGetConfigs) {
         ...(query as PipelineStage[]),
         { $count: 'nbTotalConfigs' },
     ]);
-
     
     const nbTotalConfigs = aggregateCount[0]?.nbTotalConfigs || 0;
     const nbConfigsLeft = nbTotalConfigs - configs.length;

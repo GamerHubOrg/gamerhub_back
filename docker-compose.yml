@@ -25,15 +25,16 @@ services:
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     environment:
-      - KC_DB=postgres
-      - KC_DB_PASSWORD=casaos
-      - KC_DB_URL=jdbc:postgresql://postgres/keycloak
-      - KC_DB_USERNAME=casaos
-      # - KC_HOSTNAME=keycloak.lucashost.fr
-      # - KC_PROXY=edge
-      - KEYCLOAK_ADMIN=admin
-      - KEYCLOAK_ADMIN_PASSWORD=admin
-      - WEBHOOK_URI=http://node:3000/api/webhooks/keycloak
+      KC_DB: "postgres"
+      KC_DB_PASSWORD: "casaos"
+      KC_DB_URL: "jdbc:postgresql://postgres/keycloak"
+      KC_DB_USERNAME: "casaos"
+      KEYCLOAK_ADMIN: "admin"
+      KEYCLOAK_ADMIN_PASSWORD: "admin"
+      WEBHOOK_HTTP_BASE_PATH: "http://node:3000/api/webhooks/keycloak"
+      WEBHOOK_EVENTS_TAKEN: "LOGIN,REGISTER"
+      WEBHOOK_HTTP_AUTH_USERNAME: "admin"
+      WEBHOOK_HTTP_AUTH_PASSWORD: "password"
     ports:
       - 8443:8080
     volumes:
