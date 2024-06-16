@@ -19,14 +19,18 @@ const instance = axios.create({
 
 export async function verifyKeycloakSession(token: string): Promise<boolean> {
   try {
+
     const { data } = await instance.post('/gamerhub/protocol/openid-connect/token/introspect', { token });
 
     const currentTimestampInSeconds = Math.floor(Date.now() / 1000);
     const isTokenExpired = data.exp < currentTimestampInSeconds;
     const isTokenSessionActive = data.active;
 
+    console.log({ data, isTokenExpired, isTokenSessionActive })
+
     return !isTokenExpired && isTokenSessionActive;
   } catch(err) {
+    console.log(err)
     return false;
   }
 }

@@ -72,9 +72,13 @@ const handler: RequestHandler = async (
 ) => {
   const token = req.header("Authorization");
 
+  console.log({ token })
+
   if (!token) {
     return res.status(401).send();
   }
+
+  console.log("OKOKOKOKOKOKOKOKOKOK")
 
   const isTokenSessionValid = await verifyKeycloakSession(token);
 
