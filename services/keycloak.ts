@@ -12,7 +12,7 @@ const instance = axios.create({
   headers: {
     Authorization: `Basic ${process.env.KEYCLOAK_CLIENT_AUTH}`,
     Accept: '*/*',
-    Host: 'localhost:8443',
+    Host: process.env.KEYCLOAK_HOST,
     'Content-Type': 'application/x-www-form-urlencoded'
   }
 });
@@ -46,7 +46,7 @@ export async function getKeycloakUser(userId: string) {
     headers: {
       Authorization: `Basic ${process.env.KEYCLOAK_CLIENT_AUTH}`,
       Accept: 'application/json',
-      Host: 'localhost:8443',
+      Host: process.env.KEYCLOAK_HOST,
       'Content-Type': 'application/x-www-form-urlencoded'
     }
   });
