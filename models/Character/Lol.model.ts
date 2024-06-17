@@ -43,7 +43,7 @@ const LolSchema = new Schema(
       required: true,
     },
   },
-  { _id: false }
+  { discriminatorKey: "dataType", _id: false }
 );
 
 export default LolSchema;

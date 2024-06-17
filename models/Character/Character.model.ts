@@ -1,8 +1,6 @@
 import mongoose, { Schema } from "mongoose";
 import LolSchema from "./Lol.model";
 
-const options = { discriminatorKey: "dataType", _id: false };
-
 const CharacterSchema = new Schema(
   {
     name: { type: String, required: true },
@@ -24,6 +22,6 @@ const CharacterSchema = new Schema(
 
 const CharacterModel = mongoose.model("Character", CharacterSchema);
 
-CharacterModel.discriminator("Lol", new Schema(LolSchema, options));
+export const LolCharacterModel = CharacterModel.discriminator("Lol", LolSchema);
 
 export default CharacterModel;
