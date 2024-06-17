@@ -52,7 +52,7 @@ export async function getKeycloakUser(userId: string) {
     }
   });
 
-  const { data: user } = await apiInstance.get(`users/${userId}`, { headers: {
+  const { data: user } = await apiInstance.get(`/users/${userId}`, { headers: {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json'
   } })
