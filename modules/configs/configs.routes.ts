@@ -1,8 +1,8 @@
 import { Router } from 'express';
-import GetAllGames from './useCases/GetAllGames';
+import { GetConfigs } from './configs.controller';
 
 const router: Router = Router();
 
-router.get('/', GetAllGames);
+router.get('/', GetConfigs);
 
 export default router;
