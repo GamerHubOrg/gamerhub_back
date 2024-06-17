@@ -69,7 +69,7 @@ io.use((socket, next) => {
   const token = socket.request.headers["Authorization"];
   verifyAuth(token as string)
     .then((user) => console.log(user))
-    .catch((err) => console.log(err));
+    .catch((err) => console.log(err.message));
   next();
 });
 io.on("connection", (socket) => SocketConnectionHandler(io, socket));

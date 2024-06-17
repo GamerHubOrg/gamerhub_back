@@ -14,7 +14,7 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     const config = roomData.config || defaultUndercoverConfig;
     const words = gameData.words || [];
     const randomPlayerTurn = getRandomElement(roomData.users);
-    const playerTurn = randomPlayerTurn.id;
+    const playerTurn = randomPlayerTurn._id;
 
     const wordsPair = getGameWords();
     const randomOrderWords = getRandomElement(wordsPair, wordsPair.length);
@@ -22,8 +22,8 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     const randomSpies = getRandomElement(roomData.users, config.spyCount);
 
     gameData.undercoverPlayerIds = config.spyCount === 1 || config.spyCount > roomData.users.length 
-      ? [randomSpies.id]
-      : randomSpies.map((u: IUndercoverPlayer) => u.id)
+      ? [randomSpies._id]
+      : randomSpies.map((u: IUndercoverPlayer) => u._id)
     gameData.civilianWord = randomOrderWords[0];
     gameData.spyWord = randomOrderWords[1];
     gameData.playerTurn = playerTurn;
@@ -47,15 +47,15 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
         word
     })
 
-    const validWords = words.filter((w) => usersThatCanPlay.some((u) => u.id === w.playerId))
+    const validWords = words.filter((w) => usersThatCanPlay.some((u) => u._id === w.playerId))
     if (gameConfig.wordsPerTurn * usersThatCanPlay.length === validWords.length / gameTurn) {
       gameData.state = 'vote';
       io.in(roomId).emit("game:undercover:data", { data: gameData });
       return
     }
 
-    const currentPlayerIndex = usersThatCanPlay.findIndex((u: SocketUser) => u.id === userId);
-    const randomPlayer = usersThatCanPlay[currentPlayerIndex + 1] ? usersThatCanPlay[currentPlayerIndex + 1].id : usersThatCanPlay[0].id;
+    const currentPlayerIndex = usersThatCanPlay.findIndex((u: SocketUser) => u._id === userId);
+    const randomPlayer = usersThatCanPlay[currentPlayerIndex + 1] ? usersThatCanPlay[currentPlayerIndex + 1]._id : usersThatCanPlay[0]._id;
     gameData.playerTurn = randomPlayer;
     gameData.words = words;
 
@@ -100,7 +100,7 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     }
 
     if (!isVoteTied && !isMostVotedUndercover) {
-      const votedPlayerIndex = users.findIndex((u) => u.id === mostVotedPlayer.vote);
+      const votedPlayerIndex = users.findIndex((u) => u._id === mostVotedPlayer.vote);
       if (votedPlayerIndex === -1) return;
       const user = roomData.users[votedPlayerIndex];
       roomData.users[votedPlayerIndex] = {
@@ -120,8 +120,8 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     }
 
     const usersNotEliminated = roomData.users.filter((u) => !u.isEliminated);
-    const currentPlayerIndex = usersNotEliminated.findIndex((u: SocketUser) => u.id === gameData.playerTurn);
-    const randomPlayer = usersNotEliminated[currentPlayerIndex + 1] ? usersNotEliminated[currentPlayerIndex + 1].id : usersNotEliminated[0].id;
+    const currentPlayerIndex = usersNotEliminated.findIndex((u: SocketUser) => u._id === gameData.playerTurn);
+    const randomPlayer = usersNotEliminated[currentPlayerIndex + 1] ? usersNotEliminated[currentPlayerIndex + 1]._id : usersNotEliminated[0]._id;
 
     gameData.playerTurn = randomPlayer;
     gameData.state = 'words';

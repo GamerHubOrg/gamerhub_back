@@ -39,6 +39,7 @@ const ConfigSchema = new Schema<IStoredGameConfig>({
     },
     userId: {
         type: Schema.Types.ObjectId,
+        required: true,
     }
 }, { timestamps: true })
 

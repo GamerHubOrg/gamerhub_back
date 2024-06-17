@@ -1,16 +1,15 @@
 import { Request, RequestHandler } from 'express';
+import { IStoredUser } from '../../modules/users/users.model';
 
 export type User = {
-  id: string,
+  _id: string,
   email: string,
   username: string,
   roles: string[],
-  firstname: string,
-  lastname: string,
 }
 
 export interface CustomRequest extends Request {
-  user?: User
+  user?: IStoredUser
 }
 
 export interface CustomRequestHandler extends RequestHandler {}

@@ -3,19 +3,17 @@ import mongoose from "mongoose";
 const { Schema } = mongoose;
 
 export interface IStoredUser {
-  keycloakId: string,
-  userName: string,
+  _id: string;
+  username: string,
   email: string,
-  roles: string,
+  password: string,
+  refresh_token?: string,
+  roles: string[],
   xp: number
 }
 
 const UserSchema = new Schema<IStoredUser>({
-  keycloakId: {
-    type: String,
-    required: true,
-  },
-  userName:{
+  username:{
     type: String,
     required: true,
   },
@@ -23,9 +21,16 @@ const UserSchema = new Schema<IStoredUser>({
     type: String,
     required: true,
   },
-  roles:{
+  password: {
     type: String,
-    default: "user",
+    required: true,
+  },
+  refresh_token:{
+    type: String,
+  },
+  roles:{
+    type: [String],
+    default: ["user"],
   },
   xp:{
     type: Number,

@@ -1,29 +1,27 @@
-import { isValidObjectId } from "mongoose";
-import usersModel, { IStoredUser } from "./users.model";
+import usersModel from "./users.model";
 
-export function createUser({ 
-  keycloakId, userName, email, roles, xp
-}: IStoredUser) {
-  return usersModel.create({
-    keycloakId, 
-    userName, 
-    email, 
-    roles, 
-    xp
-  })
+export function findByEmail(email: string) {
+  return usersModel.findOne({ email })
 }
 
-export function updateUser(userId: string, data: Partial<IStoredUser>) {
-  const isObjectId = isValidObjectId(userId);
-  return usersModel.updateOne(
-    { $or: isObjectId ? [{ _id: userId }] : [{ keycloakId: userId }] },
-    { $set: { ...data } }
-  )
+export function findById(id: string) {
+  return usersModel.findOne({ _id: id })
 }
 
-export function findById(userId: string) {
-  const isObjectId = isValidObjectId(userId);
-  return usersModel.findOne(
-    { $or: isObjectId ? [{ _id: userId }] : [{ keycloakId: userId }] },
-  )
+interface ICreateUser {
+  username: string;
+  email: string;
+  password: string;
+}
+
+export function create({ username, email, password }: ICreateUser) {
+  return usersModel.create({ username, email, password })
+}
+
+export function fromUserId(userId: string) {
+  return {
+    setRefreshToken(refresh_token?: string) {
+      return usersModel.updateOne({ _id: userId }, { $set: { refresh_token } });
+    }
+  }
 }
