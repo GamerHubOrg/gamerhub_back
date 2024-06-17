@@ -8,13 +8,12 @@ router.post('/keycloak', async (req, res) => {
     try {
         const data = req.body;
 
-        if (data.details.response_type) {
+        if (!data) {
             res.json({ success: true })
             return;
         }
 
         const user = await getKeycloakUser(data.userId)
-
 
         const dataToSync = {
             keycloakId: user.id,
@@ -38,8 +37,7 @@ router.post('/keycloak', async (req, res) => {
         await userService.updateUser(user.id, dataToSync)
 
         res.json({ success: true })
-    } catch(err) {
-        console.log(err);
+    } catch(err: any) {
         res.status(400).json(err);
     }
 });

@@ -11,26 +11,22 @@ const instance = axios.create({
   httpsAgent: agent,
   headers: {
     Authorization: `Basic ${process.env.KEYCLOAK_CLIENT_AUTH}`,
-    Accept: 'application/json',
+    Accept: '*/*',
+    Host: 'localhost:8443',
     'Content-Type': 'application/x-www-form-urlencoded'
   }
 });
 
-
 export async function verifyKeycloakSession(token: string): Promise<boolean> {
   try {
-
     const { data } = await instance.post('/gamerhub/protocol/openid-connect/token/introspect', { token });
 
     const currentTimestampInSeconds = Math.floor(Date.now() / 1000);
     const isTokenExpired = data.exp < currentTimestampInSeconds;
     const isTokenSessionActive = data.active;
 
-    console.log({ data, isTokenExpired, isTokenSessionActive })
-
     return !isTokenExpired && isTokenSessionActive;
   } catch(err) {
-    console.log(err)
     return false;
   }
 }
@@ -50,6 +46,7 @@ export async function getKeycloakUser(userId: string) {
     headers: {
       Authorization: `Basic ${process.env.KEYCLOAK_CLIENT_AUTH}`,
       Accept: 'application/json',
+      Host: 'localhost:8443',
       'Content-Type': 'application/x-www-form-urlencoded'
     }
   });
