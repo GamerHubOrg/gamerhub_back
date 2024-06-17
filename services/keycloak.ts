@@ -38,15 +38,14 @@ export async function getKeycloakUser(userId: string) {
     client_secret: process.env.KEYCLOAK_REST_API_AUTH
   });
 
-  
+
   const token = data.access_token;
-  console.log({ token })
 
   const apiInstance = axios.create({
     baseURL: `${process.env.KEYCLOAK_BASE_URL}/admin/realms/gamerhub`,
     httpsAgent: agent,
     headers: {
-      Authorization: `Basic ${process.env.KEYCLOAK_REST_API_AUTH}`,
+      Authorization: `Basic ${process.env.KEYCLOAK_CLIENT_AUTH}`,
       Accept: 'application/json',
       Host: process.env.KEYCLOAK_HOST,
       'Content-Type': 'application/x-www-form-urlencoded'

@@ -20,7 +20,7 @@ router.post('/keycloak', async (req, res) => {
         console.log({ user });
 
         const dataToSync = {
-            keycloakId: user.id,
+            keycloakId: user.sub,
             userName: user.username,
             email: user.email
         }
