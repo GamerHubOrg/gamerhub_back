@@ -46,7 +46,7 @@ export async function getKeycloakUser(userId: string) {
     baseURL: `${process.env.KEYCLOAK_BASE_URL}/admin/realms/gamerhub`,
     httpsAgent: agent,
     headers: {
-      Authorization: `Basic ${process.env.KEYCLOAK_CLIENT_AUTH}`,
+      Authorization: `Basic ${process.env.KEYCLOAK_REST_API_AUTH}`,
       Accept: 'application/json',
       Host: process.env.KEYCLOAK_HOST,
       'Content-Type': 'application/x-www-form-urlencoded'
