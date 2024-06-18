@@ -46,6 +46,7 @@ export interface IUndercoverSendVote {
 export interface IUndercoverVote {
     playerId: string;
     vote: string;
+    turn: number;
 }
 
 export type UndercoverTheme = 'classic';

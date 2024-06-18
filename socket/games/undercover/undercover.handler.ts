@@ -79,20 +79,21 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     const gameTurn = gameData.turn || 1;
     const usersThatCanPlay = roomData.users.filter((u) => !u.isEliminated);
 
-    votes.push({ playerId: userId, vote })
+    votes.push({ playerId: userId, vote, turn: gameTurn })
     gameData.votes = votes;
 
+    const currentTurnVotes = votes.filter((v) => v.turn === gameTurn);
     const user = roomData.users.find((u) => u._id === userId) as IUndercoverPlayer;
     const votedPlayer = roomData.users.find((u) => u._id === vote) as IUndercoverPlayer;
-    gameLogger.onVote(roomData, user, votedPlayer)
+    gameLogger.onVote(roomData, user, votedPlayer);
 
-    if (votes.length !== usersThatCanPlay.length) {
+    if (currentTurnVotes.length !== usersThatCanPlay.length) {
       io.in(roomId).emit("game:undercover:data", { ...roomData, data: gameData });
       return;
     }
 
-    const mostVotedPlayer = votes.reduce((acc: any, vote: IUndercoverVote) => {
-      const voteNumber = votes.filter((v) => v.vote === vote.vote).length;
+    const mostVotedPlayer = currentTurnVotes.reduce((acc: any, vote: IUndercoverVote) => {
+      const voteNumber = currentTurnVotes.filter((v) => v.vote === vote.vote).length;
       if (!acc) return undefined
       if (acc.count > 0 && acc.count === voteNumber && acc.vote !== vote.vote) return undefined;
 
@@ -139,7 +140,6 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     gameData.playerTurn = randomPlayer;
     gameData.state = 'words';
     gameData.turn = gameTurn + 1;
-    gameData.votes = [];
     io.in(roomId).emit("game:undercover:data", { ...roomData, data: gameData });
     io.in(roomId).emit("room:updated", roomData);
   };
