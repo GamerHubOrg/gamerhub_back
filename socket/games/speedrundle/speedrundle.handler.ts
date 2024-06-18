@@ -1,37 +1,72 @@
-import { ILolData } from './../../../types/model.types';
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // import { getRandomIndex } from "../../../utils/functions";
+import RoomLogger from "../../logs-handler";
 import { roomsDataMap } from "../../room-handler";
-import { IoType, SocketType, SocketUser } from "../../types";
+import { IoType, SocketType } from "../../types";
 import { getGameCharacters } from "./speedrundle.functions";
-import { ISpeedrundleRoomData, ISpeedrundleSendVote, ISpeedrundleSendGuess, defaultSpeedrundleGameData, speedrundleColumns, ISpeedrundleLeagueOfLegendsColumn } from "./speedrundle.types";
+import {
+  ISpeedrundleRoomData,
+  defaultSpeedrundleGameData,
+  speedrundleColumns,
+  ISpeedrundleLeagueOfLegendsColumn,
+  ISpeedrundleAnswer,
+} from "./speedrundle.types";
 
 // Socket handlers
 const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
+  const roomLogger = new RoomLogger();
+
   const onInitialize = async (roomId: string) => {
-    const roomData = (roomsDataMap.get(roomId) as ISpeedrundleRoomData);
+    const roomData = roomsDataMap.get(roomId) as ISpeedrundleRoomData;
     if (!roomData) return socket.emit("room:not-found", roomId);
 
     const gameData = roomData.gameData || defaultSpeedrundleGameData;
-   if(!roomData.config?.theme) return;
+    if (!roomData.config?.theme) return;
     const allCharacters = await getGameCharacters(roomData.config?.theme);
     const nbRounds = roomData.config.nbRounds || 1;
     gameData.allCharacters = allCharacters;
-    gameData.charactersToGuess = allCharacters.sort(() => 0.5 - Math.random()).slice(0,nbRounds);
-    gameData.currentRound = 1;
-    gameData.score = roomData.users.map((u) => ({playerId: u.id, points: 0}));
-    gameData.columns = speedrundleColumns.league_of_legends as ISpeedrundleLeagueOfLegendsColumn || [];
-    
-    io.in(roomId).emit("game:speedrundle:data", { data: gameData });
+    gameData.charactersToGuess = allCharacters
+      .sort(() => 0.5 - Math.random())
+      .slice(0, nbRounds);
+    gameData.usersAnswers = roomData.users.map(({ _id }) => ({
+      playerId: _id,
+      currentRound: 1,
+      guesses: [],
+    }));
+    gameData.columns =
+      (speedrundleColumns.league_of_legends as ISpeedrundleLeagueOfLegendsColumn) ||
+      [];
+
+    roomLogger.onGameInitialized(roomData);
+
+    io.in(roomId).emit("game:speedrundle:data", {
+      ...roomData,
+      data: gameData,
+    });
   };
 
-  const onGuess = ({ roomId, userId, characterId }: ISpeedrundleSendGuess) => {
-    const roomData = (roomsDataMap.get(roomId) as ISpeedrundleRoomData);
+  const onGuess = (roomId: string, userId: string, characterId: string) => {
+    const roomData = roomsDataMap.get(roomId) as ISpeedrundleRoomData;
     if (!roomData) return socket.emit("room:not-found", roomId);
+    console.log("roomId", roomId);
+    console.log("userId", userId);
+    console.log("characterId", characterId);
+    const gameData = roomData.gameData || defaultSpeedrundleGameData;
 
-    
+    const userAnswers: ISpeedrundleAnswer | undefined =
+      gameData.usersAnswers.find(({ playerId }) => playerId === userId);
 
-    // io.in(roomId).emit("game:speedrundle:data", { data: gameData });
+    if (!userAnswers) return;
+
+    const thisRoundGuesses =
+      userAnswers.guesses[userAnswers.currentRound - 1] || [];
+    userAnswers.guesses[userAnswers.currentRound - 1] = [
+      ...thisRoundGuesses,
+      characterId,
+    ];
+    console.log("gameData", gameData);
+
+    io.in(roomId).emit("game:speedrundle:data", { data: gameData });
   };
 
   // const onVote = ({ roomId, userId, vote }: ISpeedrundleSendVote) => {

@@ -61,6 +61,16 @@ export class RoomLogger {
       },
     ];
   }
+
+  public onGameInitialized(roomData : IRoomData) {
+    roomData.logs = [
+      ...roomData.logs,
+      {
+        date: new Date(),
+        message: `${roomData.gameName} game has been initialized.`,
+      },
+    ];
+  }
 }
 
 export class UndercoverLogger {

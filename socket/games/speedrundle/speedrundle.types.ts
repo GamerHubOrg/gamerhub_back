@@ -1,79 +1,80 @@
-import { ICharacter } from './../../../types/model.types';
+import { ICharacter } from "./../../../types/model.types";
 import { IGameData, IRoomConfig, IRoomData, SocketUser } from "../../types";
 
-export type SpeedrundleTheme = 'league_of_legends' | 'pokemon' | 'marvel';
-export type ISpeedrundleGameState = 'guess';
+export type SpeedrundleTheme = "league_of_legends" | "pokemon" | "marvel";
+export type ISpeedrundleGameState = "guess";
 
 export interface ISpeedrundlePlayer extends SocketUser {
-    isEliminated?: boolean
+  isEliminated?: boolean;
 }
 
 export interface ISpeedrundleRoomData extends IRoomData {
-    users: ISpeedrundlePlayer[];
-    config?: ISpeedrundleConfig;
-    gameData?: ISpeedrundleGameData;
+  users: ISpeedrundlePlayer[];
+  config?: ISpeedrundleConfig;
+  gameData?: ISpeedrundleGameData;
 }
 
 export interface ISpeedrundleGameData extends IGameData {
-    columns: ISpeedrundleColumn[];
-    allCharacters: ICharacter[];
-    charactersToGuess: ICharacter[];
-    currentRound: number;
-    score: ISpeedrundleScore[];
+  columns: IColumn[];
+  allCharacters: ICharacter[];
+  charactersToGuess: ICharacter[];
+  usersAnswers: ISpeedrundleAnswer[];
 }
 
 export type ISpeedrundleLeagueOfLegendsColumn = [];
 
-
-export interface ISpeedrundleScore {
-    playerId: string, 
-    points: number
+export interface ISpeedrundleAnswer {
+  playerId: string;
+  currentRound: number;
+  guesses: string[][];
 }
+
 export interface ISpeedrundleSendGuess {
-    roomId: string,
-    userId: string,
-    characterId: string,
+  roomId: string;
+  userId: string;
+  characterId: string;
 }
 
 export interface ISpeedrundleSendVote {
-    roomId: string,
-    vote: string;
-    userId: string,
+  roomId: string;
+  vote: string;
+  userId: string;
 }
 
 export interface ISpeedrundleGuess {
-    playerId: string;
-    guess: string;
+  playerId: string;
+  guess: string;
 }
 
-
 export interface ISpeedrundleConfig extends IRoomConfig {
-    nbRounds: number;
-    theme : string;
+  nbRounds: number;
+  theme: string;
 }
 
 interface IColumn {
-    name: string;
-    key: string;
-  }
-  
-  interface ISpeedrundleColumn {
-    league_of_legends?: IColumn[],
-    marvel?: IColumn[],
-  }
-  
-  const LEAGUE_OF_LEGENDS_COLUMNS: IColumn[] = [
-    {name: 'Sprite', key: 'sprite'},
-    {name: 'Name', key: 'name'},
-    {name: 'Tags', key: 'tags'},
-    {name: 'Ressource', key: 'ressource'},
-    {name: 'Range', key: 'range'},
-    {name: 'Position', key: 'position'},
-  ] 
-  
-  export const speedrundleColumns: ISpeedrundleColumn = {
-    league_of_legends: LEAGUE_OF_LEGENDS_COLUMNS,
-    marvel: []
-  }
+  name: string;
+  key: string;
+  type?: string;
+}
 
-export const defaultSpeedrundleGameData: ISpeedrundleGameData = {  currentRound: 1, allCharacters: [], charactersToGuess : [], score: [], columns:[]};
+const LEAGUE_OF_LEGENDS_COLUMNS: IColumn[] = [
+  { name: "Sprite", key: "sprite", type: "image" },
+  { name: "Name", key: "name" },
+  { name: "Tags", key: "tags" },
+  { name: "Ressource", key: "ressource" },
+  { name: "Range", key: "range" },
+  { name: "Position", key: "position" },
+];
+
+export const speedrundleColumns: Record<SpeedrundleTheme, IColumn[]> = {
+  league_of_legends: LEAGUE_OF_LEGENDS_COLUMNS,
+  marvel: [],
+  pokemon: [],
+};
+
+export const defaultSpeedrundleGameData: ISpeedrundleGameData = {
+  allCharacters: [],
+  charactersToGuess: [],
+  columns: [],
+  usersAnswers: [],
+};

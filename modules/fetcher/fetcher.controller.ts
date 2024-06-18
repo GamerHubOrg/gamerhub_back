@@ -93,11 +93,13 @@ const formatChampion = (
   data: ILolApiChampion,
   rates: ILolChampionRatesResponse
 ): ILolCharacter => {
-  const { key, name, lore, title, tags, stats, partype } = data;
+  const { key, name, lore, title, tags, stats, partype, image } = data;
   const championRates = rates.data[key];
 
   const gender = getGenderFromLore(name, lore);
   const range = getAttackRange(name, stats);
+
+  const imageName = image.full.split(".")[0];
 
   return {
     name,
@@ -105,8 +107,8 @@ const formatChampion = (
     apiId: key,
     data: {
       dataType: "Lol",
-      splash: `https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/splash/${name}_0.jpg`,
-      sprite: `https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/${name}.png`,
+      splash: `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${imageName}_0.jpg`,
+      sprite: `https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/${imageName}.png`,
       title,
       tags,
       gender,
@@ -141,7 +143,7 @@ const fetchLolApi = async (req: Request, res: Response, next: NextFunction) => {
       formattedDatas.map((data) => ({
         updateOne: {
           filter: { apiId: data.apiId },
-          update: {$set : data},
+          update: { $set: data },
           upsert: true,
         },
       }))
