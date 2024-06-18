@@ -31,6 +31,7 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     gameData.spyWord = randomOrderWords[1];
     gameData.playerTurn = playerTurn;
     gameData.words = words;
+    gameData.turn = 1;
 
     io.in(roomId).emit("game:undercover:data", { data: gameData });
   };
