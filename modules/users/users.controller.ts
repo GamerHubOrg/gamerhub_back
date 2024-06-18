@@ -70,8 +70,6 @@ export async function PostRegister(req: CustomRequest, res: Response, next: Next
     const access_token = jwt.sign({ userId: createdUser._id }, config.security.tokenSecret, { expiresIn: '5h' });
     const refresh_token = jwt.sign({ userId: createdUser._id }, config.security.refreshTokenSecret, { expiresIn: '48h' });
 
-    console.log({ access_token, refresh_token })
-
     await usersService
       .fromUserId(createdUser._id)
       .setRefreshToken(refresh_token);

@@ -68,7 +68,7 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     if (!user) return socket.emit("user:not-auth");
 
     const roomId = generateRoomId(io);
-    const socketUser = { ...user, socket_id: socket.id, isOwner: true };
+    const socketUser: SocketUser = { ...user, socket_id: socket.id, isOwner: true, joindedAt: new Date() };
     const data: IRoomData = {
       users: [socketUser],
       logs: roomLogger.onRoomCreate(roomId, socketUser),
@@ -87,7 +87,7 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     const roomData = roomsDataMap.get(roomId);
     if (!roomData) return socket.emit("room:not-found", roomId);
 
-    const socketUser = { ...user, socket_id: socket.id };
+    const socketUser: SocketUser = { ...user, socket_id: socket.id, joindedAt: new Date() };
     addUserToRoom(roomData, socketUser);
     roomLogger.onRoomJoin(roomData, socketUser);
 
@@ -101,6 +101,7 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     roomLogger.onRoomStart(roomData);
     roomData.gameState = "started";
     roomData.gameData = {};
+    roomData.users = roomData.users.sort((a, b) => a.joindedAt.getTime() - b.joindedAt.getTime())
     io.in(roomId).emit("room:started", roomData);
   };
 
