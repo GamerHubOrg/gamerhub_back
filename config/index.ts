@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 export default {
+  env: process.env.NODE_ENV || 'dev',
   origin: process.env.ORIGIN || 'http://localhost:5174',
   database: {
     url: process.env.MONGO_URI || 'mongodb://admin:admin@mongo:27017/database?authSource=admin',

@@ -22,19 +22,27 @@ const handler: RequestHandler = async (
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.header("Authorization");
+  const token = req.cookies.gamerhub_access_token;
 
-  if (!token) {
-    return res.status(401).send();
+  try {
+    if (!token) {
+      return res.status(401).send();
+    }
+
+    const decoded = jwt.verify(token, config.security.tokenSecret) as any;
+
+    const user = await usersService.findById(decoded.userId).select('-password -refresh_token');
+
+    req.user = user as IStoredUser;
+  
+    next();
+  } catch(err: any) {
+    if (err.message == 'jwt expired') {
+      res.sendStatus(403);
+      return;
+    }
+    res.sendStatus(401);
   }
-
-  const decoded = jwt.verify(token, config.security.tokenSecret) as any;
-
-  const user = await usersService.findById(decoded.userId).select('-password -refresh_token');
-
-  req.user = user as IStoredUser;
-
-  next();
 };
 
 export default handler;

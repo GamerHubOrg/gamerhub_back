@@ -7,6 +7,7 @@ export interface IStoredUser {
   username: string,
   email: string,
   password: string,
+  picture: string,
   refresh_token?: string,
   roles: string[],
   xp: number
@@ -27,6 +28,10 @@ const UserSchema = new Schema<IStoredUser>({
   },
   refresh_token:{
     type: String,
+  },
+  picture: {
+    type: String,
+    default: "https://www.repol.copl.ulaval.ca/wp-content/uploads/2019/01/default-user-icon.jpg",
   },
   roles:{
     type: [String],
