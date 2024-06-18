@@ -40,3 +40,19 @@ export async function getConfigs({ filters, sort, skip, limit }: IGetConfigs) {
         total: nbTotalConfigs,
     };
 }
+
+interface ICreateConfig {
+    game: string;
+    name: string;
+    config: any;
+    userId?: string;
+}
+
+export function create({ game, name, config, userId }: ICreateConfig) {
+    return configsModel.create({
+        game,
+        name,
+        options: config,
+        userId
+    })
+}
