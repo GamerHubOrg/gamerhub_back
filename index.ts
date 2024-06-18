@@ -11,6 +11,7 @@ import config from "./config";
 import { Server } from "socket.io";
 import SocketConnectionHandler from "./socket";
 import { verifyAuth } from "./middlewares/authenticated";
+import cookieParser from 'cookie-parser';
 
 const logger = getLogger();
 
@@ -22,6 +23,7 @@ promClient.collectDefaultMetrics({ register });
 
 const app: Application = express();
 
+app.use(cookieParser());
 app.use(express.json());
 app.use(
   cors({
@@ -65,7 +67,7 @@ const io = new Server(server, {
   },
 });
 
-io.use((socket, next) => {  
+io.use((socket, next) => {
   const token = socket.request.headers["Authorization"];
   verifyAuth(token as string)
     .then((user) => console.log(user))

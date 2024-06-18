@@ -33,7 +33,8 @@ export async function PostLogin(req: CustomRequest, res: Response, next: NextFun
       .setRefreshToken(refresh_token);
 
     res
-      .cookie('gamerhub_refresh_token', refresh_token)
+      .cookie('gamerhub_refresh_token', refresh_token, { httpOnly: true, secure: config.env === 'production' })
+      .cookie('gamerhub_access_token', access_token, { httpOnly: true, secure: config.env === 'production' })
       .json({ access_token })
 
   } catch(err) {
@@ -76,7 +77,8 @@ export async function PostRegister(req: CustomRequest, res: Response, next: Next
       .setRefreshToken(refresh_token);
 
     res
-      .cookie('gamerhub_refresh_token', refresh_token)
+      .cookie('gamerhub_refresh_token', refresh_token, { httpOnly: true, secure: config.env === 'production' })
+      .cookie('gamerhub_access_token', access_token, { httpOnly: true, secure: config.env === 'production' })
       .json({ access_token })
 
   } catch(err) {
@@ -95,6 +97,7 @@ export async function PostLogout(req: CustomRequest, res: Response, next: NextFu
 
     res
       .clearCookie('gamerhub_refresh_token')
+      .clearCookie('gamerhub_access_token')
       .sendStatus(200)
   } catch(err) {
     next(err)
@@ -123,6 +126,41 @@ export async function GetUser(req: CustomRequest, res: Response, next: NextFunct
     }
 
     res.json(user);
+  } catch(err) {
+    next(err)
+  }
+}
+
+export async function GetRefreshAccessToken(req: CustomRequest, res: Response, next: NextFunction) {
+  try {
+    const token = req.cookies.gamerhub_refresh_token;
+
+    if (!token) return res.status(401).send('No token')
+
+    const result = jwt.verify(token, config.security.refreshTokenSecret) as any;
+
+    const user = await usersService.findById(result.userId);
+
+    if (!user) {
+      res.status(400).send('User not found');
+      return;
+    }
+
+    if(!user.refresh_token || (user.refresh_token !== token)){
+      return res.status(400).send("Refresh Token is invalid")
+    }
+
+    try {
+      jwt.verify(user.refresh_token, config.security.refreshTokenSecret);
+    } catch(e) {
+      return res.status(401).send("Refresh Token is invalid")
+    }
+
+    const access_token = jwt.sign({ userId: user._id }, config.security.tokenSecret, { expiresIn: '5h' });
+
+    res
+      .cookie('gamerhub_access_token', access_token, { httpOnly: true, secure: config.env === 'production' })
+      .sendStatus(201)
   } catch(err) {
     next(err)
   }
