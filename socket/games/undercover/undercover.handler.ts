@@ -1,4 +1,5 @@
 import { getRandomElement } from "../../../utils/functions";
+import { UndercoverLogger } from "../../logs-handler";
 import { roomsDataMap } from "../../room-handler";
 import { IoType, SocketType, SocketUser } from "../../types";
 import { getGameWords } from "./undercover.functions";
@@ -6,6 +7,8 @@ import { IUndercoverRoomData, IUndercoverSendVote, IUndercoverSendWord, IUnderco
 
 // Socket handlers
 const UndercoverHandler = (io: IoType, socket: SocketType) => {
+  const gameLogger = new UndercoverLogger();
+
   const onInitialize = (roomId: string) => {
     const roomData = (roomsDataMap.get(roomId) as IUndercoverRoomData);
     if (!roomData) return socket.emit("room:not-found", roomId);
@@ -47,10 +50,14 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
         word
     })
 
+    const user = roomData.users.find((u) => u._id === userId) as IUndercoverPlayer;
+    gameLogger.onSendWord(roomData, user, word)
+
     const validWords = words.filter((w) => usersThatCanPlay.some((u) => u._id === w.playerId))
     if (gameConfig.wordsPerTurn * usersThatCanPlay.length === validWords.length / gameTurn) {
+      gameLogger.onCanVote(roomData)
       gameData.state = 'vote';
-      io.in(roomId).emit("game:undercover:data", { data: gameData });
+      io.in(roomId).emit("game:undercover:data", { ...roomData, data: gameData });
       return
     }
 
@@ -59,7 +66,7 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     gameData.playerTurn = randomPlayer;
     gameData.words = words;
 
-    io.in(roomId).emit("game:undercover:data", { data: gameData });
+    io.in(roomId).emit("game:undercover:data", { ...roomData, data: gameData });
   };
 
   const onVote = ({ roomId, userId, vote }: IUndercoverSendVote) => {
@@ -75,8 +82,12 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     votes.push({ playerId: userId, vote })
     gameData.votes = votes;
 
+    const user = roomData.users.find((u) => u._id === userId) as IUndercoverPlayer;
+    const votedPlayer = roomData.users.find((u) => u._id === vote) as IUndercoverPlayer;
+    gameLogger.onVote(roomData, user, votedPlayer)
+
     if (votes.length !== usersThatCanPlay.length) {
-      io.in(roomId).emit("game:undercover:data", { data: gameData });
+      io.in(roomId).emit("game:undercover:data", { ...roomData, data: gameData });
       return;
     }
 
@@ -92,9 +103,10 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     const isMostVotedUndercover = !isVoteTied && gameData.undercoverPlayerIds?.includes(mostVotedPlayer.vote);
 
     if (!isVoteTied && isMostVotedUndercover) {
+      gameLogger.onSideWin(roomData, 'civilian')
       roomData.gameState = 'results';
       gameData.campWin = 'civilian';
-      io.in(roomId).emit("game:undercover:data", { data: gameData });
+      io.in(roomId).emit("game:undercover:data", { ...roomData, data: gameData });
       io.in(roomId).emit("room:updated", roomData);
       return;
     }
@@ -111,6 +123,7 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
       const notEliminatedPlayers = users.filter((u) => !u.isEliminated).length;
 
       if (notEliminatedPlayers < 3) {
+        gameLogger.onSideWin(roomData, 'undercover')
         roomData.gameState = 'results';
         gameData.campWin = 'undercover';
         io.in(roomId).emit("game:undercover:data", { data: gameData });
@@ -127,7 +140,7 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     gameData.state = 'words';
     gameData.turn = gameTurn + 1;
     gameData.votes = [];
-    io.in(roomId).emit("game:undercover:data", { data: gameData });
+    io.in(roomId).emit("game:undercover:data", { ...roomData, data: gameData });
     io.in(roomId).emit("room:updated", roomData);
   };
 

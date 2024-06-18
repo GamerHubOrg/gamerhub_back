@@ -7,7 +7,7 @@ import {
   SocketUser,
 } from "./types";
 import { generateRandomString } from "../utils/functions";
-import RoomLogger from "./logs-handler";
+import { RoomLogger } from "./logs-handler";
 
 export const roomsDataMap: Map<string, IRoomData> = new Map();
 
