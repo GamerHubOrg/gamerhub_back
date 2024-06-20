@@ -2,14 +2,14 @@ import { getRandomElement } from "../../../utils/functions";
 import { UndercoverLogger } from "../../logs-handler";
 import { roomsDataMap } from "../../room-handler";
 import { IoType, SocketType, SocketUser } from "../../types";
-import { getGameWords } from "./undercover.functions";
+import { getGameWords, getGameImages } from "./undercover.functions";
 import { IUndercoverRoomData, IUndercoverSendVote, IUndercoverSendWord, IUndercoverVote, defaultUndercoverGameData, defaultUndercoverConfig, IUndercoverPlayer } from "./undercover.types";
 
 // Socket handlers
 const UndercoverHandler = (io: IoType, socket: SocketType) => {
   const gameLogger = new UndercoverLogger();
 
-  const onInitialize = (roomId: string) => {
+  const onInitialize = async (roomId: string) => {
     const roomData = (roomsDataMap.get(roomId) as IUndercoverRoomData);
     if (!roomData) return socket.emit("room:not-found", roomId);
 
@@ -19,16 +19,26 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     const randomPlayerTurn = getRandomElement(roomData.users);
     const playerTurn = randomPlayerTurn._id;
 
-    const wordsPair = getGameWords();
-    const randomOrderWords = getRandomElement(wordsPair, wordsPair.length);
+    if (config.mode === 'words') {
+      const wordsPair = await getGameWords();
+      const randomOrderWords = getRandomElement(wordsPair, wordsPair.length);
+      gameData.civilianWord = randomOrderWords[0];
+      gameData.spyWord = randomOrderWords[1];
+    }
+
+    if (config.mode === 'images') {
+      const imagesPair = await getGameImages();
+      console.log({ imagesPair, r: imagesPair.length })
+      const randomOrderImages = getRandomElement(imagesPair, imagesPair.length);
+      gameData.civilianWord = randomOrderImages[0];
+      gameData.spyWord = randomOrderImages[1];
+    }
 
     const randomSpies = getRandomElement(roomData.users, config.spyCount);
 
     gameData.undercoverPlayerIds = config.spyCount === 1 || config.spyCount > roomData.users.length 
       ? [randomSpies._id]
       : randomSpies.map((u: IUndercoverPlayer) => u._id)
-    gameData.civilianWord = randomOrderWords[0];
-    gameData.spyWord = randomOrderWords[1];
     gameData.playerTurn = playerTurn;
     gameData.words = words;
     gameData.turn = 1;
