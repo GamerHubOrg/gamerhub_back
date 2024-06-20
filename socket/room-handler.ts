@@ -105,6 +105,14 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     io.in(roomId).emit("room:started", roomData);
   };
 
+  const onRoomBackToLobby = (roomId: string) => {
+    const roomData = roomsDataMap.get(roomId);
+    if (!roomData) return socket.emit("room:not-found", roomId);
+    roomData.gameState = "lobby";
+    roomData.gameData = {};
+    io.in(roomId).emit("room:lobbied", roomData);
+  }
+
   const onRoomDelete = (roomId: string) => {
     const roomData = roomsDataMap.get(roomId);
     if (!roomData) return socket.emit("room:not-found", roomId);
@@ -153,6 +161,7 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
   socket.on("room:create", onRoomCreate);
   socket.on("room:join", onRoomJoin);
   socket.on("room:start", onRoomStart);
+  socket.on("room:lobby", onRoomBackToLobby);
   socket.on("room:delete", onRoomDelete);
   socket.on("room:leave", onRoomLeave);
   socket.on("room:update", onRoomUpdate);
