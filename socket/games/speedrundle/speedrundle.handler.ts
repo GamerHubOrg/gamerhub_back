@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // import { getRandomIndex } from "../../../utils/functions";
-import RoomLogger from "../../logs-handler";
+import { RoomLogger } from "../../logs-handler";
 import { roomsDataMap } from "../../room-handler";
 import { IoType, SocketType } from "../../types";
 import { getGameCharacters } from "./speedrundle.functions";
@@ -48,9 +48,6 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
   const onGuess = (roomId: string, userId: string, characterId: string) => {
     const roomData = roomsDataMap.get(roomId) as ISpeedrundleRoomData;
     if (!roomData) return socket.emit("room:not-found", roomId);
-    console.log("roomId", roomId);
-    console.log("userId", userId);
-    console.log("characterId", characterId);
     const gameData = roomData.gameData || defaultSpeedrundleGameData;
 
     const userAnswers: ISpeedrundleAnswer | undefined =
@@ -58,13 +55,28 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
 
     if (!userAnswers) return;
 
-    const thisRoundGuesses =
-      userAnswers.guesses[userAnswers.currentRound - 1] || [];
-    userAnswers.guesses[userAnswers.currentRound - 1] = [
-      ...thisRoundGuesses,
-      characterId,
-    ];
-    console.log("gameData", gameData);
+    const { currentRound } = userAnswers;
+
+    const thisRoundGuesses = userAnswers.guesses[currentRound - 1] || [];
+    userAnswers.guesses[currentRound - 1] = [...thisRoundGuesses, characterId];
+
+    const currentGuess = gameData.charactersToGuess[currentRound - 1];
+    console.log("to guess", currentGuess._id);
+    console.log("my guess", characterId);
+
+    if (currentGuess._id.toString() === characterId) {
+      if (currentRound < roomData.config.nbRounds) {
+        userAnswers.currentRound = userAnswers.currentRound + 1;
+        setTimeout(
+          () => io.in(roomId).emit("game:speedrundle:data", { data: gameData }),
+          3000
+        );
+      } else {
+        roomData.gameState = "results";
+        io.in(roomId).emit("game:speedrundle:data", { data: gameData });
+        io.in(roomId).emit("room:updated", roomData);
+      }
+    }
 
     io.in(roomId).emit("game:speedrundle:data", { data: gameData });
   };
@@ -138,8 +150,16 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
   //   io.in(roomId).emit("room:updated", roomData);
   // };
 
+  const onGetData = (roomId: string) => {
+    const roomData = roomsDataMap.get(roomId);
+    if (!roomData) return socket.emit("room:not-found", roomId);
+    const gameData = roomData.gameData || defaultSpeedrundleGameData;
+    io.in(roomId).emit("game:speedrundle:data", { data: gameData });
+  };
+
   socket.on("game:speedrundle:initialize", onInitialize);
   socket.on("game:speedrundle:guess", onGuess);
+  socket.on("game:speedrundle:get-data", onGetData);
   // socket.on("game:speedrundle:vote", onVote);
 };
 

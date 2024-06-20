@@ -57,7 +57,7 @@ const getAttackRange = (name: string, stats: ILolApiChampionStats) => {
     "kayle",
     "samira",
   ];
-  if (mixedChampions.includes(name)) return ["melee", "range"];
+  if (mixedChampions.includes(name.toLowerCase())) return ["melee", "range"];
   return stats.attackrange <= 325 ? ["melee"] : ["range"];
 };
 
@@ -92,7 +92,7 @@ const getChampionPosition = (rates: ILolChampionRate) => {
 const formatChampion = (
   data: ILolApiChampion,
   rates: ILolChampionRatesResponse
-): ILolCharacter => {
+): Partial<ILolCharacter> => {
   const { key, name, lore, title, tags, stats, partype, image } = data;
   const championRates = rates.data[key];
 

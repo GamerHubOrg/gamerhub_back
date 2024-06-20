@@ -37,7 +37,7 @@ const LolSchema = new Schema(
       type: String,
       required: true,
     },
-    // Ressource
+    // Range
     range: {
       type: [String],
       required: true,

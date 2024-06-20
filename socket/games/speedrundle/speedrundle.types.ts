@@ -10,7 +10,7 @@ export interface ISpeedrundlePlayer extends SocketUser {
 
 export interface ISpeedrundleRoomData extends IRoomData {
   users: ISpeedrundlePlayer[];
-  config?: ISpeedrundleConfig;
+  config: ISpeedrundleConfig;
   gameData?: ISpeedrundleGameData;
 }
 
@@ -60,6 +60,7 @@ interface IColumn {
 const LEAGUE_OF_LEGENDS_COLUMNS: IColumn[] = [
   { name: "Sprite", key: "sprite", type: "image" },
   { name: "Name", key: "name" },
+  { name: "Gender", key: "gender" },
   { name: "Tags", key: "tags" },
   { name: "Ressource", key: "ressource" },
   { name: "Range", key: "range" },

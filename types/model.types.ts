@@ -11,6 +11,7 @@ export interface ILolData {
 }
 
 export interface ICharacter {
+  _id : string;
   name: string;
   lang: string;
   apiId?: string;

@@ -1,15 +1,15 @@
 import CharacterModel from "../../../models/Character/Character.model";
 import { ICharacter } from "../../../types/model.types";
 
-
-export async function getGameCharacters(theme: string) : Promise<ICharacter[]> {
-  let characters : ICharacter[];
+export async function getGameCharacters(theme: string): Promise<ICharacter[]> {
+  let characters: ICharacter[];
   switch (theme) {
-    case 'league_of_legends':
-      characters = await CharacterModel.find({ 'data.dataType': 'Lol' }).lean()
+    case "league_of_legends":
+      characters = await CharacterModel.find({ "data.dataType": "Lol" }).lean();
+
       break;
     default:
-      characters = []
+      characters = [];
       break;
   }
   return characters;
