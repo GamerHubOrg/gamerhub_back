@@ -70,7 +70,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     io.in(roomId).emit("game:speedrundle:data", {
       ...roomData,
       data: gameData,
-    });
+    }, "all");
   };
 
   const onGuess = (roomId: string, userId: string, characterId: string) => {
@@ -111,7 +111,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
       }
     }
 
-    io.in(roomId).emit("game:speedrundle:data", { data: gameData });
+    socket.emit("game:speedrundle:data", { data: gameData }, userId);
   };
 
   // const onVote = ({ roomId, userId, vote }: ISpeedrundleSendVote) => {
