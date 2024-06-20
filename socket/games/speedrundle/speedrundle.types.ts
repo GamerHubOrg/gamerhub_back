@@ -19,6 +19,7 @@ export interface ISpeedrundleGameData extends IGameData {
   allCharacters: ICharacter[];
   charactersToGuess: ICharacter[];
   usersAnswers: ISpeedrundleAnswer[];
+  startDate : Date;
 }
 
 export type ISpeedrundleLeagueOfLegendsColumn = [];
@@ -27,12 +28,7 @@ export interface ISpeedrundleAnswer {
   playerId: string;
   currentRound: number;
   guesses: string[][];
-}
-
-export interface ISpeedrundleSendGuess {
-  roomId: string;
-  userId: string;
-  characterId: string;
+  score: number;
 }
 
 export interface ISpeedrundleSendVote {
@@ -59,7 +55,6 @@ interface IColumn {
 
 const LEAGUE_OF_LEGENDS_COLUMNS: IColumn[] = [
   { name: "Sprite", key: "sprite", type: "image" },
-  { name: "Name", key: "name" },
   { name: "Gender", key: "gender" },
   { name: "Tags", key: "tags" },
   { name: "Ressource", key: "ressource" },
@@ -78,4 +73,5 @@ export const defaultSpeedrundleGameData: ISpeedrundleGameData = {
   charactersToGuess: [],
   columns: [],
   usersAnswers: [],
+  startDate : new Date()
 };

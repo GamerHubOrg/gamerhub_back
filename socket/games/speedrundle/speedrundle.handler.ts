@@ -12,6 +12,32 @@ import {
   ISpeedrundleAnswer,
 } from "./speedrundle.types";
 
+const calculateScore = (time : number, nbTries : number) => {
+  const baseScore = 1000;
+
+  let reduction = 0;
+
+  if (time > 10) {
+    reduction += time * 0.8;
+  }
+
+  if (nbTries < 1) {
+    reduction += nbTries * 0;
+  } else if (nbTries < 15) {
+    reduction += nbTries * 17;
+  } else {
+    reduction += nbTries * 22;
+  }
+
+  const ratio = (nbTries / time);
+  if (ratio > 0.4) reduction += 20 / ratio;
+
+  console.log(nbTries, time, ratio);
+
+  const reducedScore = baseScore - reduction;
+  return Math.max(Math.round(reducedScore), 100);
+};
+
 // Socket handlers
 const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
   const roomLogger = new RoomLogger();
@@ -21,7 +47,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     if (!roomData) return socket.emit("room:not-found", roomId);
 
     const gameData = roomData.gameData || defaultSpeedrundleGameData;
-    if (!roomData.config?.theme) return;
+    if (!roomData.config.theme) return;
     const allCharacters = await getGameCharacters(roomData.config?.theme);
     const nbRounds = roomData.config.nbRounds || 1;
     gameData.allCharacters = allCharacters;
@@ -32,10 +58,12 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
       playerId: _id,
       currentRound: 1,
       guesses: [],
+      score: 0,
     }));
     gameData.columns =
       (speedrundleColumns.league_of_legends as ISpeedrundleLeagueOfLegendsColumn) ||
       [];
+    gameData.startDate = new Date();
 
     roomLogger.onGameInitialized(roomData);
 
@@ -61,10 +89,13 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     userAnswers.guesses[currentRound - 1] = [...thisRoundGuesses, characterId];
 
     const currentGuess = gameData.charactersToGuess[currentRound - 1];
-    console.log("to guess", currentGuess._id);
-    console.log("my guess", characterId);
 
     if (currentGuess._id.toString() === characterId) {
+      const currentScore = calculateScore(
+        (new Date().getTime() - gameData.startDate.getTime())/1000,
+        userAnswers.guesses[currentRound - 1].length
+      );
+      userAnswers.score += currentScore;
       if (currentRound < roomData.config.nbRounds) {
         userAnswers.currentRound = userAnswers.currentRound + 1;
         setTimeout(
@@ -72,9 +103,11 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
           3000
         );
       } else {
-        roomData.gameState = "results";
-        io.in(roomId).emit("game:speedrundle:data", { data: gameData });
-        io.in(roomId).emit("room:updated", roomData);
+        // roomData.gameState = "results";
+        setTimeout(() => {
+          io.in(roomId).emit("game:speedrundle:data", { data: gameData });
+          // io.in(roomId).emit("room:updated", roomData);
+        }, 3000);
       }
     }
 
