@@ -28,7 +28,6 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
 
     if (config.mode === 'images') {
       const imagesPair = await getGameImages();
-      console.log({ imagesPair, r: imagesPair.length })
       const randomOrderImages = getRandomElement(imagesPair, imagesPair.length);
       gameData.civilianWord = randomOrderImages[0];
       gameData.spyWord = randomOrderImages[1];
