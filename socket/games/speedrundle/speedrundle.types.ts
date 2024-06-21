@@ -22,24 +22,17 @@ export interface ISpeedrundleGameData extends IGameData {
   startDate : Date;
 }
 
-export type ISpeedrundleLeagueOfLegendsColumn = [];
-
 export interface ISpeedrundleAnswer {
   playerId: string;
   currentRound: number;
-  guesses: string[][];
-  score: number;
+  roundsData: ISpeedrundleRoundData[];
+  state : "playing" | "finished"
 }
 
-export interface ISpeedrundleSendVote {
-  roomId: string;
-  vote: string;
-  userId: string;
-}
-
-export interface ISpeedrundleGuess {
-  playerId: string;
-  guess: string;
+export interface ISpeedrundleRoundData {
+  guesses : string[];
+  score : number;
+  hasFound : boolean;
 }
 
 export interface ISpeedrundleConfig extends IRoomConfig {
