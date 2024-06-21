@@ -8,11 +8,9 @@ import {
   ISpeedrundleRoomData,
   defaultSpeedrundleGameData,
   speedrundleColumns,
-  ISpeedrundleLeagueOfLegendsColumn,
-  ISpeedrundleAnswer,
 } from "./speedrundle.types";
 
-const calculateScore = (time : number, nbTries : number) => {
+const calculateScore = (time: number, nbTries: number) => {
   const baseScore = 1000;
 
   let reduction = 0;
@@ -29,7 +27,7 @@ const calculateScore = (time : number, nbTries : number) => {
     reduction += nbTries * 22;
   }
 
-  const ratio = (nbTries / time);
+  const ratio = nbTries / time;
   if (ratio > 0.4) reduction += 20 / ratio;
 
   const reducedScore = baseScore - reduction;
@@ -43,8 +41,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
   const onInitialize = async (roomId: string) => {
     const roomData = roomsDataMap.get(roomId) as ISpeedrundleRoomData;
     if (!roomData) return socket.emit("room:not-found", roomId);
-
-    const gameData = roomData.gameData || defaultSpeedrundleGameData;
+    const gameData = defaultSpeedrundleGameData;
     if (!roomData.config.theme) return;
     const allCharacters = await getGameCharacters(roomData.config?.theme);
     const nbRounds = roomData.config.nbRounds || 1;
@@ -55,13 +52,18 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     gameData.usersAnswers = roomData.users.map(({ _id }) => ({
       playerId: _id,
       currentRound: 1,
-      guesses: [],
+      roundsData: Array.from({ length: nbRounds }, (_, i) => ({
+        guesses: [],
+        score: 0,
+        hasFound: false,
+      })),
       score: 0,
+      state: "playing",
     }));
-    gameData.columns =
-      (speedrundleColumns.league_of_legends as ISpeedrundleLeagueOfLegendsColumn) ||
-      [];
+    gameData.columns = speedrundleColumns.league_of_legends || [];
     gameData.startDate = new Date();
+
+    roomData.gameData = gameData;
 
     roomLogger.onGameInitialized(roomData);
 
@@ -74,42 +76,55 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
   const onGuess = (roomId: string, userId: string, characterId: string) => {
     const roomData = roomsDataMap.get(roomId) as ISpeedrundleRoomData;
     if (!roomData) return socket.emit("room:not-found", roomId);
-    const gameData = roomData.gameData || defaultSpeedrundleGameData;
+    const gameData = roomData.gameData;
+    if (!gameData) return;
 
-    const userAnswers: ISpeedrundleAnswer | undefined =
-      gameData.usersAnswers.find(({ playerId }) => playerId === userId);
+    const userAnswers = gameData.usersAnswers.find(
+      ({ playerId }) => playerId === userId
+    );
 
     if (!userAnswers) return;
 
     const { currentRound } = userAnswers;
 
-    const thisRoundGuesses = userAnswers.guesses[currentRound - 1] || [];
-    userAnswers.guesses[currentRound - 1] = [...thisRoundGuesses, characterId];
+    const thisRoundData = userAnswers.roundsData[currentRound - 1];
+    thisRoundData.guesses = [...thisRoundData.guesses, characterId];
 
     const currentGuess = gameData.charactersToGuess[currentRound - 1];
+    const hasGuessedRight = currentGuess._id.toString() === characterId;
 
-    if (currentGuess._id.toString() === characterId) {
-      const currentScore = calculateScore(
-        (new Date().getTime() - gameData.startDate.getTime())/1000,
-        userAnswers.guesses[currentRound - 1].length
+    // If he hasn't guessed write -> continue
+    if (!hasGuessedRight)
+      return socket.emit("game:speedrundle:data", { data: gameData });
+
+    const currentScore = calculateScore(
+      (new Date().getTime() - gameData.startDate.getTime()) / 1000,
+      thisRoundData.guesses.length
+    );
+    thisRoundData.score = currentScore;
+
+    // If one player is finished -> set state to "finished"
+    const isLastRound = currentRound === roomData.config.nbRounds;
+    if (isLastRound) {
+      userAnswers.state = "finished";
+      io.in(roomId).emit("game:speedrundle:data", { data: gameData });
+
+      const allPlayersFinished = gameData.usersAnswers.every(
+        (answer) => answer.state === "finished"
       );
-      userAnswers.score += currentScore;
-      if (currentRound < roomData.config.nbRounds) {
-        userAnswers.currentRound = userAnswers.currentRound + 1;
-        setTimeout(
-          () => io.in(roomId).emit("game:speedrundle:data", { data: gameData }),
-          3000
-        );
-      } else {
-        // roomData.gameState = "results";
-        setTimeout(() => {
-          io.in(roomId).emit("game:speedrundle:data", { data: gameData });
-          // io.in(roomId).emit("room:updated", roomData);
-        }, 3000);
+
+      // If all players are finished -> results page
+      if (allPlayersFinished) {
+        roomData.gameState = "results";
+        io.in(roomId).emit("room:updated", roomData);
       }
+
+      return;
     }
 
-    socket.emit("game:speedrundle:data", { data: gameData });
+    // If he's not finished -> next character to guess
+    userAnswers.currentRound = userAnswers.currentRound + 1;
+    io.in(roomId).emit("game:speedrundle:data", { data: gameData }), 3000;
   };
 
   const onGetData = (roomId: string) => {
