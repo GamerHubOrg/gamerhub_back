@@ -4,6 +4,7 @@ import { CustomRequest } from "../shared/types/express";
 import config from "../config";
 import * as usersService from '../modules/users/users.service';
 import { IStoredUser } from "../modules/users/users.model";
+import { log } from "console";
 
 export const verifyAuth = async (token?: string) => {
   if (!token) {

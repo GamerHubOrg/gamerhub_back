@@ -188,3 +188,29 @@ export async function GetRefreshAccessToken(req: CustomRequest, res: Response, n
     next(err)
   }
 }
+
+export async function UpdateUserById(req: CustomRequest, res: Response) {
+  const {id} = req.params
+  const {body} = req
+  console.log(req.user);
+  try {
+      const updatedUser = await usersService.updateUserById(id, body)
+      return res.json(updatedUser)
+  } catch (error) {
+      return res.status(500).json(error)
+  }
+}
+
+export async function UpdateUserPassword(req: CustomRequest, res: Response) {
+  const {id} = req.params
+  const {body} = req
+  try {
+      const updatedUser = await usersService.updateUserById(id, body)
+      return res.json(updatedUser)
+  } catch (error) {
+      return res.status(500).json(error)
+  }
+}
+
+
+
