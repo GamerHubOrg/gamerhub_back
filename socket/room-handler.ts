@@ -135,7 +135,7 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     const leavingUser = removeUserFromRoom(roomId, roomData, socket.id);
     if (leavingUser) roomLogger.onRoomLeave(roomData, leavingUser);
 
-    io.to(roomId).emit("room:updated", roomData);
+    io.in(roomId).emit("room:updated", roomData);
   };
 
   const onRoomUpdate = (roomId: string, config: IRoomConfig) => {
