@@ -1,4 +1,4 @@
-import { IGameData, IRoomConfig, IRoomData, SocketUser } from "../../types";
+import { IGameData, IRoomData, SocketUser } from "../../types";
 
 export type IUndercoverGameState = 'vote' | 'words';
 
@@ -53,12 +53,13 @@ export type UndercoverTheme = 'classic';
 
 export type UndercoverMode = 'words' | 'images' | 'songs';
 
-export interface IUndercoverConfig extends IRoomConfig {
-  mode: UndercoverMode;
-  theme: UndercoverTheme;
-  spyCount: number;
-  wordsPerTurn: number;
-  anonymousMode: boolean;
+export interface IUndercoverConfig {
+    maxPlayers: number;
+    mode: UndercoverMode;
+    theme: UndercoverTheme;
+    spyCount: number;
+    wordsPerTurn: number;
+    anonymousMode: boolean;
 }
 
 export const defaultUndercoverConfig: IUndercoverConfig = { maxPlayers: 6, mode: 'words', theme: 'classic', spyCount: 1, wordsPerTurn: 3, anonymousMode: true }

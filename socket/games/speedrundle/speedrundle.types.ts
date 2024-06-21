@@ -1,5 +1,5 @@
 import { ICharacter } from "./../../../types/model.types";
-import { IGameData, IRoomConfig, IRoomData, SocketUser } from "../../types";
+import { IGameData, IRoomData, SocketUser } from "../../types";
 
 export type SpeedrundleTheme = "league_of_legends" | "pokemon" | "marvel";
 export type ISpeedrundleGameState = "guess";
@@ -42,7 +42,8 @@ export interface ISpeedrundleGuess {
   guess: string;
 }
 
-export interface ISpeedrundleConfig extends IRoomConfig {
+export interface ISpeedrundleConfig {
+  maxPlayers: number;
   nbRounds: number;
   theme: string;
 }

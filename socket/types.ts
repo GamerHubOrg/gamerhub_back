@@ -1,6 +1,8 @@
 import { User } from "../shared/types/express";
 import { Server, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
+import { IUndercoverConfig } from "./games/undercover/undercover.types";
+import { ISpeedrundleConfig } from "./games/speedrundle/speedrundle.types";
 
 export type IoType = Server<
   DefaultEventsMap,
@@ -37,9 +39,7 @@ export interface IRoomData {
   gameName: string;
 }
 
-export interface IRoomConfig {
-  maxPlayers: number;
-}
+export type IRoomConfig = IUndercoverConfig | ISpeedrundleConfig
 
 export interface IGameData {}
 
