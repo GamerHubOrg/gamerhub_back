@@ -19,7 +19,6 @@ export interface ISpeedrundleGameData extends IGameData {
   allCharacters: ICharacter[];
   charactersToGuess: ICharacter[];
   usersAnswers: ISpeedrundleAnswer[];
-  startDate : Date;
 }
 
 export interface ISpeedrundleAnswer {
@@ -33,6 +32,7 @@ export interface ISpeedrundleRoundData {
   guesses : string[];
   score : number;
   hasFound : boolean;
+  startDate : Date;
 }
 
 export interface ISpeedrundleConfig {
@@ -67,5 +67,4 @@ export const defaultSpeedrundleGameData: ISpeedrundleGameData = {
   charactersToGuess: [],
   columns: [],
   usersAnswers: [],
-  startDate : new Date()
 };

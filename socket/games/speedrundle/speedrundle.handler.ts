@@ -19,7 +19,7 @@ const calculateScore = (time: number, nbTries: number) => {
     reduction += time * 0.8;
   }
 
-  if (nbTries < 1) {
+  if (nbTries <= 1) {
     reduction += nbTries * 0;
   } else if (nbTries < 15) {
     reduction += nbTries * 17;
@@ -28,7 +28,7 @@ const calculateScore = (time: number, nbTries: number) => {
   }
 
   const ratio = nbTries / time;
-  if (ratio > 0.4) reduction += 20 / ratio;
+  if (nbTries > 10 && ratio > 0.4) reduction += 20 / ratio;
 
   const reducedScore = baseScore - reduction;
   return Math.max(Math.round(reducedScore), 100);
@@ -56,12 +56,12 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
         guesses: [],
         score: 0,
         hasFound: false,
+        startDate : new Date()
       })),
       score: 0,
       state: "playing",
     }));
     gameData.columns = speedrundleColumns.league_of_legends || [];
-    gameData.startDate = new Date();
 
     roomData.gameData = gameData;
 
@@ -93,12 +93,12 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     const currentGuess = gameData.charactersToGuess[currentRound - 1];
     const hasGuessedRight = currentGuess._id.toString() === characterId;
 
-    // If he hasn't guessed write -> continue
+    // If he hasn't guessed right -> continue
     if (!hasGuessedRight)
       return socket.emit("game:speedrundle:data", { data: gameData });
 
     const currentScore = calculateScore(
-      (new Date().getTime() - gameData.startDate.getTime()) / 1000,
+      (new Date().getTime() - thisRoundData.startDate.getTime()) / 1000,
       thisRoundData.guesses.length
     );
     thisRoundData.score = currentScore;
@@ -122,8 +122,10 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
       return;
     }
 
-    // If he's not finished -> next character to guess
-    userAnswers.currentRound = userAnswers.currentRound + 1;
+    // If he's not finished -> next character to guess   
+    const newRound = userAnswers.currentRound + 1
+    userAnswers.currentRound = newRound;
+    userAnswers.roundsData[newRound -1].startDate = new Date();
     io.in(roomId).emit("game:speedrundle:data", { data: gameData }), 3000;
   };
 
