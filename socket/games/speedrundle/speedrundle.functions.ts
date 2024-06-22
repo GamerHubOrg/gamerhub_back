@@ -5,7 +5,7 @@ export async function getGameCharacters(theme: string): Promise<ICharacter[]> {
   let characters: ICharacter[];
   switch (theme) {
     case "league_of_legends":
-      characters = await CharacterModel.find({ "data.dataType": "Lol" }).lean();
+      characters = await CharacterModel.find({ "data.dataType": theme }).lean();
 
       break;
     default:
