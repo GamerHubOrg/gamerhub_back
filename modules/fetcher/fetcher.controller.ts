@@ -1,125 +1,15 @@
 import axios from "axios";
 import { NextFunction, Request, Response } from "express";
-import { ILolCharacter } from "../../types/model.types";
+import { ILolCharacter } from "../characters/characters.types";
 import {
-  ILolApiChampion,
-  ILolApiChampionStats,
+  ILolChampionSearchResponse,
   ILolApiResponse,
-  ILolChampionRate,
   ILolChampionRatesResponse,
-} from "./types/lol-fetcher.types";
-import CharacterModel from "../../models/Character/Character.model";
+} from "./lol/lol-fetcher.types";
+import CharacterModel from "../characters/models/characters.model";
+import { formatLolChampion } from "./lol/fetcher.functions";
 
-const getGenderFromLore = (name: string, lore: string) => {
-  switch (name.toLowerCase()) {
-    case "blitzcrank":
-      return "other";
-    case "naafiri":
-      return "female";
-    case "kog'maw":
-      return "male";
-    case "zac":
-      return "male";
-
-    default:
-      break;
-  }
-
-  const malePronouns = ["he", "him", "his", "boy", "man"];
-  const femalePronouns = ["she", "her", "hers", "girl", "woman"];
-
-  const maleWords: string[] = [];
-  const femaleWords: string[] = [];
-
-  const words = lore.split(/\s+|(?<=\w)'|'(?=\w)/);
-
-  for (let word of words) {
-    word = word.toLowerCase();
-
-    if (malePronouns.includes(word)) {
-      maleWords.push(word);
-    } else if (femalePronouns.includes(word)) {
-      femaleWords.push(word);
-    }
-  }
-
-  if (maleWords.length > femaleWords.length) return "male";
-  else if (femaleWords.length > maleWords.length) return "female";
-  return "other";
-};
-
-const getAttackRange = (name: string, stats: ILolApiChampionStats) => {
-  const mixedChampions = [
-    "gnar",
-    "nidalee",
-    "jayce",
-    "elise",
-    "kayle",
-    "samira",
-  ];
-  if (mixedChampions.includes(name.toLowerCase())) return ["melee", "range"];
-  return stats.attackrange <= 325 ? ["melee"] : ["range"];
-};
-
-const getChampionPosition = (rates: ILolChampionRate) => {
-  const getPositionName = (position: string) => {
-    switch (position) {
-      case "UTILITY":
-        return "support";
-      case "BOTTOM":
-        return "bot";
-      case "MIDDLE":
-        return "mid";
-      default:
-        return position.toLowerCase();
-    }
-  };
-
-  const positions = Object.entries(rates).map(([position, { playRate }]) => ({
-    position,
-    playRate,
-  }));
-
-  positions.sort((a, b) => b.playRate - a.playRate);
-
-  const mostPlayedPositions = positions
-    .filter((pos) => pos.playRate > 0)
-    .map((pos) => getPositionName(pos.position));
-
-  return mostPlayedPositions;
-};
-
-const formatChampion = (
-  data: ILolApiChampion,
-  rates: ILolChampionRatesResponse
-): Partial<ILolCharacter> => {
-  const { key, name, lore, title, tags, stats, partype, image } = data;
-  const championRates = rates.data[key];
-
-  const gender = getGenderFromLore(name, lore);
-  const range = getAttackRange(name, stats);
-
-  const imageName = image.full.split(".")[0];
-
-  return {
-    name,
-    lang: "en_US",
-    apiId: key,
-    data: {
-      dataType: "Lol",
-      splash: `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${imageName}_0.jpg`,
-      sprite: `https://ddragon.leagueoflegends.com/cdn/14.10.1/img/champion/${imageName}.png`,
-      title,
-      tags,
-      gender,
-      range,
-      ressource: partype,
-      position: getChampionPosition(championRates),
-    },
-  };
-};
-
-const fetchLolApi = async (req: Request, res: Response, next: NextFunction) => {
+const fetchLolApi = async (_req: Request, res: Response, next: NextFunction) => {
   try {
     const { data: versions } = await axios.get(
       "https://ddragon.leagueoflegends.com/api/versions.json"
@@ -132,11 +22,15 @@ const fetchLolApi = async (req: Request, res: Response, next: NextFunction) => {
       await axios.get(
         `https://cdn.merakianalytics.com/riot/lol/resources/latest/en-US/championrates.json`
       );
+      const {data : searchData} : {data : ILolChampionSearchResponse} = 
+      await axios.get(
+        `https://universe-meeps.leagueoflegends.com/v1/en_us/champion-browse/index.json`
+      );
 
     const formattedDatas: Partial<ILolCharacter>[] = Object.values(
       lolResponse.data
     ).map((data) => {
-      return formatChampion(data, positionData);
+      return formatLolChampion(data, positionData, searchData);
     });
 
     await CharacterModel.bulkWrite(

@@ -1,5 +1,5 @@
 import mongoose, { Schema } from "mongoose";
-import LolSchema from "./Lol.model";
+import LolSchema from "./lol-characters.model";
 
 const CharacterSchema = new Schema(
   {

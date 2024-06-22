@@ -1,4 +1,7 @@
-import { ICharacter } from "./../../../types/model.types";
+import {
+  CharacterDataType,
+  ICharacter,
+} from "../../../modules/characters/characters.types";
 import { IGameData, IRoomData, SocketUser } from "../../types";
 
 export type SpeedrundleTheme = "league_of_legends" | "pokemon" | "marvel";
@@ -25,20 +28,20 @@ export interface ISpeedrundleAnswer {
   playerId: string;
   currentRound: number;
   roundsData: ISpeedrundleRoundData[];
-  state : "playing" | "finished"
+  state: "playing" | "finished";
 }
 
 export interface ISpeedrundleRoundData {
-  guesses : string[];
-  score : number;
-  hasFound : boolean;
-  startDate : Date;
+  guesses: string[];
+  score: number;
+  hasFound: boolean;
+  startDate: Date;
 }
 
 export interface ISpeedrundleConfig {
   maxPlayers: number;
   nbRounds: number;
-  theme: string;
+  theme: CharacterDataType;
 }
 
 interface IColumn {
@@ -54,6 +57,8 @@ const LEAGUE_OF_LEGENDS_COLUMNS: IColumn[] = [
   { name: "Ressource", key: "ressource" },
   { name: "Range", key: "range" },
   { name: "Position", key: "position" },
+  { name: "Region", key: "region" },
+  { name: "Release year", key: "releaseYear", type : "comparison" },
 ];
 
 export const speedrundleColumns: Record<SpeedrundleTheme, IColumn[]> = {

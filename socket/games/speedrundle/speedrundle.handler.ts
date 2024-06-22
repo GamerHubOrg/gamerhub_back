@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // import { getRandomIndex } from "../../../utils/functions";
+import charactersService from "../../../modules/characters/characters.service";
 import { RoomLogger } from "../../logs-handler";
 import { roomsDataMap } from "../../room-handler";
 import { IoType, SocketType } from "../../types";
-import { getGameCharacters } from "./speedrundle.functions";
 import {
   ISpeedrundleRoomData,
   defaultSpeedrundleGameData,
@@ -43,7 +43,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     if (!roomData) return socket.emit("room:not-found", roomId);
     const gameData = defaultSpeedrundleGameData;
     if (!roomData.config.theme) return;
-    const allCharacters = await getGameCharacters(roomData.config?.theme);
+    const allCharacters = await charactersService.getAllCharactersByTheme(roomData.config?.theme);
     const nbRounds = roomData.config.nbRounds || 1;
     gameData.allCharacters = allCharacters;
     gameData.charactersToGuess = allCharacters
