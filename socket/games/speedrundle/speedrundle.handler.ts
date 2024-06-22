@@ -95,7 +95,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
 
     // If he hasn't guessed right -> continue
     if (!hasGuessedRight)
-      return socket.emit("game:speedrundle:data", { data: gameData });
+      return socket.emit("game:speedrundle:data", { data: gameData }, userId);
 
     const currentScore = calculateScore(
       (new Date().getTime() - thisRoundData.startDate.getTime()) / 1000,
@@ -110,7 +110,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     const isLastRound = currentRound === roomData.config.nbRounds;
     if (isLastRound) {
       userAnswers.state = "finished";
-      io.in(roomId).emit("game:speedrundle:data", { data: gameData });
+      io.in(roomId).emit("game:speedrundle:data", { data: gameData }, userId);
 
       const allPlayersFinished = gameData.usersAnswers.every(
         (answer) => answer.state === "finished"
@@ -130,7 +130,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     const newRound = userAnswers.currentRound + 1
     userAnswers.currentRound = newRound;
     userAnswers.roundsData[newRound -1].startDate = new Date();
-    io.in(roomId).emit("game:speedrundle:data", { data: gameData }), 3000;
+    io.in(roomId).emit("game:speedrundle:data", { data: gameData }, userId), 3000;
   };
 
   const onGetData = (roomId: string) => {
