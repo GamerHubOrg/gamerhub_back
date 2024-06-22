@@ -42,6 +42,16 @@ const LolSchema = new Schema(
       type: [String],
       required: true,
     },
+    // Region
+    region: {
+      type: String,
+      required: true,
+    },
+    // Release year
+    releaseYear: {
+      type: Number,
+      required: true,
+    },
   },
   { discriminatorKey: "dataType", _id: false }
 );

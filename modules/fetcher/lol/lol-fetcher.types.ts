@@ -29,6 +29,7 @@ export interface ILolApiChampionStats {
 }
 
 export interface ILolApiChampion {
+  id : string;
   key: string;
   name: string;
   title: string;
@@ -62,4 +63,15 @@ export interface ILolChampionRate {
 
 export interface ILolChampionRatesResponse {
   data: Record<string, ILolChampionRate>;
+}
+
+export interface ILolChampionSearch {
+  name: string;
+  slug : string;
+  "associated-faction-slug": string;
+  "release-date" : string;
+}
+
+export interface ILolChampionSearchResponse {
+    champions: ILolChampionSearch[];
 }
