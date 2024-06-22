@@ -5,6 +5,7 @@ import { IoType, SocketType, SocketUser } from "../../types";
 import { getGameWords, getGameImages } from "./undercover.functions";
 import { IUndercoverRoomData, IUndercoverSendVote, IUndercoverSendWord, IUndercoverVote, defaultUndercoverGameData, defaultUndercoverConfig, IUndercoverPlayer } from "./undercover.types";
 
+
 // Socket handlers
 const UndercoverHandler = (io: IoType, socket: SocketType) => {
   const gameLogger = new UndercoverLogger();
@@ -43,6 +44,7 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     gameData.turn = 1;
 
     io.in(roomId).emit("game:undercover:data", { data: gameData });
+    io.in(roomId).emit("game:undercover:start");
   };
 
   const onSendWord = ({ roomId, userId, word }: IUndercoverSendWord) => {
@@ -68,6 +70,7 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
       gameLogger.onCanVote(roomData)
       gameData.state = 'vote';
       io.in(roomId).emit("game:undercover:data", { ...roomData, data: gameData });
+      io.in(roomId).emit('game:undercover:new-round');
       return
     }
 
@@ -153,6 +156,7 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     const randomPlayer = usersNotEliminated[currentPlayerIndex + 1] ? usersNotEliminated[currentPlayerIndex + 1]._id : usersNotEliminated[0]._id;
 
     io.in(roomId).emit('room:notifications:info', "Le vote s'est soldé par une égalité");
+    io.in(roomId).emit('game:undercover:new-round');
 
     gameData.playerTurn = randomPlayer;
     gameData.state = 'words';
