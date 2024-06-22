@@ -103,6 +103,9 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     );
     thisRoundData.score = currentScore;
 
+    socket.emit('room:notifications:success', `Vous avez trouvé ${currentGuess.name} !`);
+    socket.emit('game:speedrundle:find-character');
+
     // If one player is finished -> set state to "finished"
     const isLastRound = currentRound === roomData.config.nbRounds;
     if (isLastRound) {
@@ -116,6 +119,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
       // If all players are finished -> results page
       if (allPlayersFinished) {
         roomData.gameState = "results";
+        io.in(roomId).emit('game:speedrundle:end-game');
         io.in(roomId).emit("room:updated", roomData);
       }
 
