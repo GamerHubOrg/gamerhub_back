@@ -75,3 +75,11 @@ export interface ILolChampionSearch {
 export interface ILolChampionSearchResponse {
     champions: ILolChampionSearch[];
 }
+
+export interface ILolChampionSpecie {
+  id: string;
+  species: string[];
+}
+
+
+export type ILolChampionSpeciesResponse = ILolChampionSpecie[];

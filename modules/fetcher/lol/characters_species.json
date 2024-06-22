@@ -1,0 +1,670 @@
+[
+  {
+    "id": "Aatrox",
+    "species": ["Darkin"]
+  },
+  {
+    "id": "Ahri",
+    "species": ["Vastayan"]
+  },
+  {
+    "id": "Akali",
+    "species": ["Human"]
+  },
+  {
+    "id": "Akshan",
+    "species": ["Human"]
+  },
+  {
+    "id": "Alistar",
+    "species": ["Minotaur"]
+  },
+  {
+    "id": "Amumu",
+    "species": ["Undead", "Yordle"]
+  },
+  {
+    "id": "Anivia",
+    "species": ["God", "Spirit"]
+  },
+  {
+    "id": "Annie",
+    "species": ["Human", "Magicborn"]
+  },
+  {
+    "id": "Aphelios",
+    "species": ["Human", "Spiritualist"]
+  },
+  {
+    "id": "Ashe",
+    "species": ["Human", "Iceborn"]
+  },
+  {
+    "id": "AurelionSol",
+    "species": ["Celestial", "Dragon"]
+  },
+  {
+    "id": "Azir",
+    "species": ["God-Warrior"]
+  },
+  {
+    "id": "Bard",
+    "species": ["Celestial"]
+  },
+  {
+    "id": "Belveth",
+    "species": ["Void-Being"]
+  },
+  {
+    "id": "Blitzcrank",
+    "species": ["Golem"]
+  },
+  {
+    "id": "Brand",
+    "species": ["Human", "Magically Altered"]
+  },
+  {
+    "id": "Braum",
+    "species": ["Human", "Iceborn"]
+  },
+  {
+    "id": "Briar",
+    "species": ["Golem"]
+  },
+  {
+    "id": "Caitlyn",
+    "species": ["Human"]
+  },
+  {
+    "id": "Camille",
+    "species": ["Human", "Cyborg"]
+  },
+  {
+    "id": "Cassiopeia",
+    "species": ["Human", "Magically Altered"]
+  },
+  {
+    "id": "Chogath",
+    "species": ["Void-Being"]
+  },
+  {
+    "id": "Corki",
+    "species": ["Yorlde"]
+  },
+  {
+    "id": "Darius",
+    "species": ["Human"]
+  },
+  {
+    "id": "Diana",
+    "species": ["Aspect", "Human"]
+  },
+  {
+    "id": "Draven",
+    "species": ["Human"]
+  },
+  {
+    "id": "DrMundo",
+    "species": ["Chemically Altered", "Human"]
+  },
+  {
+    "id": "Ekko",
+    "species": ["Human"]
+  },
+  {
+    "id": "Elise",
+    "species": ["Human", "Magically Altered"]
+  },
+  {
+    "id": "Evelynn",
+    "species": ["Demon", "Spirit"]
+  },
+  {
+    "id": "Ezreal",
+    "species": ["Human", "Magicborn"]
+  },
+  {
+    "id": "Fiddlesticks",
+    "species": ["Demon", "Spirit"]
+  },
+  {
+    "id": "Fiora",
+    "species": ["Human"]
+  },
+  {
+    "id": "Fizz",
+    "species": ["Yordle"]
+  },
+  {
+    "id": "Galio",
+    "species": ["Golem"]
+  },
+  {
+    "id": "Gangplank",
+    "species": ["Human"]
+  },
+  {
+    "id": "Garen",
+    "species": ["Human"]
+  },
+  {
+    "id": "Gnar",
+    "species": ["Yordle"]
+  },
+  {
+    "id": "Gragas",
+    "species": ["Human", "Iceborn"]
+  },
+  {
+    "id": "Graves",
+    "species": ["Human"]
+  },
+  {
+    "id": "Gwen",
+    "species": ["Human", "Magically Altered"]
+  },
+  {
+    "id": "Hecarim",
+    "species": ["Undead"]
+  },
+  {
+    "id": "Heimerdinger",
+    "species": ["Yordle"]
+  },
+  {
+    "id": "Hwei",
+    "species": ["Human", "Magicborn"]
+  },
+  {
+    "id": "Illaoi",
+    "species": ["Human", "Spiritualist"]
+  },
+  {
+    "id": "Irelia",
+    "species": ["Human", "Spiritualist"]
+  },
+  {
+    "id": "Ivern",
+    "species": ["Human", "Magically Altered"]
+  },
+  {
+    "id": "Janna",
+    "species": ["God", "Spirit"]
+  },
+  {
+    "id": "JarvanIV",
+    "species": ["Human"]
+  },
+  {
+    "id": "Jax",
+    "species": ["Unknown"]
+  },
+  {
+    "id": "Jayce",
+    "species": ["Human"]
+  },
+  {
+    "id": "Jhin",
+    "species": ["Human", "Spiritualist"]
+  },
+  {
+    "id": "Jinx",
+    "species": ["Human", "Chemically Altered"]
+  },
+  {
+    "id": "Kaisa",
+    "species": ["Human", "Void-Being"]
+  },
+  {
+    "id": "Kalista",
+    "species": ["Undead"]
+  },
+  {
+    "id": "Karma",
+    "species": ["Human", "Spiritualist"]
+  },
+  {
+    "id": "Karthus",
+    "species": ["Undead"]
+  },
+  {
+    "id": "Kassadin",
+    "species": ["Human", "Void-Being"]
+  },
+  {
+    "id": "Katarina",
+    "species": ["Human"]
+  },
+  {
+    "id": "Kayle",
+    "species": ["Human", "Aspect", "Magically Altered"]
+  },
+  {
+    "id": "Kayn",
+    "species": ["Human", "Darkin", "Magically Altered"]
+  },
+  {
+    "id": "Kennen",
+    "species": ["Yordle"]
+  },
+  {
+    "id": "Khazix",
+    "species": ["Void-Being"]
+  },
+  {
+    "id": "Kindred",
+    "species": ["God", "Spirit"]
+  },
+  {
+    "id": "Kled",
+    "species": ["Yordle"]
+  },
+  {
+    "id": "KogMaw",
+    "species": ["Void-Being"]
+  },
+  {
+    "id": "KSante",
+    "species": ["Human"]
+  },
+  {
+    "id": "Leblanc",
+    "species": ["Human", "Magically Altered"]
+  },
+  {
+    "id": "LeeSin",
+    "species": ["Human", "Spiritualist"]
+  },
+  {
+    "id": "Leona",
+    "species": ["Human", "Aspect"]
+  },
+  {
+    "id": "Lillia",
+    "species": ["Spirit"]
+  },
+  {
+    "id": "Lissandra",
+    "species": ["Human", "Iceborn"]
+  },
+  {
+    "id": "Lucian",
+    "species": ["Human"]
+  },
+  {
+    "id": "Lulu",
+    "species": ["Yordle"]
+  },
+  {
+    "id": "Lux",
+    "species": ["Human", "Magicborn"]
+  },
+  {
+    "id": "Malphite",
+    "species": ["Golem"]
+  },
+  {
+    "id": "Malzahar",
+    "species": ["Human", "Void-Being"]
+  },
+  {
+    "id": "Maokai",
+    "species": ["Spirit"]
+  },
+  {
+    "id": "MasterYi",
+    "species": ["Human", "Spiritualist"]
+  },
+  {
+    "id": "Milio",
+    "species": ["Human", "Magicborn"]
+  },
+  {
+    "id": "MissFortune",
+    "species": ["Human"]
+  },
+  {
+    "id": "MonkeyKing",
+    "species": ["Human"]
+  },
+  {
+    "id": "Mordekaiser",
+    "species": ["Revenant"]
+  },
+  {
+    "id": "Morgana",
+    "species": ["Human", "Aspect", "Magically Altered"]
+  },
+  {
+    "id": "Naafiri",
+    "species": ["Darkin", "Dog"]
+  },
+  {
+    "id": "Nami",
+    "species": ["Vastayan"]
+  },
+  {
+    "id": "Nasus",
+    "species": ["God-Warrior"]
+  },
+  {
+    "id": "Nautilus",
+    "species": ["Revenant"]
+  },
+  {
+    "id": "Neeko",
+    "species": ["Vastayan"]
+  },
+  {
+    "id": "Nidalee",
+    "species": ["Human", "Spiritualist"]
+  },
+  {
+    "id": "Nilah",
+    "species": ["Human", "Magically Altered"]
+  },
+  {
+    "id": "Nocturne",
+    "species": ["Demon", "Spirit"]
+  },
+  {
+    "id": "Nunu",
+    "species": ["Human", "Yeti"]
+  },
+  {
+    "id": "Olaf",
+    "species": ["Human", "Iceborn"]
+  },
+  {
+    "id": "Orianna",
+    "species": ["Golem"]
+  },
+  {
+    "id": "Ornn",
+    "species": ["God", "Spirit"]
+  },
+  {
+    "id": "Pantheon",
+    "species": ["Human", "Aspect"]
+  },
+  {
+    "id": "Poppy",
+    "species": ["Yordle"]
+  },
+  {
+    "id": "Pyke",
+    "species": ["Revenant"]
+  },
+  {
+    "id": "Qiyana",
+    "species": ["Human", "Magicborn"]
+  },
+  {
+    "id": "Quinn",
+    "species": ["Human"]
+  },
+  {
+    "id": "Rakan",
+    "species": ["Vastayan"]
+  },
+  {
+    "id": "Rammus",
+    "species": ["Unknown"]
+  },
+  {
+    "id": "RekSai",
+    "species": ["Void-Being"]
+  },
+  {
+    "id": "Rell",
+    "species": ["Human", "Magically Altered", "Magicborn"]
+  },
+  {
+    "id": "Renata",
+    "species": ["Human", "Chemically Altered"]
+  },
+  {
+    "id": "Renekton",
+    "species": ["God-Warrior"]
+  },
+  {
+    "id": "Rengar",
+    "species": ["Vastayan"]
+  },
+  {
+    "id": "Riven",
+    "species": ["Human"]
+  },
+  {
+    "id": "Rumble",
+    "species": ["Yordle"]
+  },
+  {
+    "id": "Ryze",
+    "species": ["Human", "Magically Altered"]
+  },
+  {
+    "id": "Samira",
+    "species": ["Human"]
+  },
+  {
+    "id": "Sejuani",
+    "species": ["Human", "Iceborn"]
+  },
+  {
+    "id": "Senna",
+    "species": ["Human", "Undead"]
+  },
+  {
+    "id": "Seraphine",
+    "species": ["Human", "Magicborn"]
+  },
+  {
+    "id": "Sett",
+    "species": ["Human", "Vastayan"]
+  },
+  {
+    "id": "Shaco",
+    "species": ["Spirit"]
+  },
+  {
+    "id": "Shen",
+    "species": ["Human", "Spiritualist"]
+  },
+  {
+    "id": "Shyvana",
+    "species": ["Dragon", "Magically Altered"]
+  },
+  {
+    "id": "Singed",
+    "species": ["Human", "Chemically Altered"]
+  },
+  {
+    "id": "Sion",
+    "species": ["Revenant"]
+  },
+  {
+    "id": "Sivir",
+    "species": ["Human"]
+  },
+  {
+    "id": "Skarner",
+    "species": ["Brackern"]
+  },
+  {
+    "id": "Smolder",
+    "species": ["Dragon"]
+  },
+  {
+    "id": "Sona",
+    "species": ["Human", "Magicborn"]
+  },
+  {
+    "id": "Soraka",
+    "species": ["Celestial"]
+  },
+  {
+    "id": "Swain",
+    "species": ["Human", "Magically Altered"]
+  },
+  {
+    "id": "Sylas",
+    "species": ["Human", "Magicborn"]
+  },
+  {
+    "id": "Syndra",
+    "species": ["Human", "Magicborn"]
+  },
+  {
+    "id": "TahmKench",
+    "species": ["Demon", "Spirit"]
+  },
+  {
+    "id": "Taliyah",
+    "species": ["Human", "Magicborn"]
+  },
+  {
+    "id": "Talon",
+    "species": ["Human"]
+  },
+  {
+    "id": "Taric",
+    "species": ["Human", "Aspect"]
+  },
+  {
+    "id": "Teemo",
+    "species": ["Yordle"]
+  },
+  {
+    "id": "Thresh",
+    "species": ["Undead"]
+  },
+  {
+    "id": "Tristana",
+    "species": ["Yordle"]
+  },
+  {
+    "id": "Trundle",
+    "species": ["Troll", "Iceborn"]
+  },
+  {
+    "id": "Tryndamere",
+    "species": ["Human", "Magically Altered"]
+  },
+  {
+    "id": "TwistedFate",
+    "species": ["Human", "Magicborn"]
+  },
+  {
+    "id": "Twitch",
+    "species": ["Rat", "Chemically Altered"]
+  },
+  {
+    "id": "Udyr",
+    "species": ["Human", "Spiritualist"]
+  },
+  {
+    "id": "Urgot",
+    "species": ["Human", "Chemically Altered", "Cyborg"]
+  },
+  {
+    "id": "Varus",
+    "species": ["Human", "Darkin"]
+  },
+  {
+    "id": "Vayne",
+    "species": ["Human"]
+  },
+  {
+    "id": "Veigar",
+    "species": ["Yordle"]
+  },
+  {
+    "id": "Velkoz",
+    "species": ["Void-Being"]
+  },
+  {
+    "id": "Vex",
+    "species": ["Yordle"]
+  },
+  {
+    "id": "Vi",
+    "species": ["Human"]
+  },
+  {
+    "id": "Viego",
+    "species": ["Undead"]
+  },
+  {
+    "id": "Viktor",
+    "species": ["Human", "Cyborg"]
+  },
+  {
+    "id": "Vladimir",
+    "species": ["Human", "Magically Altered"]
+  },
+  {
+    "id": "Volibear",
+    "species": ["God", "Spirit"]
+  },
+  {
+    "id": "Warwick",
+    "species": ["Chemically Altered", "Cyborg", "Human"]
+  },
+  {
+    "id": "Xayah",
+    "species": ["Vastayan"]
+  },
+  {
+    "id": "Xerath",
+    "species": ["God-Warrior"]
+  },
+  {
+    "id": "XinZhao",
+    "species": ["Human"]
+  },
+  {
+    "id": "Yasuo",
+    "species": ["Human", "Magicborn"]
+  },
+  {
+    "id": "Yone",
+    "species": ["Human", "Magically Altered"]
+  },
+  {
+    "id": "Yorick",
+    "species": ["Human", "Magically Altered"]
+  },
+  {
+    "id": "Yuumi",
+    "species": ["Cat", "Magically Altered"]
+  },
+  {
+    "id": "Zac",
+    "species": ["Golem"]
+  },
+  {
+    "id": "Zed",
+    "species": ["Human", "Magically Altered"]
+  },
+  {
+    "id": "Zeri",
+    "species": ["Human", "Magicborn"]
+  },
+  {
+    "id": "Ziggs",
+    "species": ["Yordle"]
+  },
+  {
+    "id": "Zilean",
+    "species": ["Human", "Magicborn"]
+  },
+  {
+    "id": "Zoe",
+    "species": ["Human", "Aspect"]
+  },
+  {
+    "id": "Zyra",
+    "species": ["Unknown"]
+  }
+]

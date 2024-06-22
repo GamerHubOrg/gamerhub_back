@@ -22,15 +22,16 @@ const fetchLolApi = async (_req: Request, res: Response, next: NextFunction) => 
       await axios.get(
         `https://cdn.merakianalytics.com/riot/lol/resources/latest/en-US/championrates.json`
       );
-      const {data : searchData} : {data : ILolChampionSearchResponse} = 
+    const {data : searchData} : {data : ILolChampionSearchResponse} = 
       await axios.get(
         `https://universe-meeps.leagueoflegends.com/v1/en_us/champion-browse/index.json`
       );
+    const { default: speciesData } = await import('./lol/characters_species.json');
 
     const formattedDatas: Partial<ILolCharacter>[] = Object.values(
       lolResponse.data
     ).map((data) => {
-      return formatLolChampion(data, positionData, searchData);
+      return formatLolChampion(data, positionData, searchData, speciesData);
     });
 
     await CharacterModel.bulkWrite(

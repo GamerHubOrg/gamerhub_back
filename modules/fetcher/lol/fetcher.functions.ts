@@ -1,4 +1,3 @@
-import { capitalizeFirstLetter } from "../../../utils/functions";
 import { ILolCharacter } from "../../characters/characters.types";
 import {
   ILolApiChampion,
@@ -7,8 +6,11 @@ import {
   ILolChampionRate,
   ILolChampionRatesResponse,
   ILolChampionSearch,
+  ILolChampionSpeciesResponse,
+  ILolChampionSpecie,
 } from "./lol-fetcher.types";
 import puppeteer from "puppeteer";
+import { capitalizeFirstLetter } from '../../../utils/functions'
 
 const getGenderFromLore = (name: string, lore: string) => {
   switch (name.toLowerCase()) {
@@ -89,6 +91,12 @@ const getChampionPosition = (rates: ILolChampionRate) => {
   return mostPlayedPositions;
 };
 
+const getChampionSpecies = (championId: string, species: ILolChampionSpecie[]) => {
+  const championSpecies = species.find((specie: ILolChampionSpecie) => championId === specie.id);
+  if (!championSpecies) return ['Unknown'];
+  return championSpecies.species;
+}
+
 export const getChampionRegion = (searchData?: ILolChampionSearch) => {
   const factionSlug = searchData?.["associated-faction-slug"];
 
@@ -110,7 +118,8 @@ export const getChampionRegion = (searchData?: ILolChampionSearch) => {
 export const formatLolChampion = (
   data: ILolApiChampion,
   rates: ILolChampionRatesResponse,
-  searchDatas: ILolChampionSearchResponse
+  searchDatas: ILolChampionSearchResponse,
+  speciesData: ILolChampionSpeciesResponse,
 ): Partial<ILolCharacter> => {
   const { id, key, name, lore, title, tags, stats, partype, image } = data;
   const championRates = rates.data[key];
@@ -141,6 +150,7 @@ export const formatLolChampion = (
       ressource: partype,
       region: getChampionRegion(championSearchData),
       position: getChampionPosition(championRates),
+      species: getChampionSpecies(data.id, speciesData),
       releaseYear: parseInt(releaseYear),
     },
   };
@@ -153,14 +163,8 @@ export const getLolRegions = async () => {
     waitUntil: "networkidle0",
   });
 
-  console.log("regions");
-
   const regions = await page.evaluate(() => {
-    console.log("reg");
-
     const elements = document.querySelectorAll('[class*="factionWrapper"]');
-    console.log("elements", elements);
-
     const regionNames: string[] = [];
     elements.forEach((element) => {
       const regionName = element

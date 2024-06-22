@@ -51,11 +51,12 @@ interface IColumn {
 }
 
 const LEAGUE_OF_LEGENDS_COLUMNS: IColumn[] = [
-  { name: "Sprite", key: "sprite", type: "image" },
+  { name: "Champion", key: "sprite", type: "image" },
   { name: "Gender", key: "gender" },
-  { name: "Tags", key: "tags" },
+  { name: "Species", key: "species" },
+  { name: "Combat", key: "tags" },
   { name: "Ressource", key: "ressource" },
-  { name: "Range", key: "range" },
+  { name: "Type", key: "range" },
   { name: "Position", key: "position" },
   { name: "Region", key: "region" },
   { name: "Release year", key: "releaseYear", type : "comparison" },
