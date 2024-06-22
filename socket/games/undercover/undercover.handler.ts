@@ -131,6 +131,11 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
         isEliminated: true
       }
 
+      io.in(roomId).emit('room:notifications:info', `Joueur éliminé lors du vote : ${user.username}`);
+      if (user.socket_id === socket.id) {
+        socket.emit('room:notifications:error', "Vous avez été éliminé");
+      }
+
       const notEliminatedPlayers = users.filter((u) => !u.isEliminated).length;
 
       if (notEliminatedPlayers < 3) {
@@ -146,6 +151,8 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     const usersNotEliminated = roomData.users.filter((u) => !u.isEliminated);
     const currentPlayerIndex = usersNotEliminated.findIndex((u: SocketUser) => u._id === gameData.playerTurn);
     const randomPlayer = usersNotEliminated[currentPlayerIndex + 1] ? usersNotEliminated[currentPlayerIndex + 1]._id : usersNotEliminated[0]._id;
+
+    io.in(roomId).emit('room:notifications:info', "Le vote s'est soldé par une égalité");
 
     gameData.playerTurn = randomPlayer;
     gameData.state = 'words';
