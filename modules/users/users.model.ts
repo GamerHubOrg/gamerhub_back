@@ -2,6 +2,12 @@ import mongoose from "mongoose";
 
 const { Schema } = mongoose;
 
+
+export interface IUserStripeConfig {
+  customerId: string;
+  subscriptionId: string;
+}
+
 export interface IStoredUser {
   _id: string;
   username: string,
@@ -10,8 +16,20 @@ export interface IStoredUser {
   picture: string,
   refresh_token?: string,
   roles: string[],
-  xp: number
+  xp: number,
+  subscribedAt?: Date,
+  stripe: IUserStripeConfig
 }
+
+const UserStripeConfig = new mongoose.Schema({
+  customerId: {
+    type: String,
+    required: true,
+  },
+  subscriptionId: {
+    type: String,
+  }
+}, { _id: false });
 
 const UserSchema = new Schema<IStoredUser>({
   username:{
@@ -40,7 +58,11 @@ const UserSchema = new Schema<IStoredUser>({
   xp:{
     type: Number,
     default: 0,
-  }
+  },
+  subscribedAt: {
+    type: Date,
+  },
+  stripe: UserStripeConfig,
 }, { timestamps: true })
 
 export default mongoose.model('Users', UserSchema);
