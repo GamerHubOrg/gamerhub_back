@@ -97,6 +97,8 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     if (!hasGuessedRight)
       return socket.emit("game:speedrundle:data", { data: gameData }, userId);
 
+    thisRoundData.hasFound = true;
+
     const currentScore = calculateScore(
       (new Date().getTime() - thisRoundData.startDate.getTime()) / 1000,
       thisRoundData.guesses.length
@@ -133,6 +135,55 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     io.in(roomId).emit("game:speedrundle:data", { data: gameData }, userId), 3000;
   };
 
+  const onGiveUp = (roomId: string, userId: string) => {
+    const roomData = roomsDataMap.get(roomId) as ISpeedrundleRoomData;
+    if (!roomData) return socket.emit("room:not-found", roomId);
+    const gameData = roomData.gameData;
+    if (!gameData) return;
+
+    const userAnswers = gameData.usersAnswers.find(
+      ({ playerId }) => playerId === userId
+    );
+
+    if (!userAnswers) return;
+
+    const { currentRound } = userAnswers;
+
+    const thisRoundData = userAnswers.roundsData[currentRound - 1];
+    const currentGuess = gameData.charactersToGuess[currentRound - 1];
+    thisRoundData.score = 0;
+
+    socket.emit('room:notifications:error', `Vous avez abandonné ce tour, la réponse était ${currentGuess.name} !`);
+    socket.emit('game:speedrundle:give-up-character');
+
+    // If this player is finished -> set state to "finished"
+    const isLastRound = currentRound === roomData.config.nbRounds;
+    if (isLastRound) {
+      userAnswers.state = "finished";
+      io.in(roomId).emit("game:speedrundle:data", { data: gameData }, userId);
+
+      const allPlayersFinished = gameData.usersAnswers.every(
+        (answer) => answer.state === "finished"
+      );
+
+      // If all players are finished -> results page
+      if (allPlayersFinished) {
+        roomData.gameState = "results";
+        io.in(roomId).emit('game:speedrundle:end-game');
+        io.in(roomId).emit("room:updated", roomData);
+      }
+
+      return;
+    }
+
+    // If he's not finished -> next character to guess   
+    const newRound = userAnswers.currentRound + 1
+    userAnswers.currentRound = newRound;
+    userAnswers.roundsData[newRound -1].startDate = new Date();
+    io.in(roomId).emit("game:speedrundle:data", { data: gameData }, userId), 3000;
+  };
+
+
   const onGetData = (roomId: string) => {
     const roomData = roomsDataMap.get(roomId);
     if (!roomData) return socket.emit("room:not-found", roomId);
@@ -142,6 +193,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
 
   socket.on("game:speedrundle:initialize", onInitialize);
   socket.on("game:speedrundle:guess", onGuess);
+  socket.on("game:speedrundle:give-up", onGiveUp);
   socket.on("game:speedrundle:get-data", onGetData);
 };
 
