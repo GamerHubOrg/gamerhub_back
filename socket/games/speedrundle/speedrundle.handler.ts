@@ -4,6 +4,7 @@ import charactersService from "../../../modules/characters/characters.service";
 import { RoomLogger } from "../../logs-handler";
 import { roomsDataMap } from "../../room-handler";
 import { IoType, SocketType } from "../../types";
+import { getCharacters } from "./speedrundle.functions";
 import {
   ISpeedrundleRoomData,
   defaultSpeedrundleGameData,
@@ -42,8 +43,10 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     const roomData = roomsDataMap.get(roomId) as ISpeedrundleRoomData;
     if (!roomData) return socket.emit("room:not-found", roomId);
     const gameData = defaultSpeedrundleGameData;
-    if (!roomData.config.theme) return;
-    const allCharacters = await charactersService.getAllCharactersByTheme(roomData.config?.theme);
+    const { theme } = roomData.config;
+    if (!theme) return;
+    const allCharacters = await getCharacters(roomData.config)   
+    
     const nbRounds = roomData.config.nbRounds || 1;
     gameData.allCharacters = allCharacters;
     gameData.charactersToGuess = allCharacters
@@ -56,12 +59,12 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
         guesses: [],
         score: 0,
         hasFound: false,
-        startDate : new Date()
+        startDate: new Date(),
       })),
       score: 0,
       state: "playing",
     }));
-    gameData.columns = speedrundleColumns.league_of_legends || [];
+    gameData.columns = speedrundleColumns[theme] || [];
 
     roomData.gameData = gameData;
 
@@ -105,8 +108,11 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     );
     thisRoundData.score = currentScore;
 
-    socket.emit('room:notifications:success', `Vous avez trouvé ${currentGuess.name} !`);
-    socket.emit('game:speedrundle:find-character');
+    socket.emit(
+      "room:notifications:success",
+      `Vous avez trouvé ${currentGuess.name} !`
+    );
+    socket.emit("game:speedrundle:find-character");
 
     // If one player is finished -> set state to "finished"
     const isLastRound = currentRound === roomData.config.nbRounds;
@@ -121,18 +127,19 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
       // If all players are finished -> results page
       if (allPlayersFinished) {
         roomData.gameState = "results";
-        io.in(roomId).emit('game:speedrundle:end-game');
+        io.in(roomId).emit("game:speedrundle:end-game");
         io.in(roomId).emit("room:updated", roomData);
       }
 
       return;
     }
 
-    // If he's not finished -> next character to guess   
-    const newRound = userAnswers.currentRound + 1
+    // If he's not finished -> next character to guess
+    const newRound = userAnswers.currentRound + 1;
     userAnswers.currentRound = newRound;
-    userAnswers.roundsData[newRound -1].startDate = new Date();
-    io.in(roomId).emit("game:speedrundle:data", { data: gameData }, userId), 3000;
+    userAnswers.roundsData[newRound - 1].startDate = new Date();
+    io.in(roomId).emit("game:speedrundle:data", { data: gameData }, userId),
+      3000;
   };
 
   const onGiveUp = (roomId: string, userId: string) => {
@@ -153,8 +160,11 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     const currentGuess = gameData.charactersToGuess[currentRound - 1];
     thisRoundData.score = 0;
 
-    socket.emit('room:notifications:error', `Vous avez abandonné ce tour, la réponse était ${currentGuess.name} !`);
-    socket.emit('game:speedrundle:give-up-character');
+    socket.emit(
+      "room:notifications:error",
+      `Vous avez abandonné ce tour, la réponse était ${currentGuess.name} !`
+    );
+    socket.emit("game:speedrundle:give-up-character");
 
     // If this player is finished -> set state to "finished"
     const isLastRound = currentRound === roomData.config.nbRounds;
@@ -169,20 +179,20 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
       // If all players are finished -> results page
       if (allPlayersFinished) {
         roomData.gameState = "results";
-        io.in(roomId).emit('game:speedrundle:end-game');
+        io.in(roomId).emit("game:speedrundle:end-game");
         io.in(roomId).emit("room:updated", roomData);
       }
 
       return;
     }
 
-    // If he's not finished -> next character to guess   
-    const newRound = userAnswers.currentRound + 1
+    // If he's not finished -> next character to guess
+    const newRound = userAnswers.currentRound + 1;
     userAnswers.currentRound = newRound;
-    userAnswers.roundsData[newRound -1].startDate = new Date();
-    io.in(roomId).emit("game:speedrundle:data", { data: gameData }, userId), 3000;
+    userAnswers.roundsData[newRound - 1].startDate = new Date();
+    io.in(roomId).emit("game:speedrundle:data", { data: gameData }, userId),
+      3000;
   };
-
 
   const onGetData = (roomId: string) => {
     const roomData = roomsDataMap.get(roomId);

@@ -7,11 +7,7 @@ const getAllCharacters = async (
   next: NextFunction
 ) => {
   try {
-    const { theme } = req.query;
-    const allCharacters =
-      theme && typeof theme === "string"
-        ? await charactersService.getAllCharactersByTheme(theme)
-        : await charactersService.getAllCharacters();
+    const allCharacters = await charactersService.getAllCharacters(req.query);   
     res.send(allCharacters);
   } catch (error) {
     next(error);

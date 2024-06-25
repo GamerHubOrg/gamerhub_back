@@ -1,8 +1,4 @@
-export type CharacterDataType = "league_of_legends" | "pokemon";
-
-export interface ICharacterData extends Record<string, any> {
-  dataType: CharacterDataType;
-}
+import { ICharacter, ICharacterData } from "./characters.types";
 
 export interface ILolCharacterData extends ICharacterData {
   dataType: "league_of_legends";
@@ -18,14 +14,7 @@ export interface ILolCharacterData extends ICharacterData {
   releaseYear: number;
 }
 
-export interface ICharacter {
-  _id: string;
-  name: string;
-  lang: string;
-  apiId?: string;
-  data: ICharacterData;
-}
-
 export interface ILolCharacter extends ICharacter {
   data: ILolCharacterData;
 }
+

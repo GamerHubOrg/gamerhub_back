@@ -1,4 +1,3 @@
-import { ILolCharacter } from "../../characters/characters.types";
 import {
   ILolApiChampion,
   ILolChampionSearchResponse,
@@ -11,6 +10,7 @@ import {
 } from "./lol-fetcher.types";
 import puppeteer from "puppeteer";
 import { capitalizeFirstLetter } from '../../../utils/functions'
+import { ILolCharacter } from "../../characters/types/lol.types";
 
 const getGenderFromLore = (name: string, lore: string) => {
   switch (name.toLowerCase()) {
@@ -116,6 +116,7 @@ export const getChampionRegion = (searchData?: ILolChampionSearch) => {
 };
 
 export const formatLolChampion = (
+  locale : string,
   data: ILolApiChampion,
   rates: ILolChampionRatesResponse,
   searchDatas: ILolChampionSearchResponse,
@@ -137,8 +138,8 @@ export const formatLolChampion = (
 
   return {
     name,
-    lang: "en_US",
-    apiId: key,
+    lang: locale,
+    apiId: `league_of_legends-${key}`,
     data: {
       dataType: "league_of_legends",
       splash: `https://ddragon.leagueoflegends.com/cdn/img/champion/splash/${imageName}_0.jpg`,
