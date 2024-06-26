@@ -8,6 +8,7 @@ import {
 } from "./types";
 import { generateRandomString } from "../utils/functions";
 import { RoomLogger } from "./logs-handler";
+import { defaultConfigs } from "./room.constants";
 
 export const roomsDataMap: Map<string, IRoomData> = new Map();
 
@@ -153,6 +154,7 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     if (!roomData) return socket.emit("room:not-found", roomId);
 
     roomData.gameName = game;
+    roomData.config = defaultConfigs[game];
     roomLogger.onGameChange(roomData);
 
     io.in(roomId).emit("room:updated", roomData);
