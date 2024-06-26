@@ -16,10 +16,13 @@ interface ICreateUser {
   username: string;
   email: string;
   password: string;
+  stripe: {
+    customerId: string;
+  };
 }
 
-export function create({ username, email, password }: ICreateUser) {
-  return usersModel.create({ username, email, password })
+export function create({ username, email, password, stripe }: ICreateUser) {
+  return usersModel.create({ username, email, password, stripe })
 }
 
 export function fromUserId(userId: string) {
