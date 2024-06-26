@@ -44,7 +44,7 @@ export interface ISpeedrundleConfig {
   nbRounds: number;
   theme: CharacterDataType;
   selectedGenerations: number[];
-  selectedColumns: string[];
+  selectedColumns?: string[];
 }
 
 interface IColumn {
@@ -91,7 +91,8 @@ export const defaultSpeedrundleConfig: ISpeedrundleConfig = {
   nbRounds: 1,
   mode: 'classic',
   theme: 'league_of_legends',
-  selectedGenerations: [] 
+  selectedGenerations: [],
+  selectedColumns: [],
 }
 
 export const defaultSpeedrundleGameData: ISpeedrundleGameData = {
