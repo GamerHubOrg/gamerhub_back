@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { IStoredUser } from "./users.model";
 import config from "../../config";
 import jwt from 'jsonwebtoken'
+import stripe from "../../services/stripe";
 
 export async function PostLogin(req: CustomRequest, res: Response, next: NextFunction) {
   const { email, password } = req.body;
@@ -106,7 +107,22 @@ export async function GetMe(req: CustomRequest, res: Response, next: NextFunctio
   const { user } = req
 
   try {
-    res.json(user);
+
+    if (user?.stripe?.customerId) {
+      res.json(user);
+      return;
+    }
+
+    const stripeCustomer = await stripe.customers.create({
+      email: user!.email,
+      name: user?.username,
+    });
+
+    const updatedUser = await usersService
+      .fromUserId(user!._id)
+      .setCustomerId({ customerId: stripeCustomer.id }).select('-password -refresh_token');
+
+    res.json(updatedUser);
   } catch(err) {
     next(err)
   }

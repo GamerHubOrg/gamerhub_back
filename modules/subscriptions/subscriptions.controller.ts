@@ -75,21 +75,14 @@ export async function handleCustomerSubscriptionDeleted(data: IStripeWebhookData
 
 export const cancelSubscription = async (req: CustomRequest, res: Response) => {
   const { user } = req;
-  const { feedback } = req.query;
 
   try {
-    const subscriptions = await stripe.subscriptions.list({ customer: user!.stripe.customerId, status: 'active' });
-
-    const currentSubscription = subscriptions?.data[0];
-
-    if (!currentSubscription) {
+    if (!user?.stripe.subscriptionId) {
       res.status(400).send('User dont have any subscriptions');
       return;
     }
 
-    await stripe.subscriptions.cancel(currentSubscription.id, { 
-      cancellation_details: { feedback }, 
-    });
+    await stripe.subscriptions.cancel(user?.stripe.subscriptionId);
 
     res.sendStatus(200);
   } catch(err) {

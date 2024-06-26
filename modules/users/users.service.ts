@@ -39,10 +39,20 @@ export function fromUserId(userId: string) {
     setSubscription({ subscriptionId }: { subscriptionId?: string }) {
       const updatePayload = subscriptionId ? { $set: { 'stripe.subscriptionId': subscriptionId } } : { $unset: { 'stripe.subscriptionId': '' } };
 
-      return usersModel.updateOne(
+      return usersModel.findOneAndUpdate(
         { _id: userId },
-        { ...updatePayload }
+        { ...updatePayload },
+        { new: true }
       )
     },
+    setCustomerId({ customerId }: { customerId?: string }) {
+      const updatePayload = customerId ? { $set: { 'stripe.customerId': customerId } } : { $unset: { 'stripe.customerId': '' } };
+
+      return usersModel.findOneAndUpdate(
+        { _id: userId },
+        { ...updatePayload },
+        { new: true }
+      )
+    }
   }
 }
