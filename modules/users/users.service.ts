@@ -9,7 +9,7 @@ export function findById(id: string) {
 }
 
 export function getOneByCustomerId(customerId: string) {
-  return usersModel.findOne({ 'customerId': customerId });
+  return usersModel.findOne({ 'stripe.customerId': customerId });
 }
 
 interface ICreateUser {
