@@ -45,8 +45,8 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     const gameData = defaultSpeedrundleGameData;
     const { theme } = roomData.config;
     if (!theme) return;
-    const allCharacters = await getCharacters(roomData.config)   
-    
+    const allCharacters = await getCharacters(roomData.config);
+
     const nbRounds = roomData.config.nbRounds || 1;
     gameData.allCharacters = allCharacters;
     gameData.charactersToGuess = allCharacters
@@ -97,8 +97,10 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     const hasGuessedRight = currentGuess._id.toString() === characterId;
 
     // If he hasn't guessed right -> continue
-    if (!hasGuessedRight)
-      return socket.emit("game:speedrundle:data", { data: gameData }, userId);
+    if (!hasGuessedRight) {
+      const { charactersToGuess, allCharacters, ...data } = gameData;
+      return socket.emit("game:speedrundle:data", { data }, userId);
+    }
 
     thisRoundData.hasFound = true;
 
@@ -118,7 +120,8 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     const isLastRound = currentRound === roomData.config.nbRounds;
     if (isLastRound) {
       userAnswers.state = "finished";
-      io.in(roomId).emit("game:speedrundle:data", { data: gameData }, userId);
+      const { charactersToGuess, allCharacters, ...data } = gameData;
+      io.in(roomId).emit("game:speedrundle:data", { data }, userId);
 
       const allPlayersFinished = gameData.usersAnswers.every(
         (answer) => answer.state === "finished"
@@ -138,8 +141,8 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     const newRound = userAnswers.currentRound + 1;
     userAnswers.currentRound = newRound;
     userAnswers.roundsData[newRound - 1].startDate = new Date();
-    io.in(roomId).emit("game:speedrundle:data", { data: gameData }, userId),
-      3000;
+    const { charactersToGuess, allCharacters, ...data } = gameData;
+    io.in(roomId).emit("game:speedrundle:data", { data }, userId), 3000;
   };
 
   const onGiveUp = (roomId: string, userId: string) => {
@@ -170,7 +173,8 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     const isLastRound = currentRound === roomData.config.nbRounds;
     if (isLastRound) {
       userAnswers.state = "finished";
-      io.in(roomId).emit("game:speedrundle:data", { data: gameData }, userId);
+      const { charactersToGuess, allCharacters, ...data } = gameData;
+      io.in(roomId).emit("game:speedrundle:data", { data }, userId);
 
       const allPlayersFinished = gameData.usersAnswers.every(
         (answer) => answer.state === "finished"
@@ -190,8 +194,8 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     const newRound = userAnswers.currentRound + 1;
     userAnswers.currentRound = newRound;
     userAnswers.roundsData[newRound - 1].startDate = new Date();
-    io.in(roomId).emit("game:speedrundle:data", { data: gameData }, userId),
-      3000;
+    const { charactersToGuess, allCharacters, ...data } = gameData;
+    io.in(roomId).emit("game:speedrundle:data", { data }, userId), 3000;
   };
 
   const onGetData = (roomId: string) => {

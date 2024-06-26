@@ -13,6 +13,8 @@ const getAllCharacters = async (filters?: IFilters): Promise<ICharacter[]> => {
     filtersObject = {...filtersObject, ...otherFilters};
   }
   
+  console.log("filters", filtersObject);
+  
   const characters: ICharacter[] = await CharacterModel.find(
     filtersObject
   ).lean();
