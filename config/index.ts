@@ -13,5 +13,8 @@ export default {
     iteration: Number(process.env.CRYPTO_HASH_ITERATION) || 1000,
     tokenSecret: process.env.JWT_SECRET || 'dasdasda',
     refreshTokenSecret: process.env.REFRESH_JWT_SECRET || 'dpasdasdaddapda'
+  },
+  subscriptions: {
+    stripeSecretKey: process.env.STRIPE_SECRET_KEY
   }
 };

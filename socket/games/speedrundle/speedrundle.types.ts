@@ -40,10 +40,11 @@ export interface ISpeedrundleRoundData {
 
 export interface ISpeedrundleConfig {
   maxPlayers: number;
+  mode: string;
   nbRounds: number;
   theme: CharacterDataType;
   selectedGenerations: number[];
-  selectedColumns: string[];
+  selectedColumns?: string[];
 }
 
 interface IColumn {
@@ -84,6 +85,15 @@ export const speedrundleColumns: Record<SpeedrundleTheme, IColumn[]> = {
   marvel: [],
   pokemon: POKEMON_COLUMNS,
 };
+
+export const defaultSpeedrundleConfig: ISpeedrundleConfig = { 
+  maxPlayers: 6,
+  nbRounds: 1,
+  mode: 'classic',
+  theme: 'league_of_legends',
+  selectedGenerations: [],
+  selectedColumns: [],
+}
 
 export const defaultSpeedrundleGameData: ISpeedrundleGameData = {
   allCharacters: [],

@@ -5,6 +5,7 @@ import crypto from 'crypto';
 import { IStoredUser } from "./users.model";
 import config from "../../config";
 import jwt from 'jsonwebtoken'
+import stripe from "../../services/stripe";
 
 export async function PostLogin(req: CustomRequest, res: Response, next: NextFunction) {
   const { email, password } = req.body;
@@ -61,10 +62,16 @@ export async function PostRegister(req: CustomRequest, res: Response, next: Next
 
     const hashedPassword = crypto.pbkdf2Sync(password, config.security.salt, config.security.iteration, 64, 'sha512').toString('hex')
 
+    const stripeCustomer = await stripe.customers.create({
+      email: email,
+      name: username,
+    });
+
     const createdUser = await usersService.create({
       username,
       email,
-      password: hashedPassword
+      password: hashedPassword,
+      stripe: { customerId: stripeCustomer.id },
     })
 
     const access_token = jwt.sign({ userId: createdUser._id }, config.security.tokenSecret, { expiresIn: '5h' });
@@ -106,7 +113,22 @@ export async function GetMe(req: CustomRequest, res: Response, next: NextFunctio
   const { user } = req
 
   try {
-    res.json(user);
+
+    if (user?.stripe?.customerId) {
+      res.json(user);
+      return;
+    }
+
+    const stripeCustomer = await stripe.customers.create({
+      email: user!.email,
+      name: user?.username,
+    });
+
+    const updatedUser = await usersService
+      .fromUserId(user!._id)
+      .setCustomerId({ customerId: stripeCustomer.id }).select('-password -refresh_token');
+
+    res.json(updatedUser);
   } catch(err) {
     next(err)
   }
