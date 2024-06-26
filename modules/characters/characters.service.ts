@@ -1,10 +1,28 @@
-import { CharacterDataType, ICharacter } from "./characters.types";
+import { CharacterDataType, ICharacter } from "./types/characters.types";
 import CharacterModel from "./models/characters.model";
 
-const getAllCharacters = async (
-  filters?: Record<string, any>
-): Promise<ICharacter[]> => {
-  return await CharacterModel.find(filters || {}).lean();
+interface IFilters extends Record<string, any> {
+  theme?: "pokemon" | "league_of_legends";
+}
+
+const getAllCharacters = async (filters?: IFilters): Promise<ICharacter[]> => {
+  let filtersObject: Record<string, any> = {};
+  if (filters) {
+    const { theme, ...otherFilters } = filters;
+    if (theme) filtersObject["data.dataType"] = filters.theme;
+    filtersObject = {...filtersObject, ...otherFilters};
+  }
+  
+  console.log("filters", filtersObject);
+  
+  const characters: ICharacter[] = await CharacterModel.find(
+    filtersObject
+  ).lean();
+  return characters.sort((a, b) => {
+    const aId = parseInt(a.apiId.split("-").pop() || "0", 10);
+    const bId = parseInt(b.apiId.split("-").pop() || "0", 10);
+    return aId - bId;
+  });
 };
 
 const getCharacterById = async (_id: string): Promise<ICharacter | null> => {

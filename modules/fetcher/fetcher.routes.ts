@@ -1,14 +1,11 @@
 import { Router } from "express";
-import { fetchLolApi } from "./fetcher.controller";
-import { getLolRegions } from "./lol/fetcher.functions";
+import { fetchLolApi } from "./lol/lol-fetcher.controller";
+import { fetchPokemonApi } from "./pokemon/pokemon-fetcher.controller";
 
 const router: Router = Router();
 
 router.get("/lol", fetchLolApi);
 
-router.get("/lol-regions", async (req, res) => {
-  const regions = await getLolRegions();
-  res.send(regions)
-});
+router.get("/pokemon", fetchPokemonApi);
 
 export default router;
