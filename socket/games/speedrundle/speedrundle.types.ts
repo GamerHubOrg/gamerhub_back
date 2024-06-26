@@ -42,17 +42,19 @@ export interface ISpeedrundleConfig {
   maxPlayers: number;
   nbRounds: number;
   theme: CharacterDataType;
-  selectedGenerations? : number[]
+  selectedGenerations: number[];
+  selectedColumns: string[];
 }
 
 interface IColumn {
   name: string;
   key: string;
   type?: string;
+  isIcon?: boolean;
 }
 
 const LEAGUE_OF_LEGENDS_COLUMNS: IColumn[] = [
-  { name: "Champion", key: "sprite", type: "image" },
+  { name: "Champion", key: "sprite", type: "image", isIcon: true },
   { name: "Gender", key: "gender" },
   { name: "Species", key: "species" },
   { name: "Combat", key: "tags" },
@@ -69,12 +71,12 @@ const POKEMON_COLUMNS: IColumn[] = [
   { name: "Type 2", key: "type2" },
   { name: "Generation", key: "generation" },
   { name: "Color", key: "color" },
-  { name: "Evolution Stage", key: "evolutionStage", type : "comparison" },
+  { name: "Evolution Stage", key: "evolutionStage", type: "comparison" },
   { name: "Fully Evolved ?", key: "fullyEvolved" },
   { name: "Status", key: "status" },
   // { name: "Habitat", key: "habitat" },
-  { name: "Height", key: "height", type : "comparison" },
-  { name: "Weight", key: "weight", type : "comparison" },
+  { name: "Height", key: "height", type: "comparison" },
+  { name: "Weight", key: "weight", type: "comparison" },
 ];
 
 export const speedrundleColumns: Record<SpeedrundleTheme, IColumn[]> = {

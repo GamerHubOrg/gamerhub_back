@@ -43,8 +43,17 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     const roomData = roomsDataMap.get(roomId) as ISpeedrundleRoomData;
     if (!roomData) return socket.emit("room:not-found", roomId);
     const gameData = defaultSpeedrundleGameData;
-    const { theme } = roomData.config;
-    if (!theme) return;
+    const { theme, selectedColumns } = roomData.config;
+    if (!theme)
+      return socket.emit(
+        "room:notifications:error",
+        `Veuillez envoyer le thème de la partie.`
+      );
+    if (selectedColumns.length < 1)
+      return socket.emit(
+        "room:notifications:error",
+        `Veuillez sélectionner au moins 2 indices.`
+      );
     const allCharacters = await getCharacters(roomData.config);
 
     const nbRounds = roomData.config.nbRounds || 1;
@@ -64,7 +73,10 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
       score: 0,
       state: "playing",
     }));
-    gameData.columns = speedrundleColumns[theme] || [];
+    gameData.columns =
+      speedrundleColumns[theme].filter(({ key, isIcon }) =>
+        isIcon || selectedColumns.includes(key)
+      ) || [];
 
     roomData.gameData = gameData;
 
