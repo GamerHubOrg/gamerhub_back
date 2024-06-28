@@ -6,6 +6,7 @@ import { IStoredUser } from "./users.model";
 import config from "../../config";
 import jwt from 'jsonwebtoken'
 import stripe from "../../services/stripe";
+import cache from '../../services/redis';
 
 export async function PostLogin(req: CustomRequest, res: Response, next: NextFunction) {
   const { email, password } = req.body;
@@ -144,6 +145,8 @@ export async function GetUser(req: CustomRequest, res: Response, next: NextFunct
       res.status(400).send('User not found');
       return;
     }
+
+    cache.setEx(req.originalUrl, config.database.redisTtl, JSON.stringify(user));
 
     res.json(user);
   } catch(err) {

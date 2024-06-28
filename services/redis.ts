@@ -1,20 +1,21 @@
-import { createClient, RedisClientOptions } from 'redis';
+import { createClient } from 'redis';
 import config from '../config';
-import { getLogger } from '../shared/tools/logger';
 
 const client = createClient({
     url: config.database.redisUrl
 });
-const logger = getLogger();
 
 export async function connectRedis() {
     try {
-        client.on("error", (error) => console.error(`Error : ${error}`));
+        client.on("error", async (error): Promise<void> => {
+            console.error(`Error : ${error}`)
+            await client.disconnect();
+        });
 
         await client.connect();
-        logger.info('[redis]: Connected successfully')
+        console.log('[redis] Cache connected')
     } catch(err) {
-        logger.error('[redis]: Unable to connect => ', err);
+        console.error('[redis] Unable to connect => ', err);
     }
 }
 

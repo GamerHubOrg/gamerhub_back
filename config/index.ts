@@ -8,6 +8,7 @@ export default {
   database: {
     url: process.env.MONGO_URI || 'mongodb://admin:admin@mongo:27017/database?authSource=admin',
     redisUrl: process.env.REDIS_URI || 'redis://192.168.1.44:6379',
+    redisTtl: Number(process.env.REDIS_TTL) || 10000,
   },
   security: {
     salt: process.env.CRYTO_HASH_SALT || 'lkdsnaoklpsdnaskoldas',
