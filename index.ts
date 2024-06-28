@@ -1,17 +1,19 @@
 import promClient from "prom-client";
 import responseTime from "response-time";
+import cookieParser from 'cookie-parser';
+import express, { Application } from "express";
+import cors from "cors";
+import http from "http";
+import { Server } from "socket.io";
+
 import { getLogger } from "./shared/tools/logger";
 import { logError, logResponseTime } from "./middlewares/logs";
-import express, { Application } from "express";
-import http from "http";
-import cors from "cors";
 import database from "./services/database";
+import { connectRedis } from './services/redis';
 import router from "./router";
 import config from "./config";
-import { Server } from "socket.io";
 import SocketConnectionHandler from "./socket";
 import { verifyAuth } from "./middlewares/authenticated";
-import cookieParser from 'cookie-parser';
 import { errorHandler } from "./middlewares/errorHandler";
 
 const logger = getLogger();
@@ -62,6 +64,7 @@ if (logger) {
 const server = http.createServer(app);
 
 database.connect();
+connectRedis();
 
 const io = new Server(server, {
   cors: {

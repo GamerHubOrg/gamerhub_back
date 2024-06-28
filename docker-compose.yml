@@ -1,0 +1,8 @@
+services:
+  redis:
+    image: docker.dragonflydb.io/dragonflydb/dragonfly:latest
+    environment:
+      REDIS_PWD: '${REDIS_PWD}'
+    ports:
+      - 6379:6379
+    command: dragonfly --requirepass $REDIS_PWD
