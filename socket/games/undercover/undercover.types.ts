@@ -51,7 +51,7 @@ export interface IUndercoverVote {
 
 export type UndercoverTheme = 'classic';
 
-export type UndercoverMode = 'words' | 'images' | 'songs';
+export type UndercoverMode = 'words' | 'images';
 
 export interface IUndercoverConfig {
     maxPlayers: number;
