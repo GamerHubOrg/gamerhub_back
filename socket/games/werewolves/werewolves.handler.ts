@@ -202,7 +202,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
 
     votes.push({ playerId: userId, vote, turn: gameTurn })
     gameData.villageVotes = votes;
-    gameData.tmpVotes = votes.filter((v) => v.playerId !== userId);
+    gameData.tmpVotes = gameData.tmpVotes.filter((v) => v.playerId !== userId);
 
     const currentTurnVotes = votes.filter((v) => v.turn === gameTurn);
 
@@ -243,6 +243,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
 
     gameData.tmpVotes = [];
     gameData.state = 'night';
+    gameData.turn += 1;
 
     io.in(roomId).emit("game:werewolves:data", { data: gameData });
   }
