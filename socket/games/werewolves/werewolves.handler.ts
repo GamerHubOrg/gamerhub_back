@@ -1,5 +1,6 @@
 import { roomsDataMap } from "../../room-handler";
 import { IoType, SocketType } from "../../types";
+import Witch from "./roles/Witch";
 import { nightRolesOrder } from "./werewolves.constants";
 import { getAvailableRoles, getAvailableRolesInstance, handleGiveUsersRoles } from "./werewolves.functions";
 import { IWerewolvesRoomData, IWerewolvesSendKill, IWerewolvesSendSave, IWerewolvesSendVote, IWerewolvesVote, defaultWerewolvesConfig, defaultWerewolvesGameData } from "./werewolves.types";
@@ -133,6 +134,10 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     roomData.users[votedPlayerIndex].role?.setIsBeingKilled(false);
     roomData.users[votedPlayerIndex].role?.setDeathTurn(undefined);
 
+    const currentPlayerIndex = roomData.users.findIndex((u) => u._id === userId);
+    if (currentPlayerIndex === -1) return;
+    (roomData.users[currentPlayerIndex].role as Witch).power.useSavePotion();
+
     const compositionRoles = getAvailableRoles(config.composition);
     const gameRoles = compositionRoles.filter((role) => roomData.users.some((u) => u.role instanceof role));
     const order = nightRolesOrder.filter((role) => gameRoles.some((comp) => comp === role));
@@ -169,6 +174,10 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     roomData.users[votedPlayerIndex].role?.setIsBeingKilled(false);
     roomData.users[votedPlayerIndex].role?.setIsAlive(false);
     roomData.users[votedPlayerIndex].role?.setDeathTurn(gameTurn);
+
+    const currentPlayerIndex = roomData.users.findIndex((u) => u._id === userId);
+    if (currentPlayerIndex === -1) return;
+    (roomData.users[currentPlayerIndex].role as Witch).power.useKillPotion();
 
     const compositionRoles = getAvailableRoles(config.composition);
     const gameRoles = compositionRoles.filter((role) => roomData.users.some((u) => u.role instanceof role));
