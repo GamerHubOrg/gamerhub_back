@@ -1,10 +1,13 @@
 import { IGameData, IRoomData, SocketUser } from "../../types";
+import { WerewolfRole } from "./roles/WerewolvePlayer";
 
-export type IWerewolvesGameState = 'night' | 'vote';
+export type IWerewolvesGameState = 'night' | 'day';
 
 export type IWerewolvesCamp = 'wolve' | 'villager' | 'solo';
 
-export interface IWerewolvesPlayer extends SocketUser {}
+export interface IWerewolvesPlayer extends SocketUser {
+  role?: WerewolfRole;
+}
 
 export interface IWerewolvesRoomData extends IRoomData {
   users: IWerewolvesPlayer[];
@@ -20,8 +23,12 @@ export interface IWerewolvesConfig {
 }
 
 export interface IWerewolvesGameData extends IGameData {
-  votes: IWerewolvesVote[],
-  playerTurn?: string;
+  wolfVotes: IWerewolvesVote[],
+  villageVotes: IWerewolvesVote[],
+  tmpVotes: Partial<IWerewolvesVote>[],
+  witchSaves?: IWerewolvesSave[],
+  witchKills?: IWerewolvesKill[],
+  roleTurn?: string;
   state: IWerewolvesGameState;
   campWin?: IWerewolvesCamp;
   turn: number;
@@ -33,4 +40,36 @@ export interface IWerewolvesVote {
   turn: number;
 }
 
-export const defaultWerewolvesGameData = {}
+export interface IWerewolvesSave {
+  playerId: string;
+  save: string;
+  turn: number;
+}
+
+export interface IWerewolvesKill {
+  playerId: string;
+  kill: string;
+  turn: number;
+}
+
+export interface IWerewolvesSendVote {
+  roomId: string;
+  vote: string;
+  userId: string;
+}
+
+export interface IWerewolvesSendSave {
+  roomId: string;
+  save: string;
+  userId: string;
+}
+
+export interface IWerewolvesSendKill {
+  roomId: string;
+  kill: string;
+  userId: string;
+}
+
+export const defaultWerewolvesGameData: IWerewolvesGameData = { state: 'day', turn: 1, wolfVotes: [], tmpVotes: [], villageVotes: [] };
+
+export const defaultWerewolvesConfig: IWerewolvesConfig = { composition: { 'wolf': 1, 'witch': 1 }, maxPlayers: 10 }
