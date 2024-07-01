@@ -7,7 +7,7 @@ export default {
   origin: process.env.ORIGIN || 'http://localhost:5174',
   database: {
     url: process.env.MONGO_URI || 'mongodb://admin:admin@mongo:27017/database?authSource=admin',
-    redisUrl: process.env.REDIS_URI || 'redis://192.168.1.44:6379',
+    redisUrl: process.env.REDIS_URI || 'redis://127.0.0.1:6379',
     redisTtl: Number(process.env.REDIS_TTL) || 10000,
   },
   security: {
