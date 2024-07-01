@@ -52,6 +52,26 @@ export class RoomLogger {
     ];
   }
 
+  public onUserPromoted(roomData: IRoomData, user: SocketUser) {
+    roomData.logs = [
+      ...roomData.logs,
+      {
+        date: new Date(),
+        message: `User ${user.username} has been promoted to owner.`,
+      },
+    ];
+  }
+
+  public onUserKicked(roomData: IRoomData, user: SocketUser) {
+    roomData.logs = [
+      ...roomData.logs,
+      {
+        date: new Date(),
+        message: `User ${user.username} has been kicked.`,
+      },
+    ];
+  }
+
   public onGameChange(roomData: IRoomData) {
     roomData.logs = [
       ...roomData.logs,
@@ -62,7 +82,7 @@ export class RoomLogger {
     ];
   }
 
-  public onGameInitialized(roomData : IRoomData) {
+  public onGameInitialized(roomData: IRoomData) {
     roomData.logs = [
       ...roomData.logs,
       {
@@ -89,7 +109,7 @@ export class UndercoverLogger {
       ...roomData.logs,
       {
         date: new Date(),
-        message: 'Players can now vote to find the undercover',
+        message: "Players can now vote to find the undercover",
       },
     ];
   }
@@ -110,6 +130,56 @@ export class UndercoverLogger {
       {
         date: new Date(),
         message: `Game ended, ${side} win`,
+      },
+    ];
+  }
+}
+
+export class SpeedundleLogger {
+  public onFindGuess(
+    roomData: IRoomData,
+    user: SocketUser,
+    roundIndex: number
+  ) {
+    roomData.logs = [
+      ...roomData.logs,
+      {
+        date: new Date(),
+        message: `${user.username} has found the round ${roundIndex}.`,
+      },
+    ];
+  }
+
+  public onAbandonGuess(
+    roomData: IRoomData,
+    user: SocketUser,
+    roundIndex: number
+  ) {
+    roomData.logs = [
+      ...roomData.logs,
+      {
+        date: new Date(),
+        message: `${user.username} has abandoned the round ${roundIndex}.`,
+      },
+    ];
+  }
+
+  public onFinish(roomData: IRoomData, user: SocketUser) {
+    roomData.logs = [
+      ...roomData.logs,
+      {
+        date: new Date(),
+        message: `${user.username} has finished all guesses.`,
+      },
+    ];
+  }
+
+  public onGameEnded(roomData: IRoomData) {
+    roomData.logs = [
+      ...roomData.logs,
+      {
+        date: new Date(),
+        message: `Game ended`,
       },
     ];
   }

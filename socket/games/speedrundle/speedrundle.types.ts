@@ -4,7 +4,7 @@ import {
 } from "../../../modules/characters/types/characters.types";
 import { IGameData, IRoomData, SocketUser } from "../../types";
 
-export type SpeedrundleTheme = "league_of_legends" | "pokemon" | "marvel";
+export type SpeedrundleTheme = "league_of_legends" | "pokemon";
 export type ISpeedrundleGameState = "guess";
 
 export interface ISpeedrundlePlayer extends SocketUser {
@@ -82,7 +82,6 @@ const POKEMON_COLUMNS: IColumn[] = [
 
 export const speedrundleColumns: Record<SpeedrundleTheme, IColumn[]> = {
   league_of_legends: LEAGUE_OF_LEGENDS_COLUMNS,
-  marvel: [],
   pokemon: POKEMON_COLUMNS,
 };
 

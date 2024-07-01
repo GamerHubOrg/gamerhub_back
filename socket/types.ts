@@ -20,7 +20,7 @@ export type SocketType = Socket<
 export interface SocketUser extends User {
   socket_id: string;
   isOwner?: boolean;
-  joindedAt: Date;
+  joinedAt: Date;
 }
 
 export type GameState = "lobby" | "started" | "results";

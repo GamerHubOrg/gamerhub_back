@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // import { getRandomIndex } from "../../../utils/functions";
 import charactersService from "../../../modules/characters/characters.service";
-import { RoomLogger } from "../../logs-handler";
+import { RoomLogger, SpeedundleLogger } from "../../logs-handler";
 import { roomsDataMap } from "../../room-handler";
 import { IoType, SocketType } from "../../types";
 import { getCharacters } from "./speedrundle.functions";
@@ -38,6 +38,7 @@ const calculateScore = (time: number, nbTries: number) => {
 // Socket handlers
 const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
   const roomLogger = new RoomLogger();
+  const gameLogger = new SpeedundleLogger();
 
   const onInitialize = async (roomId: string) => {
     const roomData = roomsDataMap.get(roomId) as ISpeedrundleRoomData;
@@ -77,8 +78,8 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
       state: "playing",
     }));
     gameData.columns =
-      speedrundleColumns[theme].filter(({ key, isIcon }) =>
-        isIcon || selectedColumns?.includes(key)
+      speedrundleColumns[theme].filter(
+        ({ key, isIcon }) => isIcon || selectedColumns?.includes(key)
       ) || [];
 
     roomData.gameData = gameData;
@@ -117,6 +118,9 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
       return socket.emit("game:speedrundle:data", { data }, userId);
     }
 
+    const user = roomData.users.find((u) => u._id === userId);
+    if (user) gameLogger.onFindGuess(roomData, user, currentRound);
+
     thisRoundData.hasFound = true;
 
     const currentScore = calculateScore(
@@ -134,6 +138,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     // If one player is finished -> set state to "finished"
     const isLastRound = currentRound === roomData.config.nbRounds;
     if (isLastRound) {
+      if (user) gameLogger.onFinish(roomData, user);
       userAnswers.state = "finished";
       const { charactersToGuess, allCharacters, ...data } = gameData;
       io.in(roomId).emit("game:speedrundle:data", { data }, userId);
@@ -144,6 +149,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
 
       // If all players are finished -> results page
       if (allPlayersFinished) {
+        if (user) gameLogger.onGameEnded(roomData);
         roomData.gameState = "results";
         io.in(roomId).emit("game:speedrundle:end-game");
         io.in(roomId).emit("room:updated", roomData);
@@ -178,6 +184,9 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     const currentGuess = gameData.charactersToGuess[currentRound - 1];
     thisRoundData.score = 0;
 
+    const user = roomData.users.find((u) => u._id === userId);
+    if (user) gameLogger.onAbandonGuess(roomData, user, currentRound);
+
     socket.emit(
       "room:notifications:error",
       `Vous avez abandonné ce tour, la réponse était ${currentGuess.name} !`
@@ -187,6 +196,8 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     // If this player is finished -> set state to "finished"
     const isLastRound = currentRound === roomData.config.nbRounds;
     if (isLastRound) {
+      if (user) gameLogger.onFinish(roomData, user);
+
       userAnswers.state = "finished";
       const { charactersToGuess, allCharacters, ...data } = gameData;
       io.in(roomId).emit("game:speedrundle:data", { data }, userId);
@@ -197,6 +208,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
 
       // If all players are finished -> results page
       if (allPlayersFinished) {
+        if (user) gameLogger.onGameEnded(roomData);
         roomData.gameState = "results";
         io.in(roomId).emit("game:speedrundle:end-game");
         io.in(roomId).emit("room:updated", roomData);
