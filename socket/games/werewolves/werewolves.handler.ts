@@ -1,10 +1,11 @@
 import { roomsDataMap } from "../../room-handler";
 import { IoType, SocketType } from "../../types";
 import Hunter from "./roles/Hunter";
+import Thief from "./roles/Thief";
 import Witch from "./roles/Witch";
 import { nightRolesOrder } from "./werewolves.constants";
-import { getAvailableRoles, getAvailableRolesInstance, getNextPlayingRole, handleGiveUsersRoles } from "./werewolves.functions";
-import { IWerewolvesGameData, IWerewolvesRoomData, IWerewolvesSendCouple, IWerewolvesSendKill, IWerewolvesSendSave, IWerewolvesSendVote, IWerewolvesSendWatchRole, IWerewolvesVote, defaultWerewolvesConfig, defaultWerewolvesGameData } from "./werewolves.types";
+import { getAvailableRoles, getAvailableRolesInstance, getNextPlayingRole, getThiefUsers, handleGiveUsersRoles } from "./werewolves.functions";
+import { IWerewolvesChooseRole, IWerewolvesGameData, IWerewolvesRoomData, IWerewolvesSendCouple, IWerewolvesSendKill, IWerewolvesSendSave, IWerewolvesSendVote, IWerewolvesSendWatchRole, IWerewolvesVote, defaultWerewolvesConfig, defaultWerewolvesGameData } from "./werewolves.types";
 
 const WerewolvesHandler = (io: IoType, socket: SocketType) => {
   const onInitialize = async (roomId: string) => {
@@ -17,7 +18,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     gameData.state = 'day';
     gameData.turn = 1;
     gameData.wolfVotes = [];
-    roomData.users = handleGiveUsersRoles(roomData.users, config.composition);
+    roomData.users = handleGiveUsersRoles(roomData.users, config.composition, gameData);
     
     io.in(roomId).emit("room:updated", roomData);
 
@@ -27,11 +28,15 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
 
     setTimeout(() => {
       gameData.state = 'night';
-      const compositionRoles = getAvailableRolesInstance(config.composition);
+      const compositionRoles = getAvailableRolesInstance(config.composition, gameData);
       const order = nightRolesOrder.filter((role) => compositionRoles.some((comp) => comp instanceof role));
       const playerRoleToPlay = order[0];
       const roleTurn = roomData.users.find((user) => user.role instanceof playerRoleToPlay);
       gameData.roleTurn = roleTurn?.role?.name;
+
+      if (order.includes(Thief)) {
+        gameData.thiefUsers = getThiefUsers(roomData.users);
+      }
 
       io.in(roomId).emit("game:werewolves:state", { data: gameData });
     }, 5000)
@@ -88,7 +93,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
       }
       roomData.users[votedPlayerIndex].role?.setDeathTurn(gameTurn);
 
-      const compositionRoles = getAvailableRoles(config.composition);
+      const compositionRoles = getAvailableRoles(config.composition, gameData);
       const gameRoles = compositionRoles.filter((role) => roomData.users.some((u) => u.role instanceof role));
       const order = nightRolesOrder.filter((role) => gameRoles.some((comp) => comp === role));
       const currentRole = roomData.users.find((user) => user.role?.name === gameData.roleTurn)?.role;
@@ -150,7 +155,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     if (currentPlayerIndex === -1) return;
     (roomData.users[currentPlayerIndex].role as Witch).power.useSavePotion();
 
-    const compositionRoles = getAvailableRoles(config.composition);
+    const compositionRoles = getAvailableRoles(config.composition, gameData);
     const gameRoles = compositionRoles.filter((role) => roomData.users.some((u) => u.role instanceof role));
     const order = nightRolesOrder.filter((role) => gameRoles.some((comp) => comp === role));
     const currentRole = roomData.users.find((user) => user.role?.name === gameData.roleTurn)?.role;
@@ -191,7 +196,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     if (currentPlayerIndex === -1) return;
     (roomData.users[currentPlayerIndex].role as Witch).power.useKillPotion();
 
-    const compositionRoles = getAvailableRoles(config.composition);
+    const compositionRoles = getAvailableRoles(config.composition, gameData);
     const gameRoles = compositionRoles.filter((role) => roomData.users.some((u) => u.role instanceof role));
     const order = nightRolesOrder.filter((role) => gameRoles.some((comp) => comp === role));
     const currentRole = roomData.users.find((user) => user.role?.name === gameData.roleTurn)?.role;
@@ -252,7 +257,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
       io.in(roomId).emit("room:updated", roomData);
     }
 
-    const compositionRoles = getAvailableRoles(config.composition);
+    const compositionRoles = getAvailableRoles(config.composition, gameData);
     const gameRoles = compositionRoles.filter((role) => roomData.users.some((u) => u.role?.isAlive && u.role instanceof role));
     const order = nightRolesOrder.filter((role) => gameRoles.some((comp) => comp === role));
 
@@ -294,7 +299,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     const villageAlreadyVoted = !!villageVotes.find((v) => v.turn === gameTurn);
 
     if (villageAlreadyVoted) {
-      const compositionRoles = getAvailableRoles(config.composition);
+      const compositionRoles = getAvailableRoles(config.composition, gameData);
       const gameRoles = compositionRoles.filter((role) => roomData.users.some((u) => u.role instanceof role));
       const order = nightRolesOrder.filter((role) => gameRoles.some((comp) => comp === role));
       const roleTurn = roomData.users.find((user) => user.role instanceof order[0]);
@@ -348,21 +353,41 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     io.in(roomId).emit("game:werewolves:data", { data: gameData });
   }
 
+  const onThiefChooseRole = ({ roomId, userId, swap }: IWerewolvesChooseRole) => {
+    const roomData = (roomsDataMap.get(roomId) as IWerewolvesRoomData);
+    if (!roomData) return socket.emit("room:not-found", roomId);
+
+    let gameData = roomData.gameData || defaultWerewolvesGameData;
+    const config = defaultWerewolvesConfig;
+    const currentUserIndex = roomData.users.findIndex((u) => u._id === userId);
+    const targetUserIndex = roomData.users.findIndex((u) => u._id === swap);
+
+    const roleToSwap = roomData.users[targetUserIndex].role;
+    roomData.users[targetUserIndex].role = roomData.users[currentUserIndex].role;
+    roomData.users[currentUserIndex].role = roleToSwap;
+
+    const nextRole: Partial<IWerewolvesGameData> = getNextPlayingRole(config.composition, roomData.users, gameData);
+    gameData = {
+      ...gameData,
+      ...nextRole,
+    }
+
+    roomData.gameData = gameData;
+
+    io.in(roomId).emit("room:updated", roomData);
+  }
+
   socket.on("game:werewolves:initialize", onInitialize);
   socket.on("game:werewolves:get-data", onGetData);
   socket.on("game:werewolves:vote:tmp", onWolfVoteSelectPlayer);
   socket.on("game:werewolves:village:vote", onVillageVote);
-
   socket.on("game:werewolves:wolf:vote", onWolfVote);
-
   socket.on("game:werewolves:witch:save", onWitchSavePlayer);
   socket.on("game:werewolves:witch:kill", onWitchKillPlayer);
-
   socket.on("game:werewolves:hunter:kill", onHunterKillPlayer);
-
   socket.on("game:werewolves:psychic:watch", onPsychicWatchRole);
-
   socket.on("game:werewolves:cupidon:couple", onCupidonDefineCouple);
+  socket.on("game:werewolves:thief:choose", onThiefChooseRole);
 }
 
 export default WerewolvesHandler;

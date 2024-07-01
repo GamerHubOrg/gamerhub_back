@@ -1,3 +1,4 @@
+import { getRandomElement } from "../../../utils/functions";
 import Cupidon from "./roles/Cupidon";
 import Hunter from "./roles/Hunter";
 import Psychic from "./roles/Psychic";
@@ -11,7 +12,7 @@ import { IWerewolvesComposition, IWerewolvesGameData, IWerewolvesGameState, IWer
 
 type RoleConstructor = new () => WerewolfRole;
 
-export const werewolvesRoles: Record<string, RoleConstructor> = {
+const rolesList: Record<string, any> = {
     wolf: Wolf,
     hunter: Hunter,
     thief: Thief,
@@ -21,26 +22,38 @@ export const werewolvesRoles: Record<string, RoleConstructor> = {
     villager: Villager,
 }
 
-export function getAvailableRolesInstance(composition: IWerewolvesComposition): WerewolfRole[] {
+const firstRoundOnlyRoles = [Thief, Cupidon];
+
+export const werewolvesRoles: Record<string, RoleConstructor> = rolesList;
+
+export function getAvailableRolesInstance(composition: IWerewolvesComposition, gameData: IWerewolvesGameData): WerewolfRole[] {
     return Object.keys(composition)
-        .reduce((acc: WerewolfRole[], role: string) => ([
-            ...acc,
-            ...Array(composition[role]).fill(new werewolvesRoles[role]())
-        ])
+        .reduce((acc: WerewolfRole[], role: string) => {
+            if (gameData.turn > 1 && firstRoundOnlyRoles.includes(rolesList[role])) return acc;
+
+            return [
+                ...acc,
+                ...Array(composition[role]).fill(new werewolvesRoles[role]())
+            ];
+        }
     , [])
 }
 
-export function getAvailableRoles(composition: IWerewolvesComposition): RoleConstructor[] {
+export function getAvailableRoles(composition: IWerewolvesComposition, gameData: IWerewolvesGameData): RoleConstructor[] {
     return Object.keys(composition)
-        .reduce((acc: RoleConstructor[], role: string) => ([
-            ...acc,
-            ...Array(composition[role]).fill(werewolvesRoles[role])
-        ])
+        .reduce((acc: RoleConstructor[], role: string) => {
+            if (gameData.turn > 1 && firstRoundOnlyRoles.includes(rolesList[role])) return acc;
+
+            return [
+                ...acc,
+                ...Array(composition[role]).fill(werewolvesRoles[role])
+            ]
+        }
     , [])
 }
 
-export function handleGiveUsersRoles(users: IWerewolvesPlayer[], composition: IWerewolvesComposition): IWerewolvesPlayer[] {
-    const availableRoles = getAvailableRolesInstance(composition);
+export function handleGiveUsersRoles(users: IWerewolvesPlayer[], composition: IWerewolvesComposition, gameData: IWerewolvesGameData): IWerewolvesPlayer[] {
+    const availableRoles = getAvailableRolesInstance(composition, gameData);
     const shuffledComposition = availableRoles.sort(() => 0.5 - Math.random());
 
     return users.map((user) => {
@@ -50,8 +63,13 @@ export function handleGiveUsersRoles(users: IWerewolvesPlayer[], composition: IW
     })
 }
 
+export function getThiefUsers(users: IWerewolvesPlayer[]) {
+    const availableUsers = users.filter((user) => !(user.role instanceof Thief))
+    return getRandomElement(availableUsers, 2, true);
+}
+
 export function getNextPlayingRole(composition: IWerewolvesComposition, users: IWerewolvesPlayer[], gameData: IWerewolvesGameData): { state: IWerewolvesGameState, roleTurn: string } {
-    const compositionRoles = getAvailableRoles(composition);
+    const compositionRoles = getAvailableRoles(composition, gameData);
     const gameRoles = compositionRoles.filter((role) => users.some((u) => u.role instanceof role));
     const order = nightRolesOrder.filter((role) => gameRoles.some((comp) => comp === role));
     const currentRole = users.find((user) => user.role?.name === gameData.roleTurn)?.role;

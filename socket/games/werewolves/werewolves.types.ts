@@ -23,13 +23,14 @@ export interface IWerewolvesConfig {
 }
 
 export interface IWerewolvesGameData extends IGameData {
-  wolfVotes: IWerewolvesVote[],
-  villageVotes: IWerewolvesVote[],
-  tmpVotes: Partial<IWerewolvesVote>[],
-  witchSaves?: IWerewolvesSave[],
-  witchKills?: IWerewolvesKill[],
-  psychicWatch?: IWerewolvesWatchRole[],
-  couple?: IWerewolvesCouple,
+  wolfVotes: IWerewolvesVote[];
+  villageVotes: IWerewolvesVote[];
+  tmpVotes: Partial<IWerewolvesVote>[];
+  witchSaves?: IWerewolvesSave[];
+  witchKills?: IWerewolvesKill[];
+  psychicWatch?: IWerewolvesWatchRole[];
+  thiefUsers?: IWerewolvesPlayer[];
+  couple?: IWerewolvesCouple;
   roleTurn?: string;
   state: IWerewolvesGameState;
   campWin?: IWerewolvesCamp;
@@ -89,6 +90,12 @@ export type IWerewolvesCouple = string[];
 export interface IWerewolvesSendCouple {
   roomId: string;
   couple: IWerewolvesCouple;
+}
+
+export interface IWerewolvesChooseRole {
+  roomId: string;
+  userId: string;
+  swap: string;
 }
 
 export const defaultWerewolvesGameData: IWerewolvesGameData = { state: 'day', turn: 1, wolfVotes: [], tmpVotes: [], villageVotes: [] };
