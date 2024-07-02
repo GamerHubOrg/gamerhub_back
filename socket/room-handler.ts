@@ -12,6 +12,17 @@ import { defaultConfigs } from "./room.constants";
 
 export const roomsDataMap: Map<string, IRoomData> = new Map();
 
+const getMinimumPlayers = (gameName: string) => {
+  switch (gameName) {
+    case "undercover":
+      return process.env.PROD ? 3 : 1;
+    case "speedrundle":
+      return 2;
+    default:
+      return 0;
+  }
+};
+
 // Room data functions
 const generateRoomId = (io: IoType): string => {
   const roomId = generateRandomString(8);
@@ -160,6 +171,13 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
 
     const leavingUser = removeUserFromRoom(roomId, roomData, socket.id);
     if (leavingUser) roomLogger.onRoomLeave(roomData, leavingUser);
+
+    const minimumPlayers = getMinimumPlayers(roomData.gameName);
+    if(roomData.gameState !== "lobby" && roomData.users.length < minimumPlayers) {
+      roomData.gameState = "lobby";
+      io.in(roomId).emit("room:updated", roomData);
+      io.in(roomId).emit("room:notifications:error", "Il n y a plus assez de joueurs pour continuer la partie.")
+    }
 
     io.in(roomId).emit("room:updated", roomData);
   };
