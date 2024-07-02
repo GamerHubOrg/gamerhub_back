@@ -3,7 +3,7 @@ import { WerewolfRole } from "./roles/WerewolvePlayer";
 
 export type IWerewolvesGameState = 'night' | 'day';
 
-export type IWerewolvesCamp = 'wolve' | 'villager' | 'solo';
+export type IWerewolvesCamp = 'wolve' | 'village' | 'solo';
 
 export interface IWerewolvesPlayer extends SocketUser {
   role?: WerewolfRole;
@@ -100,4 +100,12 @@ export interface IWerewolvesChooseRole {
 
 export const defaultWerewolvesGameData: IWerewolvesGameData = { state: 'day', turn: 1, wolfVotes: [], tmpVotes: [], villageVotes: [] };
 
-export const defaultWerewolvesConfig: IWerewolvesConfig = { composition: { 'wolf': 1, 'thief': 1 }, maxPlayers: 10 }
+export const defaultWerewolvesConfig: IWerewolvesConfig = { 
+  composition: {
+    'wolf': 1,
+    'villager': 1,
+    'thief': 1,
+    'hunter': 1
+  }, 
+  maxPlayers: 10 
+}

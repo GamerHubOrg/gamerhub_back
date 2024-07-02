@@ -5,6 +5,6 @@ export default class Wolf extends WerewolfRole {
     power: Power = new Power('Repas nocturne', "Décider d'une cible à dévorer avec les autres loups");
 
     constructor() {
-        super("Loup", "Loup description", "loups");
+        super("Loup", "Loup description", "wolves");
     }
 }

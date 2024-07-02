@@ -8,7 +8,7 @@ import { WerewolfRole } from "./roles/WerewolvePlayer";
 import Witch from "./roles/Witch";
 import Wolf from "./roles/Wolf";
 import { nightRolesOrder } from "./werewolves.constants";
-import { IWerewolvesComposition, IWerewolvesGameData, IWerewolvesGameState, IWerewolvesPlayer } from "./werewolves.types";
+import { defaultWerewolvesGameData, IWerewolvesComposition, IWerewolvesGameData, IWerewolvesGameState, IWerewolvesPlayer, IWerewolvesRoomData } from "./werewolves.types";
 
 type RoleConstructor = new () => WerewolfRole;
 
@@ -85,8 +85,52 @@ export function getNextPlayingRole(composition: IWerewolvesComposition, users: I
         }
     }
 
+    console.log({ playerRoleToPlay })
+
     return {
         state: 'day',
         roleTurn: 'Village',
     }
+}
+
+export function getIsGameEnded(roomData: IWerewolvesRoomData): { campWin?: string, state: string } | undefined {
+    // Le village élimine tous les autres joueurs => village
+    // Le couple élimine tous les autres joueurs si pas du meme camp => couple
+    // Les loups élimine tous les autres joueurs => loups
+    const gameData: IWerewolvesGameData = roomData.gameData || defaultWerewolvesGameData;
+
+    const aliveUsers = roomData.users.filter((u) => u.role?.isAlive);
+    const aliveVillagers = aliveUsers.filter((u) => u.role?.camp === 'village');
+    const aliveWolves = aliveUsers.filter((u) => u.role?.camp === 'wolves');
+    const aliveCouple = aliveUsers.filter((u) => gameData.couple?.includes(u._id));
+
+    if (aliveUsers.length === 0) {
+        return {
+            campWin: undefined,
+            state: 'results',
+        }
+    }
+
+    if (aliveCouple.length === aliveUsers.length) {
+        return {
+            campWin: 'solo',
+            state: 'results'
+        }
+    }
+
+    if (aliveVillagers.length === aliveUsers.length) {
+        return {
+            campWin: 'village',
+            state: 'results'
+        }
+    }
+
+    if (aliveWolves.length === aliveUsers.length) {
+        return {
+            campWin: 'wolves',
+            state: 'results'
+        }
+    }
+
+    return undefined;
 }
