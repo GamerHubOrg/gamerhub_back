@@ -20,7 +20,6 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     gameData.turn = 1;
     gameData.wolfVotes = [];
 
-    console.log({ roomConfig: roomData.config, config });
     roomData.users = handleGiveUsersRoles(roomData.users, config.composition, gameData);
     roomData.gameData = gameData;
     
@@ -35,7 +34,6 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
       const compositionRoles = getAvailableRolesInstance(config.composition, gameData);
       const order = nightRolesOrder.filter((role) => compositionRoles.some((comp) => comp instanceof role));
       const playerRoleToPlay = order[0];
-      console.log({ order, playerRoleToPlay });
       const roleTurn = roomData.users.find((user) => user.role instanceof playerRoleToPlay);
       gameData.roleTurn = roleTurn?.role?.name;
 
@@ -133,9 +131,10 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     if (isGameEnded) {
       roomData.gameState = isGameEnded.gameState as GameState;
       roomData.gameData = isGameEnded.gameData;
+    } else {
+      roomData.gameData = gameData;
     }
 
-    roomData.gameData = gameData;
     io.in(roomId).emit("room:updated", roomData);
   }
 
@@ -238,9 +237,10 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     if (isGameEnded) {
       roomData.gameState = isGameEnded.gameState as GameState;
       roomData.gameData = isGameEnded.gameData;
+    } else {
+      roomData.gameData = gameData;
     }
 
-    roomData.gameData = gameData;
     io.in(roomId).emit("room:updated", roomData);
   }
 
@@ -310,9 +310,10 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     if (isGameEnded) {
       roomData.gameState = isGameEnded.gameState as GameState;
       roomData.gameData = isGameEnded.gameData;
+    } else {
+      roomData.gameData = gameData;
     }
 
-    roomData.gameData = gameData;
     io.in(roomId).emit("room:updated", roomData);
   }
 
@@ -353,9 +354,10 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     if (isGameEnded) {
       roomData.gameState = isGameEnded.gameState as GameState;
       roomData.gameData = isGameEnded.gameData;
+    } else {
+      roomData.gameData = gameData;
     }
 
-    roomData.gameData = gameData;
     io.in(roomId).emit("room:updated", roomData);
   }
 

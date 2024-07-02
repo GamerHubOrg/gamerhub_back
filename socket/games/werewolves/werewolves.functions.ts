@@ -86,8 +86,6 @@ export function getNextPlayingRole(composition: IWerewolvesComposition, users: I
         }
     }
 
-    console.log({ playerRoleToPlay })
-
     return {
         state: 'day',
         roleTurn: 'Village',

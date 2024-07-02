@@ -11,7 +11,6 @@ const handler = async (req: Request, res: Response, next: NextFunction) => {
         return next();
     }
     
-    console.log("FROM CACHE")
     res.json(JSON.parse(fromCache));
   } catch (err: any) {
     return res.status(500).json({ message: "An error occured", err: err.message });
