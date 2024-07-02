@@ -12,6 +12,17 @@ import { defaultConfigs } from "./room.constants";
 
 export const roomsDataMap: Map<string, IRoomData> = new Map();
 
+const getMinimumPlayers = (gameName: string) => {
+  switch (gameName) {
+    case "undercover":
+      return process.env.PROD ? 3 : 1;
+    case "speedrundle":
+      return 2;
+    default:
+      return 0;
+  }
+};
+
 // Room data functions
 const generateRoomId = (io: IoType): string => {
   const roomId = generateRandomString(8);
@@ -69,7 +80,12 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     if (!user) return socket.emit("user:not-auth");
 
     const roomId = generateRoomId(io);
-    const socketUser: SocketUser = { ...user, socket_id: socket.id, isOwner: true, joindedAt: new Date() };
+    const socketUser: SocketUser = {
+      ...user,
+      socket_id: socket.id,
+      isOwner: true,
+      joinedAt: new Date(),
+    };
     const data: IRoomData = {
       users: [socketUser],
       logs: roomLogger.onRoomCreate(roomId, socketUser),
@@ -88,7 +104,25 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     const roomData = roomsDataMap.get(roomId);
     if (!roomData) return socket.emit("room:not-found", roomId);
 
-    const socketUser: SocketUser = { ...user, socket_id: socket.id, joindedAt: new Date() };
+    if (!roomData.users.some((u) => u._id === user._id)) {
+      if (roomData.gameState !== "lobby")
+        return socket.emit(
+          "room:notifications:error",
+          "Cette partie est déjà lancée, veuillez attendre la fin."
+        );
+
+      if (roomData.users.length === roomData.config?.maxPlayers)
+        return socket.emit(
+          "room:notifications:error",
+          "Cette partie a déjà atteint le nombre maximal de joueurs."
+        );
+    }
+
+    const socketUser: SocketUser = {
+      ...user,
+      socket_id: socket.id,
+      joinedAt: new Date(),
+    };
     addUserToRoom(roomData, socketUser);
     roomLogger.onRoomJoin(roomData, socketUser);
 
@@ -102,7 +136,9 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     roomLogger.onRoomStart(roomData);
     roomData.gameState = "started";
     roomData.gameData = {};
-    roomData.users = roomData.users.sort((a, b) => a.joindedAt.getTime() - b.joindedAt.getTime())
+    roomData.users = roomData.users.sort(
+      (a, b) => a.joinedAt.getTime() - b.joinedAt.getTime()
+    );
     io.in(roomId).emit("room:started", roomData);
   };
 
@@ -112,7 +148,7 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     roomData.gameState = "lobby";
     roomData.gameData = {};
     io.in(roomId).emit("room:lobbied", roomData);
-  }
+  };
 
   const onRoomDelete = (roomId: string) => {
     const roomData = roomsDataMap.get(roomId);
@@ -135,6 +171,13 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
 
     const leavingUser = removeUserFromRoom(roomId, roomData, socket.id);
     if (leavingUser) roomLogger.onRoomLeave(roomData, leavingUser);
+
+    const minimumPlayers = getMinimumPlayers(roomData.gameName);
+    if(roomData.gameState !== "lobby" && roomData.users.length < minimumPlayers) {
+      roomData.gameState = "lobby";
+      io.in(roomId).emit("room:updated", roomData);
+      io.in(roomId).emit("room:notifications:error", "Il n y a plus assez de joueurs pour continuer la partie.")
+    }
 
     io.in(roomId).emit("room:updated", roomData);
   };
@@ -160,6 +203,46 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     io.in(roomId).emit("room:updated", roomData);
   };
 
+  const onRoomUserPromote = (roomId: string, userId: string) => {
+    const roomData = roomsDataMap.get(roomId);
+    if (!roomData) return socket.emit("room:not-found", roomId);
+    const user = roomData.users.find(({ _id }) => _id === userId);
+    const currentOwner = roomData.users.find(({ isOwner }) => isOwner);
+    if (!user)
+      return socket.emit(
+        "room:notifications:error",
+        "Cet utilisateur n'est pas dans la room."
+      );
+    if (!currentOwner)
+      return socket.emit(
+        "room:notifications:error",
+        "Impossible de trouver l'owner actuel."
+      );
+    user.isOwner = true;
+    currentOwner.isOwner = false;
+    roomLogger.onUserPromoted(roomData, user);
+    socket
+      .to(user.socket_id)
+      .emit("room:notifications:success", "Tu as été promu owner de la room.");
+    io.in(roomId).emit("room:updated", roomData);
+  };
+
+  const onRoomUserKick = (roomId: string, userId: string) => {
+    const roomData = roomsDataMap.get(roomId);
+    if (!roomData) return socket.emit("room:not-found", roomId);
+    const user = roomData.users.find(({ _id }) => _id === userId);
+    if (!user)
+      return socket.emit(
+        "room:notifications:error",
+        "Cet utilisateur n'est pas dans la room."
+      );
+    const { socket_id } = user;
+    roomLogger.onUserKicked(roomData, user);
+    removeUserFromRoom(roomId, roomData, socket_id);
+    socket.to(socket_id).emit("room:kicked");
+    io.in(roomId).emit("room:updated", roomData);
+  };
+
   socket.on("room:create", onRoomCreate);
   socket.on("room:join", onRoomJoin);
   socket.on("room:start", onRoomStart);
@@ -168,6 +251,8 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
   socket.on("room:leave", onRoomLeave);
   socket.on("room:update", onRoomUpdate);
   socket.on("room:change-game", onRoomChangeGame);
+  socket.on("room:promote", onRoomUserPromote);
+  socket.on("room:kick", onRoomUserKick);
 };
 
 export default RoomHandler;

@@ -8,7 +8,6 @@ import {
   ILolChampionSpeciesResponse,
   ILolChampionSpecie,
 } from "./lol-fetcher.types";
-import puppeteer from "puppeteer";
 import { capitalizeFirstLetter } from '../../../utils/functions'
 import { ILolCharacter } from "../../characters/types/lol.types";
 
@@ -155,29 +154,4 @@ export const formatLolChampion = (
       releaseYear: parseInt(releaseYear),
     },
   };
-};
-
-export const getLolRegions = async () => {
-  const browser = await puppeteer.launch();
-  const page = await browser.newPage();
-  await page.goto("https://universe.leagueoflegends.com/en_US/regions/", {
-    waitUntil: "networkidle0",
-  });
-
-  const regions = await page.evaluate(() => {
-    const elements = document.querySelectorAll('[class*="factionWrapper"]');
-    const regionNames: string[] = [];
-    elements.forEach((element) => {
-      const regionName = element
-        .querySelector(".style__Text-sc-13btjky-3")
-        ?.textContent?.trim();
-      if (regionName) {
-        regionNames.push(regionName);
-      }
-    });
-    return regionNames;
-  });
-
-  await browser.close();
-  return regions;
 };
