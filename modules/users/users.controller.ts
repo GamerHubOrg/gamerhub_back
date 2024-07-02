@@ -215,6 +215,10 @@ export async function UpdateUserPassword(req: CustomRequest, res: Response) {
     res.status(400).send('Different password');
     return;
   }
+  console.log('coucou');
+
+  console.log(oldPassword);
+  
 
   const checkHash = crypto.pbkdf2Sync(oldPassword, config.security.salt, config.security.iteration, 64, 'sha512').toString('hex');
 

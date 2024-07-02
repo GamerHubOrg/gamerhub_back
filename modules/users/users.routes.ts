@@ -11,7 +11,7 @@ router.get('/refresh', GetRefreshAccessToken);
 router.post('/logout', authenticated, PostLogout);
 router.get('/me', authenticated, GetMe);
 router.get('/:userId', cache, authenticated, GetUser);
-router.patch('/:userId', authenticated, UpdateUserById);
-router.patch('/password/:userId', authenticated, UpdateUserPassword);
+router.put('/:userId', authenticated, UpdateUserById);
+router.put('/password/:userId', authenticated, UpdateUserPassword);
 
 export default router;
