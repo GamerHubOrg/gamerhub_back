@@ -3,6 +3,7 @@ import { Server, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { IUndercoverConfig } from "./games/undercover/undercover.types";
 import { ISpeedrundleConfig } from "./games/speedrundle/speedrundle.types";
+import { IWerewolvesConfig } from "./games/werewolves/werewolves.types";
 
 export type IoType = Server<
   DefaultEventsMap,
@@ -39,7 +40,7 @@ export interface IRoomData {
   gameName: string;
 }
 
-export type IRoomConfig = IUndercoverConfig | ISpeedrundleConfig
+export type IRoomConfig = IUndercoverConfig | ISpeedrundleConfig | IWerewolvesConfig;
 
 export interface IGameData {}
 
