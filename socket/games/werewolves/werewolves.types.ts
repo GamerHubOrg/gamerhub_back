@@ -3,7 +3,7 @@ import { WerewolfRole } from "./roles/WerewolvePlayer";
 
 export type IWerewolvesGameState = 'night' | 'day';
 
-export type IWerewolvesCamp = 'wolve' | 'village' | 'solo';
+export type IWerewolvesCamp = 'wolves' | 'village' | 'solo';
 
 export interface IWerewolvesPlayer extends SocketUser {
   role?: WerewolfRole;

@@ -9,6 +9,10 @@ const onDisconnect = () => {
 const SocketConnectionHandler = (io: IoType, socket: SocketType) => {
   console.log("user connected");
 
+  socket.onAny((event) => {
+    console.log(event);
+  })
+
   RoomHandler(io, socket);
   GameHandler(io, socket);
   socket.on("disconnect", () => onDisconnect());
