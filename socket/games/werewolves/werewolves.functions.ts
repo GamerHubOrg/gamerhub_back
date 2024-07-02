@@ -94,7 +94,7 @@ export function getNextPlayingRole(composition: IWerewolvesComposition, users: I
     }
 }
 
-export function getIsGameEnded(roomData: IWerewolvesRoomData): { campWin?: string, state: string } | undefined {
+export function getIsGameEnded(roomData: IWerewolvesRoomData): Partial<IWerewolvesRoomData> | undefined {
     // Le village élimine tous les autres joueurs => village
     // Le couple élimine tous les autres joueurs si pas du meme camp => couple
     // Les loups élimine tous les autres joueurs => loups
@@ -107,29 +107,41 @@ export function getIsGameEnded(roomData: IWerewolvesRoomData): { campWin?: strin
 
     if (aliveUsers.length === 0) {
         return {
-            campWin: undefined,
-            state: 'results',
+            gameData: {
+                ...gameData,
+                campWin: undefined,
+            },
+            gameState: 'results',
         }
     }
 
     if (aliveCouple.length === aliveUsers.length) {
         return {
-            campWin: 'solo',
-            state: 'results'
+            gameData: {
+                ...gameData,
+                campWin: 'solo',
+            },
+            gameState: 'results'
         }
     }
 
     if (aliveVillagers.length === aliveUsers.length) {
         return {
-            campWin: 'village',
-            state: 'results'
+            gameData: {
+                ...gameData,
+                campWin: 'village'
+            },
+            gameState: 'results'
         }
     }
 
     if (aliveWolves.length === aliveUsers.length) {
         return {
-            campWin: 'wolves',
-            state: 'results'
+            gameData: {
+                ...gameData,
+                campWin: 'wolves'
+            },
+            gameState: 'results'
         }
     }
 
