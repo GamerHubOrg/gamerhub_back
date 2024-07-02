@@ -190,11 +190,10 @@ export async function GetRefreshAccessToken(req: CustomRequest, res: Response, n
 }
 
 export async function UpdateUserById(req: CustomRequest, res: Response) {
-  const {id} = req.params
+  const {userId} = req.params
   const {body} = req
-  console.log(req.user);
   try {
-      const updatedUser = await usersService.updateUserById(id, body)
+      const updatedUser = await usersService.updateUserById(userId, body)
       return res.json(updatedUser)
   } catch (error) {
       return res.status(500).json(error)
@@ -202,11 +201,34 @@ export async function UpdateUserById(req: CustomRequest, res: Response) {
 }
 
 export async function UpdateUserPassword(req: CustomRequest, res: Response) {
-  const {id} = req.params
-  const {body} = req
+  const {userId} = req.params
+  const {oldPassword, newPassword, newPasswordConfirm } = req.body
+
+  const user: IStoredUser | null = await usersService.findById(userId);
+
+  if (!user) {
+    res.status(400).send('Crendentials incorrect');
+    return;
+  }
+
+  if (newPassword !== newPasswordConfirm) {
+    res.status(400).send('Different password');
+    return;
+  }
+
+  const checkHash = crypto.pbkdf2Sync(oldPassword, config.security.salt, config.security.iteration, 64, 'sha512').toString('hex');
+
+  if (user.password !== checkHash) {
+    res.status(400).send('Crendentials incorrect1');
+    return;
+  }
+
+  const hashedPassword = crypto.pbkdf2Sync(newPassword, config.security.salt, config.security.iteration, 64, 'sha512').toString('hex')
+
+
   try {
-      const updatedUser = await usersService.updateUserById(id, body)
-      return res.json(updatedUser)
+      const updatedUserPassword = await usersService.updateUserPasswordById(userId, hashedPassword)
+      return res.json(updatedUserPassword)
   } catch (error) {
       return res.status(500).json(error)
   }

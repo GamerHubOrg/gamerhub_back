@@ -61,12 +61,9 @@ export function fromUserId(userId: string) {
 }
 
 export function updateUserById(_id: string, data: IStoredUser) {
-
-  console.log(data);
-  
   return usersModel.findOneAndUpdate({_id}, {$set: data}, {new: true})
 }
 
-export function updateUserPassword(_id: string, data: IStoredUser) {
-  return usersModel.findOneAndUpdate({_id}, {$set: data}, {upsert: true, new: true})
+export function updateUserPasswordById(_id: string, data: string) {
+  return usersModel.findOneAndUpdate({_id}, {password: data}, {new: true})
 }
