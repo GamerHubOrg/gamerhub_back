@@ -5,9 +5,7 @@ export type IWerewolvesGameState = 'night' | 'day';
 
 export type IWerewolvesCamp = 'wolves' | 'village' | 'solo';
 
-export interface IWerewolvesPlayer extends SocketUser {
-  role?: WerewolfRole;
-}
+export interface IWerewolvesPlayer extends SocketUser {}
 
 export interface IWerewolvesRoomData extends IRoomData {
   users: IWerewolvesPlayer[];
@@ -22,13 +20,16 @@ export interface IWerewolvesConfig {
   composition: IWerewolvesComposition;
 }
 
+export type ILinkedWerewolfRoles = Record<string, WerewolfRole>;
+
 export interface IWerewolvesGameData extends IGameData {
-  wolfVotes: IWerewolvesVote[];
-  villageVotes: IWerewolvesVote[];
-  tmpVotes: Partial<IWerewolvesVote>[];
+  wolfVotes?: IWerewolvesVote[];
+  villageVotes?: IWerewolvesVote[];
+  tmpVotes?: Partial<IWerewolvesVote>[];
   witchSaves?: IWerewolvesSave[];
   witchKills?: IWerewolvesKill[];
   psychicWatch?: IWerewolvesWatchRole[];
+  roles: ILinkedWerewolfRoles;
   thiefUsers?: IWerewolvesPlayer[];
   couple?: IWerewolvesCouple;
   roleTurn?: string;
@@ -98,7 +99,7 @@ export interface IWerewolvesChooseRole {
   swap: string;
 }
 
-export const defaultWerewolvesGameData: IWerewolvesGameData = { state: 'day', turn: 1, wolfVotes: [], tmpVotes: [], villageVotes: [] };
+export const defaultWerewolvesGameData: IWerewolvesGameData = { state: 'day', turn: 1, roles: {} };
 
 export const defaultWerewolvesConfig: IWerewolvesConfig = { 
   composition: {
