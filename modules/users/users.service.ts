@@ -1,4 +1,4 @@
-import usersModel from "./users.model";
+import usersModel, { IStoredUser } from "./users.model";
 
 export function findByEmail(email: string) {
   return usersModel.findOne({ email })
@@ -58,4 +58,12 @@ export function fromUserId(userId: string) {
       )
     }
   }
+}
+
+export function updateUserById(_id: string, data: IStoredUser) {
+  return usersModel.findOneAndUpdate({_id}, {$set: data}, {new: true})
+}
+
+export function updateUserPasswordById(_id: string, data: string) {
+  return usersModel.findOneAndUpdate({_id}, {password: data}, {new: true})
 }

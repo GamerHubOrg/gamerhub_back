@@ -10,13 +10,13 @@ export interface IUserStripeConfig {
 
 export interface IStoredUser {
   _id: string;
-  username: string,
-  email: string,
-  password: string,
-  picture: string,
-  refresh_token?: string,
-  roles: string[],
-  xp: number,
+  username: string;
+  email: string;
+  password: string;
+  picture: string;
+  refresh_token?: string;
+  roles: string[];
+  xp: number
   subscribedAt?: Date,
   stripe: IUserStripeConfig
 }

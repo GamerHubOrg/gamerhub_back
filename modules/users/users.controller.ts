@@ -188,3 +188,55 @@ export async function GetRefreshAccessToken(req: CustomRequest, res: Response, n
     next(err)
   }
 }
+
+export async function UpdateUserById(req: CustomRequest, res: Response) {
+  const {userId} = req.params
+  const {body} = req
+  try {
+      const updatedUser = await usersService.updateUserById(userId, body)
+      return res.json(updatedUser)
+  } catch (error) {
+      return res.status(500).json(error)
+  }
+}
+
+export async function UpdateUserPassword(req: CustomRequest, res: Response) {
+  const {userId} = req.params
+  const {oldPassword, newPassword, newPasswordConfirm } = req.body
+
+  const user: IStoredUser | null = await usersService.findById(userId);
+
+  if (!user) {
+    res.status(400).send('Crendentials incorrect');
+    return;
+  }
+
+  if (newPassword !== newPasswordConfirm) {
+    res.status(400).send('Different password');
+    return;
+  }
+  console.log('coucou');
+
+  console.log(oldPassword);
+  
+
+  const checkHash = crypto.pbkdf2Sync(oldPassword, config.security.salt, config.security.iteration, 64, 'sha512').toString('hex');
+
+  if (user.password !== checkHash) {
+    res.status(400).send('Crendentials incorrect1');
+    return;
+  }
+
+  const hashedPassword = crypto.pbkdf2Sync(newPassword, config.security.salt, config.security.iteration, 64, 'sha512').toString('hex')
+
+
+  try {
+      const updatedUserPassword = await usersService.updateUserPasswordById(userId, hashedPassword)
+      return res.json(updatedUserPassword)
+  } catch (error) {
+      return res.status(500).json(error)
+  }
+}
+
+
+
