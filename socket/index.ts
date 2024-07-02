@@ -10,7 +10,11 @@ const SocketConnectionHandler = (io: IoType, socket: SocketType) => {
   console.log("user connected");
 
   socket.onAny((event) => {
-    console.log(event);
+    console.log("[socket] event on : ", event);
+  })
+
+  socket.onAnyOutgoing((event) => {
+    console.log("[socket] event emit : ", event);
   })
 
   RoomHandler(io, socket);

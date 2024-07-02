@@ -24,7 +24,6 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     roomData.gameData = gameData;
     
     io.in(roomId).emit("room:updated", roomData);
-    io.in(roomId).emit("game:werewolves:start");
 
     // setTimeout(() => {
     //   io.in(roomId).emit("game:werewolves:start");
