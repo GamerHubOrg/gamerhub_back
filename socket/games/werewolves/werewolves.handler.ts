@@ -107,7 +107,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
         const roleTurn = roomData.users.find((user) => user.role instanceof playerRoleToPlay);
         gameData.roleTurn = roleTurn?.role?.name;
       } else {
-        gameData.roleTurn = roomData.users[votedPlayerIndex].role instanceof Hunter ? roomData.users[votedPlayerIndex].role?.name : undefined;
+        gameData.roleTurn = roomData.users[votedPlayerIndex].role instanceof Hunter ? roomData.users[votedPlayerIndex].role?.name : 'Village';
         gameData.state = 'day';
       }
 
