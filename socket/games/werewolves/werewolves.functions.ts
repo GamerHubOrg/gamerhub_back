@@ -29,6 +29,7 @@ export const werewolvesRoles: Record<string, RoleConstructor> = rolesList;
 export function getAvailableRolesInstance(composition: IWerewolvesComposition, gameData: IWerewolvesGameData): WerewolfRole[] {
     return Object.keys(composition)
         .reduce((acc: WerewolfRole[], role: string) => {
+            if (composition[role] <= 0) return acc;
             if (gameData.turn > 1 && firstRoundOnlyRoles.includes(rolesList[role])) return acc;
 
             return [

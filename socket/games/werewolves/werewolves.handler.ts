@@ -14,11 +14,12 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     if (!roomData) return socket.emit("room:not-found", roomId);
 
     const gameData = roomData.gameData || defaultWerewolvesGameData;
-    const config = defaultWerewolvesConfig;
+    const config = roomData.config || defaultWerewolvesConfig;
 
     gameData.state = 'day';
     gameData.turn = 1;
     gameData.wolfVotes = [];
+
     roomData.users = handleGiveUsersRoles(roomData.users, config.composition, gameData);
     
     io.in(roomId).emit("room:updated", roomData);
@@ -54,11 +55,11 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     if (!roomData) return socket.emit("room:not-found", roomId);
 
     let gameData = roomData.gameData || defaultWerewolvesGameData;
-    const config = defaultWerewolvesConfig;
+    const config = roomData.config || defaultWerewolvesConfig;
     const votes = gameData.wolfVotes || [];
     const gameTurn = gameData.turn || 1;
 
-    const usersThatCanVote = roomData.users.filter((u) => u.role?.isAlive && u.role?.camp === 'loups')
+    const usersThatCanVote = roomData.users.filter((u) => u.role?.isAlive && u.role?.camp === 'wolves')
 
     votes.push({ playerId: userId, vote, turn: gameTurn })
     gameData.wolfVotes = votes;
@@ -128,6 +129,18 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
       return;
     }
 
+    const isGameEnded = getIsGameEnded(roomData);
+
+    if (isGameEnded) {
+      gameData = {
+        ...gameData,
+        ...isGameEnded,
+      } as IWerewolvesGameData
+
+      roomData.gameData = gameData;
+    }
+    
+    io.in(roomId).emit("room:updated", roomData);
     io.in(roomId).emit("game:werewolves:data", { data: gameData });
   }
 
@@ -137,7 +150,6 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
 
     const gameData = roomData.gameData || defaultWerewolvesGameData;
     const votes = gameData.tmpVotes?.filter((v) => v.playerId !== userId) || [];
-    console.log({ gameData: roomData.gameData?.roleTurn })
 
     if (vote) {
       votes.push({ playerId: userId, vote })
@@ -155,7 +167,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     const gameData = roomData.gameData || defaultWerewolvesGameData;
     const witchSaves = gameData.witchSaves || [];
     const gameTurn = gameData.turn || 1;
-    const config = defaultWerewolvesConfig;
+    const config = roomData.config || defaultWerewolvesConfig;
 
     witchSaves.push({ playerId: userId, save, turn: gameTurn })
     gameData.witchSaves = witchSaves;
@@ -195,7 +207,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     let gameData = roomData.gameData || defaultWerewolvesGameData;
     const witchKills = gameData.witchKills || [];
     const gameTurn = gameData.turn || 1;
-    const config = defaultWerewolvesConfig;
+    const config = roomData.config || defaultWerewolvesConfig;
 
     witchKills.push({ playerId: userId, kill, turn: gameTurn })
     gameData.witchKills = witchKills;
@@ -246,7 +258,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     if (!roomData) return socket.emit("room:not-found", roomId);
 
     let gameData = roomData.gameData || defaultWerewolvesGameData;
-    const config = defaultWerewolvesConfig;
+    const config = roomData.config || defaultWerewolvesConfig;
     const votes = gameData.villageVotes || [];
     const gameTurn = gameData.turn || 1;
 
@@ -323,7 +335,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     const villageVotes = gameData.villageVotes || [];
     const witchKills = gameData.witchKills || [];
     const gameTurn = gameData.turn || 1;
-    const config = defaultWerewolvesConfig;
+    const config = roomData.config || defaultWerewolvesConfig;
 
     witchKills.push({ playerId: userId, kill, turn: gameTurn })
     gameData.witchKills = witchKills;
@@ -367,7 +379,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     if (!roomData) return socket.emit("room:not-found", roomId);
 
     let gameData = roomData.gameData || defaultWerewolvesGameData;
-    const config = defaultWerewolvesConfig;
+    const config = roomData.config || defaultWerewolvesConfig;
     const psychicWatch = gameData.psychicWatch || [];
     const gameTurn = gameData.turn || 1;
 
@@ -389,7 +401,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     if (!roomData) return socket.emit("room:not-found", roomId);
 
     let gameData = roomData.gameData || defaultWerewolvesGameData;
-    const config = defaultWerewolvesConfig;
+    const config = roomData.config || defaultWerewolvesConfig;
 
     gameData.couple = couple;
 
@@ -409,7 +421,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     if (!roomData) return socket.emit("room:not-found", roomId);
 
     let gameData = roomData.gameData || defaultWerewolvesGameData;
-    const config = defaultWerewolvesConfig;
+    const config = roomData.config || defaultWerewolvesConfig;
     const currentUserIndex = roomData.users.findIndex((u) => u._id === userId);
     const targetUserIndex = roomData.users.findIndex((u) => u._id === swap);
 
