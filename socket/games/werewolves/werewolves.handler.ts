@@ -22,6 +22,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
 
     console.log({ roomConfig: roomData.config, config });
     roomData.users = handleGiveUsersRoles(roomData.users, config.composition, gameData);
+    roomData.gameData = gameData;
     
     io.in(roomId).emit("room:updated", roomData);
 
@@ -116,7 +117,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
       gameData.tmpVotes = [];
       roomData.gameData = gameData;
 
-      const isGameEnded = getIsGameEnded(roomData);
+      const isGameEnded = getIsGameEnded({...roomData, gameData});
 
       if (isGameEnded) {
         roomData.gameState = isGameEnded.gameState as GameState;
@@ -127,7 +128,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
       return;
     }
 
-    const isGameEnded = getIsGameEnded(roomData);
+    const isGameEnded = getIsGameEnded({...roomData, gameData});
 
     if (isGameEnded) {
       roomData.gameState = isGameEnded.gameState as GameState;
@@ -232,7 +233,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
       gameData.state = 'day';
     }
 
-    const isGameEnded = getIsGameEnded(roomData);
+    const isGameEnded = getIsGameEnded({...roomData, gameData});
 
     if (isGameEnded) {
       roomData.gameState = isGameEnded.gameState as GameState;
@@ -304,7 +305,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
 
     gameData.tmpVotes = [];
 
-    const isGameEnded = getIsGameEnded(roomData);
+    const isGameEnded = getIsGameEnded({...roomData, gameData});
 
     if (isGameEnded) {
       roomData.gameState = isGameEnded.gameState as GameState;
@@ -347,7 +348,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
       gameData.roleTurn = 'Village';
     }
 
-    const isGameEnded = getIsGameEnded(roomData);
+    const isGameEnded = getIsGameEnded({...roomData, gameData});
 
     if (isGameEnded) {
       roomData.gameState = isGameEnded.gameState as GameState;
