@@ -20,7 +20,7 @@ class PotionPower extends Power {
 }
 
 export default class Witch extends WerewolfRole {
-    picture: string = '/src/assets/games/werewolves/images/icons/witch.png';
+    picture: string = '/assets/games/werewolves/images/icons/witch.png';
     power: PotionPower;
 
     constructor() {
