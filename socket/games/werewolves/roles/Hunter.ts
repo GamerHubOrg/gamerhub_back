@@ -1,7 +1,7 @@
 import { Power, WerewolfRole } from "./WerewolvePlayer";
 
 export default class Hunter extends WerewolfRole {
-    picture: string = '/assets/games/werewolves/images/icons/hunter.png';
+    picture: string = 'hunter';
     power: Power = new Power('Après la mort', "Vous pouvez entrainer un autre joueur avec vous");
 
     constructor() {

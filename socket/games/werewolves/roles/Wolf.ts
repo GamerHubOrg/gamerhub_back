@@ -1,7 +1,7 @@
 import { Power, WerewolfRole } from "./WerewolvePlayer";
 
 export default class Wolf extends WerewolfRole {
-    picture: string = '/assets/games/werewolves/images/icons/wolf.png';
+    picture: string = 'wolf';
     power: Power = new Power('Repas nocturne', "Décider d'une cible à dévorer avec les autres loups");
 
     constructor() {
