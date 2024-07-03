@@ -67,3 +67,7 @@ export function updateUserById(_id: string, data: IStoredUser) {
 export function updateUserPasswordById(_id: string, data: string) {
   return usersModel.findOneAndUpdate({_id}, {password: data}, {new: true})
 }
+
+export function deleteUser(_id: string) {
+  return usersModel.deleteOne({_id})
+}
