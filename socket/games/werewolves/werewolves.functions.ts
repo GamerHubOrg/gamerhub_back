@@ -30,7 +30,8 @@ export function getAvailableRolesInstance(composition: IWerewolvesComposition, g
     return Object.keys(composition)
         .reduce((acc: WerewolfRole[], role: string) => {
             if (composition[role] <= 0) return acc;
-            if (gameData.turn > 1 && firstRoundOnlyRoles.includes(rolesList[role])) return acc;
+            const isFirstRoundOnlyRole = !!firstRoundOnlyRoles.find((r) => new werewolvesRoles[role]() instanceof r);
+            if (gameData.turn > 1 && isFirstRoundOnlyRole) return acc;
 
             return [
                 ...acc,
@@ -43,8 +44,9 @@ export function getAvailableRolesInstance(composition: IWerewolvesComposition, g
 export function getAvailableRoles(composition: IWerewolvesComposition, gameData: IWerewolvesGameData): RoleConstructor[] {
     return Object.keys(composition)
         .reduce((acc: RoleConstructor[], role: string) => {
-            if (gameData.turn > 1 && firstRoundOnlyRoles.includes(rolesList[role])) return acc;
-
+            if (composition[role] <= 0) return acc;
+            const isFirstRoundOnlyRole = !!firstRoundOnlyRoles.find((r) => new werewolvesRoles[role]() instanceof r);
+            if (gameData.turn > 1 && isFirstRoundOnlyRole) return acc;
             return [
                 ...acc,
                 ...Array(composition[role]).fill(werewolvesRoles[role])

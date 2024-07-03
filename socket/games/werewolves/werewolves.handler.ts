@@ -93,6 +93,14 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
       }
       gameData.roles[votedUser._id]?.setDeathTurn(gameTurn);
 
+      const isPartOfCouple = gameData.couple?.includes(votedUser._id);
+      const otherCoupleUser = roomData.users.find((u) => gameData.couple?.includes(u._id) && u._id !== votedUser._id);
+
+      if (isPartOfCouple && !isWitchAlive) {
+        gameData.roles[otherCoupleUser!._id]?.setIsAlive(false);
+        gameData.roles[otherCoupleUser!._id]?.setDeathTurn(gameTurn);
+      }
+
       const compositionRoles = getAvailableRoles(config.composition, gameData);
       const gameRoles = compositionRoles.filter((role) => Object.values(gameData.roles).some((r) => r instanceof role && r.isAlive));
       const order = nightRolesOrder.filter((role) => gameRoles.some((comp) => comp === role));
@@ -169,6 +177,22 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     gameData.roles[votedPlayer._id]?.setIsBeingKilled(false);
     gameData.roles[votedPlayer._id]?.setDeathTurn(undefined);
 
+    const beingKilledPlayers = Object.keys(gameData.roles).filter((userId) => gameData.roles[userId].isBeingKilled);
+
+    for (userId of beingKilledPlayers) {
+      gameData.roles[userId]?.setIsBeingKilled(false);
+      gameData.roles[userId]?.setIsAlive(false);
+      gameData.roles[userId]?.setDeathTurn(gameTurn);
+
+      const isPartOfCouple = gameData.couple?.includes(userId);
+      const otherCoupleUser = roomData.users.find((u) => gameData.couple?.includes(u._id) && u._id !== userId);
+
+      if (isPartOfCouple) {
+        gameData.roles[otherCoupleUser!._id]?.setIsAlive(false);
+        gameData.roles[otherCoupleUser!._id]?.setDeathTurn(gameTurn);
+      }
+    }
+
     const currentPlayer = roomData.users.find((u) => u._id === userId);
     if (!currentPlayer) return;
     (gameData.roles[currentPlayer._id] as Witch).power.useSavePotion();
@@ -178,8 +202,6 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     const order = nightRolesOrder.filter((role) => gameRoles.some((comp) => comp === role));
     const currentRole = Object.values(gameData.roles).find((role) => role?.name === gameData.roleTurn);
     const currentRoleTurnIndex = order.findIndex((role) => currentRole instanceof role);
-
-
 
     const playerRoleToPlay = order[currentRoleTurnIndex + 1];
 
@@ -209,13 +231,27 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
 
     const votedPlayer = roomData.users.find((u) => u._id === kill);
     if (!votedPlayer) return;
-    gameData.roles[votedPlayer._id]?.setIsBeingKilled(false);
-    gameData.roles[votedPlayer._id]?.setIsAlive(false);
-    gameData.roles[votedPlayer._id]?.setDeathTurn(gameTurn);
+    gameData.roles[votedPlayer._id]?.setIsBeingKilled(true);
+
+    const beingKilledPlayers = Object.keys(gameData.roles).filter((userId) => gameData.roles[userId].isBeingKilled);
+
+    for (userId of beingKilledPlayers) {
+      gameData.roles[userId]?.setIsBeingKilled(false);
+      gameData.roles[userId]?.setIsAlive(false);
+      gameData.roles[userId]?.setDeathTurn(gameTurn);
+
+      const isPartOfCouple = gameData.couple?.includes(userId);
+      const otherCoupleUser = roomData.users.find((u) => gameData.couple?.includes(u._id) && u._id !== userId);
+
+      if (isPartOfCouple) {
+        gameData.roles[otherCoupleUser!._id]?.setIsAlive(false);
+        gameData.roles[otherCoupleUser!._id]?.setDeathTurn(gameTurn);
+      }
+    }
 
     const currentPlayer = roomData.users.find((u) => u._id === userId);
     if (!currentPlayer) return;
-    (gameData.roles[currentPlayer._id] as Witch).power.useKillPotion();
+    (gameData.roles[currentPlayer._id] as Witch).power?.useKillPotion();
 
     const compositionRoles = getAvailableRoles(config.composition, gameData);
     const gameRoles = compositionRoles.filter((role) => Object.values(gameData.roles).some((r) => r instanceof role && r.isAlive));
@@ -278,12 +314,26 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     const isVoteTied = !mostVotedPlayer;
 
     const votedPlayer = roomData.users.find((u) => u._id === mostVotedPlayer?.vote);
-    if (!isVoteTied && votedPlayer) {
-      gameData.roles[votedPlayer._id]?.setIsBeingKilled(true)
+    if (!isVoteTied && votedPlayer) {     
+      const isHunterVoted = gameData.roles[votedPlayer._id] instanceof Hunter;
+
+      const isPartOfCouple = gameData.couple?.includes(votedPlayer._id);
+      const otherCoupleUser = roomData.users.find((u) => gameData.couple?.includes(u._id) && u._id !== votedPlayer._id);
+
+      if (isHunterVoted) {
+        gameData.roles[votedPlayer._id]?.setIsBeingKilled(true)
+        if (isPartOfCouple) {
+          gameData.roles[otherCoupleUser!._id]?.setIsBeingKilled(true);
+        }
+      } else {
+        gameData.roles[votedPlayer._id]?.setIsAlive(false)
+        if (isPartOfCouple) {
+          gameData.roles[otherCoupleUser!._id]?.setIsAlive(false);
+          gameData.roles[otherCoupleUser!._id]?.setDeathTurn(gameTurn);
+        }
+      }
       gameData.roles[votedPlayer._id]?.setDeathTurn(gameTurn);
 
-      
-      const isHunterVoted = gameData.roles[votedPlayer._id] instanceof Hunter;
       if (isHunterVoted) {
         gameData.roleTurn = gameData.roles[votedPlayer._id]?.name;
         roomData.gameData = gameData;
@@ -293,6 +343,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
       }
     }
 
+    gameData.turn += 1;
     const compositionRoles = getAvailableRoles(config.composition, gameData);
     const gameRoles = compositionRoles.filter((role) => Object.values(gameData.roles).some((r) => r instanceof role && r.isAlive));
     const order = nightRolesOrder.filter((role) => gameRoles.some((comp) => comp === role));
@@ -302,7 +353,6 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
       const roleTurn = Object.values(gameData.roles).find((role) => role instanceof playerRoleToPlay);
       gameData.roleTurn = roleTurn?.name;
       gameData.state = 'night';
-      gameData.turn += 1;
     }
 
     gameData.tmpVotes = [];
@@ -340,13 +390,29 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
 
     const votedPlayer = roomData.users.find((u) => u._id === kill);
     if (votedPlayer) {
-      gameData.roles[votedPlayer._id]?.setIsAlive(false);
-      gameData.roles[votedPlayer._id]?.setDeathTurn(gameTurn);
+      gameData.roles[votedPlayer._id]?.setIsBeingKilled(true);
+    }
+
+    const beingKilledPlayers = Object.keys(gameData.roles).filter((userId) => gameData.roles[userId].isBeingKilled);
+
+    for (userId of beingKilledPlayers) {
+      gameData.roles[userId]?.setIsBeingKilled(false);
+      gameData.roles[userId]?.setIsAlive(false);
+      gameData.roles[userId]?.setDeathTurn(gameTurn);
+
+      const isPartOfCouple = gameData.couple?.includes(userId);
+      const otherCoupleUser = roomData.users.find((u) => gameData.couple?.includes(u._id) && u._id !== userId);
+
+      if (isPartOfCouple) {
+        gameData.roles[otherCoupleUser!._id]?.setIsAlive(false);
+        gameData.roles[otherCoupleUser!._id]?.setDeathTurn(gameTurn);
+      }
     }
 
     const villageAlreadyVoted = !!villageVotes.find((v) => v.turn === gameTurn);
 
     if (villageAlreadyVoted) {
+      gameData.turn += 1;
       const compositionRoles = getAvailableRoles(config.composition, gameData);
       const gameRoles = compositionRoles.filter((role) => Object.values(gameData.roles).some((r) => r instanceof role && r.isAlive));
       const order = nightRolesOrder.filter((role) => gameRoles.some((comp) => comp === role));
@@ -354,7 +420,6 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
 
       gameData.roleTurn = roleTurn?.name;
       gameData.state = 'night';
-      gameData.turn += 1;
     } else {
       gameData.roleTurn = 'Village';
     }
