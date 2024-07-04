@@ -4,7 +4,6 @@ import { CustomRequest } from "../shared/types/express";
 import config from "../config";
 import * as usersService from '../modules/users/users.service';
 import { IStoredUser } from "../modules/users/users.model";
-import { log } from "console";
 
 export const verifyAuth = async (token?: string) => {
   if (!token) {
@@ -27,7 +26,7 @@ const handler: RequestHandler = async (
 
   try {
     if (!token) {
-      return res.status(401).send();
+      return res.status(401).send("Vous n'êtes pas connecté.");
     }
 
     const decoded = jwt.verify(token, config.security.tokenSecret) as any;
@@ -42,7 +41,7 @@ const handler: RequestHandler = async (
       res.sendStatus(403);
       return;
     }
-    res.sendStatus(401);
+    res.sendStatus(401).send(err.message);
   }
 };
 

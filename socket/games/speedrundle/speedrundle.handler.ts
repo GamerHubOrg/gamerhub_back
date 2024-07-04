@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 // import { getRandomIndex } from "../../../utils/functions";
 import charactersService from "../../../modules/characters/characters.service";
+import gameRecordsService from "../../../modules/gameRecords/gameRecords.service";
 import { RoomLogger, SpeedundleLogger } from "../../logs-handler";
 import { roomsDataMap } from "../../room-handler";
 import { IoType, SocketType } from "../../types";
@@ -33,6 +34,19 @@ const calculateScore = (time: number, nbTries: number) => {
 
   const reducedScore = baseScore - reduction;
   return Math.max(Math.round(reducedScore), 100);
+};
+
+const saveGame = (roomData: ISpeedrundleRoomData) => {
+  const { gameData } = roomData;
+  if (!gameData) return;
+  const { columns, charactersToGuess, usersAnswers } = gameData;
+  gameRecordsService.insertGameRecord({
+    gameName: "speedrundle",
+    users: roomData.users.map(({ _id }) => _id),
+    columns,
+    charactersToGuess: charactersToGuess.map(({ _id }) => _id),
+    usersAnswers,
+  });
 };
 
 // Socket handlers
@@ -110,6 +124,10 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     thisRoundData.guesses = [...thisRoundData.guesses, characterId];
 
     const currentGuess = gameData.charactersToGuess[currentRound - 1];
+    if(!currentGuess) {
+      
+      return;
+    }
     const hasGuessedRight = currentGuess._id.toString() === characterId;
 
     // If he hasn't guessed right -> continue
@@ -151,6 +169,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
       if (allPlayersFinished) {
         if (user) gameLogger.onGameEnded(roomData);
         roomData.gameState = "results";
+        saveGame(roomData);
         io.in(roomId).emit("game:speedrundle:end-game");
         io.in(roomId).emit("room:updated", roomData);
       }
@@ -210,6 +229,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
       if (allPlayersFinished) {
         if (user) gameLogger.onGameEnded(roomData);
         roomData.gameState = "results";
+        saveGame(roomData);
         io.in(roomId).emit("game:speedrundle:end-game");
         io.in(roomId).emit("room:updated", roomData);
       }
