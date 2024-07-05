@@ -11,6 +11,7 @@ import { RoomLogger } from "./logs-handler";
 import { defaultConfigs } from "./room.constants";
 
 export const roomsDataMap: Map<string, IRoomData> = new Map();
+export const playingsUsersMap: Map<string, any> = new Map();
 
 const getMinimumPlayers = (gameName: string) => {
   switch (gameName) {
@@ -79,6 +80,11 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
   const onRoomCreate = (game: string, user: User) => {
     if (!user) return socket.emit("user:not-auth");
 
+    const existingRoom = playingsUsersMap.get(user._id);
+    if (existingRoom) {
+      onRoomUserKick(existingRoom.roomId, user._id)
+    }
+
     const roomId = generateRoomId(io);
     const socketUser: SocketUser = {
       ...user,
@@ -93,7 +99,10 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
       gameName: game,
     };
 
-    roomsDataMap.set(roomId, data);
+    if (!existingRoom) {
+      roomsDataMap.set(roomId, data);
+      playingsUsersMap.set(user._id, { roomId, socket_id: socket.id });
+    }
 
     socket.join(roomId);
     socket.emit("room:created", roomId, data);
@@ -103,6 +112,11 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     if (!user) return socket.emit("user:not-auth");
     const roomData = roomsDataMap.get(roomId);
     if (!roomData) return socket.emit("room:not-found", roomId);
+
+    const existingRoom = playingsUsersMap.get(user._id);
+    if (existingRoom) {
+      onRoomUserKick(existingRoom.roomId, user._id)
+    }
 
     if (!roomData.users.some((u) => u._id === user._id)) {
       if (roomData.gameState !== "lobby")
@@ -125,6 +139,11 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     };
     addUserToRoom(roomData, socketUser);
     roomLogger.onRoomJoin(roomData, socketUser);
+
+    if (!existingRoom) {
+      roomsDataMap.set(roomId, roomData);
+      playingsUsersMap.set(user._id, { roomId, socket_id: socket.id });
+    }
 
     socket.join(roomId);
     io.in(roomId).emit("room:joined", roomId, roomData);
@@ -171,7 +190,10 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     if (!roomData) return socket.emit("room:not-found", roomId);
 
     const leavingUser = removeUserFromRoom(roomId, roomData, socket.id);
-    if (leavingUser) roomLogger.onRoomLeave(roomData, leavingUser);
+    if (leavingUser) {
+      roomLogger.onRoomLeave(roomData, leavingUser);
+      playingsUsersMap.delete(leavingUser._id);
+    }
 
     const minimumPlayers = getMinimumPlayers(roomData.gameName);
     if(roomData.gameState !== "lobby" && roomData.users.length < minimumPlayers) {
@@ -240,6 +262,7 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     const { socket_id } = user;
     roomLogger.onUserKicked(roomData, user);
     removeUserFromRoom(roomId, roomData, socket_id);
+    playingsUsersMap.delete(user._id);
     socket.to(socket_id).emit("room:kicked");
     io.in(roomId).emit("room:updated", roomData);
   };
