@@ -1,6 +1,6 @@
 export const generateRandomString = (numberOfDigit = 6) : string => {
     const characters =
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let randomString = "";
 
     for (let i = 0; i < numberOfDigit; i++) {
