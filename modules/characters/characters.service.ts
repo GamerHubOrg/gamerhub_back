@@ -10,9 +10,9 @@ const getAllCharacters = async (filters?: IFilters): Promise<ICharacter[]> => {
   if (filters) {
     const { theme, ...otherFilters } = filters;
     if (theme) filtersObject["data.dataType"] = filters.theme;
-    filtersObject = {...filtersObject, ...otherFilters};
+    filtersObject = { ...filtersObject, ...otherFilters };
   }
-    
+
   const characters: ICharacter[] = await CharacterModel.find(
     filtersObject
   ).lean();

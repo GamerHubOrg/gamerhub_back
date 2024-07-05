@@ -47,7 +47,7 @@ export interface ISpeedrundleConfig {
   selectedColumns?: string[];
 }
 
-interface IColumn {
+export interface IColumn {
   name: string;
   key: string;
   type?: string;
