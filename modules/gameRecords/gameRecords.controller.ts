@@ -9,13 +9,22 @@ const getAllGameRecords = async (
   next: NextFunction
 ) => {
   try {
-    const allGameRecords = await gameRecordsService.getAllGameRecords(
-      req.query
+    const { offset, limit, ...filters } = req.query;
+    const intOffset =
+      offset && typeof offset === "string" ? parseInt(offset) : undefined;
+    const intLimit =
+      limit && typeof limit === "string" ? parseInt(limit) : undefined;
+
+    const totalRecords = await gameRecordsService.countGameRecords(filters);
+    const records = await gameRecordsService.getAllGameRecords(
+      filters,
+      intOffset,
+      intLimit
     );
 
     // cache.setEx(req.originalUrl, config.database.redisTtl, JSON.stringify(allGameRecords));
 
-    res.send(allGameRecords);
+    res.send({ records, totalRecords });
   } catch (error) {
     next(error);
   }
@@ -28,13 +37,28 @@ const getAllGameRecordsByUser = async (
 ) => {
   try {
     const { userId } = req.params;
-    const allGameRecords = await gameRecordsService.getAllGameRecords({
+    const { offset, limit, ...filters } = req.query;
+    const intOffset =
+      offset && typeof offset === "string" ? parseInt(offset) : undefined;
+    const intLimit =
+      limit && typeof limit === "string" ? parseInt(limit) : undefined;
+
+    const totalRecords = await gameRecordsService.countGameRecords({
+      ...filters,
       users: userId,
     });
+    const records = await gameRecordsService.getAllGameRecords(
+      {
+        ...filters,
+        users: userId,
+      },
+      intOffset,
+      intLimit
+    );
 
     // cache.setEx(req.originalUrl, config.database.redisTtl, JSON.stringify(allGameRecords));
 
-    res.send(allGameRecords);
+    res.send({ records, totalRecords });
   } catch (error) {
     next(error);
   }

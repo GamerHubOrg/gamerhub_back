@@ -26,9 +26,16 @@ type GameRecord = IGameRecord | ISpeedrundleRecord;
 type GameRecordWithUsers = IGameRecordWithUsers | ISpeedrundleRecordWithUsers;
 
 const getAllGameRecords = async (
-  filters: Record<string, any> = {}
+  filters: Record<string, any> = {},
+  skip = 0,
+  limit?: number
 ): Promise<GameRecordWithUsers[]> => {
-  const gameRecords = await GameRecordModel.find(filters).lean();
+  let query = GameRecordModel.find(filters).sort({ createdAt: -1 }).skip(skip);
+  if (limit) {
+    query = query.limit(limit);
+  }
+
+  const gameRecords = await query.lean();
 
   const recordsWithUsers: any[] = await Promise.all(
     gameRecords.map(async (record) => {
@@ -66,6 +73,12 @@ const getGameRecordById = async (_id: string): Promise<GameRecord | null> => {
   return await GameRecordModel.findOne({ _id }).lean();
 };
 
+const countGameRecords = async (
+  filters: Record<string, any> = {},
+): Promise<number> => {
+  return await GameRecordModel.countDocuments(filters);
+};
+
 const insertGameRecords = async (datas: Partial<GameRecord>[]) => {
   return await GameRecordModel.insertMany(datas);
 };
@@ -92,6 +105,7 @@ const deleteGameRecord = async (_id: string) => {
 const gameRecordsService = {
   getAllGameRecords,
   getGameRecordById,
+  countGameRecords,
   insertGameRecords,
   insertGameRecord,
   updateGameRecord,
