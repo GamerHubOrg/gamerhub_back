@@ -21,6 +21,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     gameData.wolfVotes = [];
 
     gameData.roles = handleGiveUsersRoles(roomData.users, config.composition, gameData);
+    gameData.usersThatPlayed = [...roomData.users];
     roomData.gameData = gameData;
     
     io.in(roomId).emit("room:updated", roomData);
@@ -163,7 +164,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     io.in(roomId).emit("game:werewolves:data", { data: gameData });
   }
 
-  const onWitchSavePlayer = ({ roomId, userId, save }: IWerewolvesSendSave) => {
+  const onWitchSavePlayer = ({ roomId, userId: playerId, save }: IWerewolvesSendSave) => {
     const roomData = (roomsDataMap.get(roomId) as IWerewolvesRoomData);
     if (!roomData) return socket.emit("room:not-found", roomId);
 
@@ -172,7 +173,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     const gameTurn = gameData.turn || 1;
     const config = roomData.config || defaultWerewolvesConfig;
 
-    witchSaves.push({ playerId: userId, save, turn: gameTurn })
+    witchSaves.push({ playerId, save, turn: gameTurn })
     gameData.witchSaves = witchSaves;
 
     const votedPlayer = roomData.users.find((u) => u._id === save);
@@ -183,7 +184,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
 
     const beingKilledPlayers = Object.keys(gameData.roles).filter((userId) => gameData.roles[userId].isBeingKilled);
 
-    for (userId of beingKilledPlayers) {
+    for (const userId of beingKilledPlayers) {
       gameData.roles[userId]?.setIsBeingKilled(false);
       gameData.roles[userId]?.setIsAlive(false);
       gameData.roles[userId]?.setDeathTurn(gameTurn);
@@ -197,7 +198,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
       }
     }
 
-    const currentPlayer = roomData.users.find((u) => u._id === userId);
+    const currentPlayer = roomData.users.find((u) => u._id === playerId);
     if (!currentPlayer) return;
     (gameData.roles[currentPlayer._id] as Witch).power.useSavePotion();
 
@@ -221,7 +222,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     io.in(roomId).emit("room:updated", roomData);
   }
 
-  const onWitchKillPlayer = ({ roomId, userId, kill }: IWerewolvesSendKill) => {
+  const onWitchKillPlayer = ({ roomId, userId: playerId, kill }: IWerewolvesSendKill) => {
     const roomData = (roomsDataMap.get(roomId) as IWerewolvesRoomData);
     if (!roomData) return socket.emit("room:not-found", roomId);
 
@@ -230,7 +231,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     const gameTurn = gameData.turn || 1;
     const config = roomData.config || defaultWerewolvesConfig;
 
-    witchKills.push({ playerId: userId, kill, turn: gameTurn })
+    witchKills.push({ playerId, kill, turn: gameTurn })
     gameData.witchKills = witchKills;
 
     const votedPlayer = roomData.users.find((u) => u._id === kill);
@@ -239,7 +240,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
 
     const beingKilledPlayers = Object.keys(gameData.roles).filter((userId) => gameData.roles[userId].isBeingKilled);
 
-    for (userId of beingKilledPlayers) {
+    for (const userId of beingKilledPlayers) {
       gameData.roles[userId]?.setIsBeingKilled(false);
       gameData.roles[userId]?.setIsAlive(false);
       gameData.roles[userId]?.setDeathTurn(gameTurn);
@@ -253,9 +254,9 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
       }
     }
 
-    const currentPlayer = roomData.users.find((u) => u._id === userId);
+    const currentPlayer = roomData.users.find((u) => u._id === playerId);
     if (!currentPlayer) return;
-    (gameData.roles[currentPlayer._id] as Witch).power?.useKillPotion();
+    (gameData.roles[currentPlayer._id] as Witch).power.useKillPotion();
 
     const compositionRoles = getAvailableRoles(config.composition, gameData);
     const gameRoles = compositionRoles.filter((role) => Object.values(gameData.roles).some((r) => r instanceof role && r.isAlive));
@@ -373,20 +374,20 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     io.in(roomId).emit("room:updated", roomData);
   }
 
-  const onHunterKillPlayer = ({ roomId, userId, kill } : IWerewolvesSendKill) => {
+  const onHunterKillPlayer = ({ roomId, userId: playerId, kill } : IWerewolvesSendKill) => {
     const roomData = (roomsDataMap.get(roomId) as IWerewolvesRoomData);
     if (!roomData) return socket.emit("room:not-found", roomId);
 
     const gameData = roomData.gameData || defaultWerewolvesGameData;
     const villageVotes = gameData.villageVotes || [];
-    const witchKills = gameData.witchKills || [];
+    const hunterKills = gameData.hunterKills || [];
     const gameTurn = gameData.turn || 1;
     const config = roomData.config || defaultWerewolvesConfig;
 
-    witchKills.push({ playerId: userId, kill, turn: gameTurn })
-    gameData.witchKills = witchKills;
+    hunterKills.push({ playerId, kill, turn: gameTurn })
+    gameData.hunterKills = hunterKills;
 
-    const hunterPlayer = roomData.users.find((u) => u._id === userId);
+    const hunterPlayer = roomData.users.find((u) => u._id === playerId);
     if (hunterPlayer) {
       gameData.roles[hunterPlayer._id]?.setIsBeingKilled(false);
       gameData.roles[hunterPlayer._id]?.setIsAlive(false);
@@ -399,7 +400,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
 
     const beingKilledPlayers = Object.keys(gameData.roles).filter((userId) => gameData.roles[userId].isBeingKilled);
 
-    for (userId of beingKilledPlayers) {
+    for (const userId of beingKilledPlayers) {
       gameData.roles[userId]?.setIsBeingKilled(false);
       gameData.roles[userId]?.setIsAlive(false);
       gameData.roles[userId]?.setDeathTurn(gameTurn);
@@ -487,6 +488,11 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     let gameData = roomData.gameData || defaultWerewolvesGameData;
     const currentUser = roomData.users.find((u) => u._id === userId);
     const targetUser = roomData.users.find((u) => u._id === swap);
+
+    gameData.swapedRoles = {
+      [currentUser!._id]: gameData.roles[currentUser!._id],
+      [targetUser!._id]: gameData.roles[targetUser!._id],
+    }
 
     gameData.roles[currentUser!._id] = gameData.roles[targetUser!._id];
     gameData.roles[targetUser!._id] = new Villager();

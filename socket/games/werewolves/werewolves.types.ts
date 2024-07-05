@@ -28,14 +28,17 @@ export interface IWerewolvesGameData extends IGameData {
   tmpVotes?: Partial<IWerewolvesVote>[];
   witchSaves?: IWerewolvesSave[];
   witchKills?: IWerewolvesKill[];
+  hunterKills?: IWerewolvesKill[];
   psychicWatch?: IWerewolvesWatchRole[];
   roles: ILinkedWerewolfRoles;
+  swapedRoles?: ILinkedWerewolfRoles;
   thiefUsers?: IWerewolvesPlayer[];
   couple?: IWerewolvesCouple;
   roleTurn?: string;
   state: IWerewolvesGameState;
   campWin?: IWerewolvesCamp;
   turn: number;
+  usersThatPlayed?: IWerewolvesPlayer[];
 }
 
 export interface IWerewolvesVote {
