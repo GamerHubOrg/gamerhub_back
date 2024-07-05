@@ -3,9 +3,11 @@ import { ICharacter } from "../characters/types/characters.types";
 import usersModel from "../users/users.model";
 import GameRecordModel, {
   SpeedrundleRecordModel,
+  UndercoverRecordModel,
 } from "./models/gameRecords.model";
 import { IGameRecord } from "./types/gameRecords.types";
 import { ISpeedrundleRecord } from "./types/speedrundleRecords.types";
+import { IUndercoverRecord } from "./types/undercoverRecords.types";
 
 interface IUserData {
   _id: string;
@@ -22,7 +24,7 @@ interface ISpeedrundleRecordWithUsers extends ISpeedrundleRecord {
   charactersData: ICharacter[];
 }
 
-type GameRecord = IGameRecord | ISpeedrundleRecord;
+type GameRecord = IGameRecord | ISpeedrundleRecord | IUndercoverRecord;
 type GameRecordWithUsers = IGameRecordWithUsers | ISpeedrundleRecordWithUsers;
 
 const getAllGameRecords = async (
@@ -86,6 +88,9 @@ const insertGameRecords = async (datas: Partial<GameRecord>[]) => {
 const insertGameRecord = async (data: Partial<GameRecord>) => {
   if (data.gameName === "speedrundle") {
     return await new SpeedrundleRecordModel(data).save();
+  }
+  if (data.gameName === "undercover") {
+    return await new UndercoverRecordModel(data).save();
   }
   return await new GameRecordModel(data).save();
 };
