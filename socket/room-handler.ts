@@ -114,7 +114,7 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     if (!roomData) return socket.emit("room:not-found", roomId);
 
     const existingRoom = playingsUsersMap.get(user._id);
-    if (existingRoom) {
+    if (existingRoom && roomId !== existingRoom.roomId) {
       onRoomUserKick(existingRoom.roomId, user._id)
     }
 

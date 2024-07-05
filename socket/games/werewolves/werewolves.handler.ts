@@ -31,8 +31,11 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
       const compositionRoles = getAvailableRolesInstance(config.composition, gameData);
       const order = nightRolesOrder.filter((role) => compositionRoles.some((comp) => comp instanceof role));
       const playerRoleToPlay = order[0];
-      const roleTurn = Object.values(gameData.roles).find((role) => role instanceof playerRoleToPlay);
-      gameData.roleTurn = roleTurn?.name;
+      
+      if (playerRoleToPlay) {
+        const roleTurn = Object.values(gameData.roles).find((role) => role instanceof playerRoleToPlay);
+        gameData.roleTurn = roleTurn?.name;
+      }
 
       if (order.includes(Thief)) {
         gameData.thiefUsers = getThiefUsersIds(roomData);
@@ -44,6 +47,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
 
   const onGetData = (roomId: string) => {
     const roomData = (roomsDataMap.get(roomId) as IWerewolvesRoomData);
+    if (!roomData) return socket.emit("room:not-found", roomId);
     const gameData = roomData.gameData || defaultWerewolvesGameData;
     io.in(roomId).emit("game:werewolves:data", { data: gameData });
   }
