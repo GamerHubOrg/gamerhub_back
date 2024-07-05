@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import SpeedrundleRecordSchema from "./speedrundleRecords.model";
+import UndercoverRecordSchema from "./undercoverRecords.model";
 
 const GameRecordSchema = new mongoose.Schema(
   {
@@ -18,7 +19,11 @@ const GameRecordSchema = new mongoose.Schema(
 const GameRecordModel = mongoose.model("GameRecords", GameRecordSchema);
 
 export const SpeedrundleRecordModel = GameRecordModel.discriminator(
-  "gameName",
+  "speedrundle",
   SpeedrundleRecordSchema
+);
+export const UndercoverRecordModel = GameRecordModel.discriminator(
+  "undercover",
+  UndercoverRecordSchema
 );
 export default GameRecordModel;
