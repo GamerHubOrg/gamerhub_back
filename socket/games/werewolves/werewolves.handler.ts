@@ -415,13 +415,14 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     }
 
     const villageAlreadyVoted = !!villageVotes.find((v) => v.turn === gameTurn);
+    const compositionRoles = getAvailableRoles(config.composition, gameData);
+    const gameRoles = compositionRoles.filter((role) => Object.values(gameData.roles).some((r) => r instanceof role && r.isAlive));
+    const order = nightRolesOrder.filter((role) => gameRoles.some((comp) => comp === role));
+    const playerRoleToPlay = order[0];
 
-    if (villageAlreadyVoted) {
+    if (villageAlreadyVoted && playerRoleToPlay) {
       gameData.turn += 1;
-      const compositionRoles = getAvailableRoles(config.composition, gameData);
-      const gameRoles = compositionRoles.filter((role) => Object.values(gameData.roles).some((r) => r instanceof role && r.isAlive));
-      const order = nightRolesOrder.filter((role) => gameRoles.some((comp) => comp === role));
-      const roleTurn = Object.values(gameData.roles).find((role) => role instanceof order[0]);
+      const roleTurn = Object.values(gameData.roles).find((role) => role instanceof playerRoleToPlay);
 
       gameData.roleTurn = roleTurn?.name;
       gameData.state = 'night';
