@@ -103,8 +103,9 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
       if (!votedUser) return;
 
       const isWitchAlive = Object.values(gameData.roles).find((role) => role instanceof Witch && role?.isAlive);
+      const isVotedHunter = gameData.roles[votedUser._id] instanceof Hunter;
 
-      if (isWitchAlive) {
+      if (isWitchAlive || isVotedHunter) {
         gameData.roles[votedUser._id]?.setIsBeingKilled(true);
       } else {
         gameData.roles[votedUser._id]?.setIsAlive(false);
