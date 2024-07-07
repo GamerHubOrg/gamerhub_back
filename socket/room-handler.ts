@@ -149,7 +149,7 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     io.in(roomId).emit("room:joined", roomId, roomData);
   };
 
-  const onRoomStart = (roomId: string, callback: any) => {
+  const onRoomStart = (roomId: string) => {
     const roomData = roomsDataMap.get(roomId);
     if (!roomData) return socket.emit("room:not-found", roomId);
     roomLogger.onRoomStart(roomData);
@@ -159,7 +159,6 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
       (a, b) => a.joinedAt.getTime() - b.joinedAt.getTime()
     );
     io.in(roomId).emit("room:started", roomData);
-    callback();
   };
 
   const onRoomBackToLobby = (roomId: string) => {

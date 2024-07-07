@@ -17,15 +17,26 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
     const config = roomData.config || defaultWerewolvesConfig;
 
     gameData.state = 'day';
-    gameData.turn = 1;
+    gameData.turn = 0;
     gameData.wolfVotes = [];
-
+    gameData.villageVotes = [];
+    gameData.tmpVotes = [];
+    gameData.witchSaves = [];
+    gameData.witchKills = [];
+    gameData.hunterKills = [];
+    gameData.psychicWatch = [];
+    gameData.swapedRoles = undefined;
+    gameData.thiefUsers = [];
+    gameData.couple = [];
+    gameData.roleTurn = undefined;
+    gameData.campWin = undefined;
     gameData.roles = handleGiveUsersRoles(roomData.users, config.composition, gameData);
     gameData.usersThatPlayed = [...roomData.users];
+
     roomData.gameData = gameData;
     
     io.in(roomId).emit("room:updated", roomData);
-    io.in(roomId).emit("game:werewolves:start");
+    setTimeout(() => io.in(roomId).emit("game:werewolves:start"), 200);
 
     setTimeout(() => {
       gameData.state = 'night';
@@ -41,6 +52,8 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
       if (order.includes(Thief)) {
         gameData.thiefUsers = getThiefUsersIds(roomData);
       }
+
+      gameData.turn = 1;
 
       io.in(roomId).emit("game:werewolves:state", { data: gameData });
     }, 5000)

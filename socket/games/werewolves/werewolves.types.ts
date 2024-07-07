@@ -102,7 +102,7 @@ export interface IWerewolvesChooseRole {
   swap: string;
 }
 
-export const defaultWerewolvesGameData: IWerewolvesGameData = { state: 'day', turn: 1, roles: {} };
+export const defaultWerewolvesGameData: IWerewolvesGameData = { state: 'day', turn: 0, roles: {} };
 
 export const defaultWerewolvesConfig: IWerewolvesConfig = { 
   composition: {
