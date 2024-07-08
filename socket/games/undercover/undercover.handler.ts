@@ -15,7 +15,7 @@ import {
 } from "./undercover.types";
 
 const saveGame = (roomData: IUndercoverRoomData) => {
-  const { gameData } = roomData;
+  const { gameData, config } = roomData;
   if (!gameData) return;
   const { words, votes, civilianWord, spyWord, undercoverPlayerIds, campWin } =
     gameData;
@@ -28,6 +28,7 @@ const saveGame = (roomData: IUndercoverRoomData) => {
     spyWord,
     undercoverPlayerIds,
     campWin,
+    config,
   });
 };
 

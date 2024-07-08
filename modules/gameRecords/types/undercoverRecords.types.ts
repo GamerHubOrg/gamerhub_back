@@ -1,4 +1,5 @@
 import {
+  IUndercoverConfig,
   IUndercoverVote,
   IUndercoverWords,
 } from "../../../socket/games/undercover/undercover.types";
@@ -11,4 +12,5 @@ export interface IUndercoverRecord extends IGameRecord {
   spyWord: string;
   undercoverPlayerIds: string[];
   campWin: string;
+  config : IUndercoverConfig
 }
