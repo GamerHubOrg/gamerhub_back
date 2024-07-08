@@ -33,6 +33,10 @@ const handler: RequestHandler = async (
 
     const user = await usersService.findById(decoded.userId).select('-password -refresh_token');
 
+    if (!user) {
+      return res.status(401).send();
+    }
+
     req.user = user as IStoredUser;
   
     next();

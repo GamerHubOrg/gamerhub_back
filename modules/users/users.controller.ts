@@ -233,5 +233,29 @@ export async function UpdateUserPassword(req: CustomRequest, res: Response) {
   }
 }
 
+export async function DeleteUser(req: CustomRequest, res: Response) {
+  const {userId} = req.params
+  const {password} = req.body
 
+  const user: IStoredUser | null = await usersService.findById(userId);
 
+  if (!user) {
+    res.status(400).send('Credentials incorrect');
+    return;
+  }
+
+  const checkHash = crypto.pbkdf2Sync(password, config.security.salt, config.security.iteration, 64, 'sha512').toString('hex');
+
+  if (user.password !== checkHash) {
+    res.status(400).send('Credentials incorrect');
+    return;
+  }
+
+  try {
+    const DeleteUser = await usersService.deleteUser(userId);
+    await stripe.customers.del(user.stripe.customerId);
+    return res.json(DeleteUser)
+  } catch (error) {
+    return res.status(500).json(error)
+  }
+}
