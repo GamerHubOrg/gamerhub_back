@@ -37,7 +37,7 @@ const calculateScore = (time: number, nbTries: number) => {
 };
 
 const saveGame = (roomData: ISpeedrundleRoomData) => {
-  const { gameData } = roomData;
+  const { gameData, config } = roomData;
   if (!gameData) return;
   const { columns, charactersToGuess, usersAnswers } = gameData;
   gameRecordsService.insertGameRecord({
@@ -46,6 +46,7 @@ const saveGame = (roomData: ISpeedrundleRoomData) => {
     columns,
     charactersToGuess: charactersToGuess.map(({ _id }) => _id),
     usersAnswers,
+    config,
   });
 };
 
@@ -124,8 +125,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     thisRoundData.guesses = [...thisRoundData.guesses, characterId];
 
     const currentGuess = gameData.charactersToGuess[currentRound - 1];
-    if(!currentGuess) {
-      
+    if (!currentGuess) {
       return;
     }
     const hasGuessedRight = currentGuess._id.toString() === characterId;
