@@ -41,7 +41,7 @@ const handler: RequestHandler = async (
       res.sendStatus(403);
       return;
     }
-    res.sendStatus(401).send(err.message);
+    res.status(401).send(err.message);
   }
 };
 
