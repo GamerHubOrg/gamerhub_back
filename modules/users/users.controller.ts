@@ -252,9 +252,10 @@ export async function DeleteUser(req: CustomRequest, res: Response) {
   }
 
   try {
-      const DeleteUser = await usersService.deleteUser(userId)
-      return res.json(DeleteUser)
+    const DeleteUser = await usersService.deleteUser(userId);
+    await stripe.customers.del(user.stripe.customerId);
+    return res.json(DeleteUser)
   } catch (error) {
-      return res.status(500).json(error)
+    return res.status(500).json(error)
   }
 }
