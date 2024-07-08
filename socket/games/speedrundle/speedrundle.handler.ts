@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-// import { getRandomIndex } from "../../../utils/functions";
-import charactersService from "../../../modules/characters/characters.service";
 import gameRecordsService from "../../../modules/gameRecords/gameRecords.service";
 import { RoomLogger, SpeedundleLogger } from "../../logs-handler";
 import { roomsDataMap } from "../../room-handler";
@@ -83,7 +81,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     gameData.usersAnswers = roomData.users.map(({ _id }) => ({
       playerId: _id,
       currentRound: 1,
-      roundsData: Array.from({ length: nbRounds }, (_, i) => ({
+      roundsData: Array.from({ length: nbRounds }, () => ({
         guesses: [],
         score: 0,
         hasFound: false,

@@ -4,10 +4,12 @@ import usersModel from "../users/users.model";
 import GameRecordModel, {
   SpeedrundleRecordModel,
   UndercoverRecordModel,
+  WerewolvesRecordModel,
 } from "./models/gameRecords.model";
 import { IGameRecord } from "./types/gameRecords.types";
 import { ISpeedrundleRecord } from "./types/speedrundleRecords.types";
 import { IUndercoverRecord } from "./types/undercoverRecords.types";
+import { IWerewolvesRecord } from "./types/werewolvesRecords.types";
 
 interface IUserData {
   _id: string;
@@ -19,13 +21,16 @@ interface IGameRecordWithUsers extends IGameRecord {
   usersData: IUserData[];
 }
 
-interface ISpeedrundleRecordWithUsers extends ISpeedrundleRecord {
-  usersData: IUserData[];
+interface ISpeedrundleRecordWithUsers extends ISpeedrundleRecord, IGameRecordWithUsers {
   charactersData: ICharacter[];
 }
 
-type GameRecord = IGameRecord | ISpeedrundleRecord | IUndercoverRecord;
-type GameRecordWithUsers = IGameRecordWithUsers | ISpeedrundleRecordWithUsers;
+interface IWerewolvesRecordWithUsers extends IWerewolvesRecord, IGameRecordWithUsers {
+
+}
+
+type GameRecord = IGameRecord | ISpeedrundleRecord | IUndercoverRecord | IWerewolvesRecord;
+type GameRecordWithUsers = IGameRecordWithUsers | ISpeedrundleRecordWithUsers |IWerewolvesRecordWithUsers;
 
 const getAllGameRecords = async (
   filters: Record<string, any> = {},
@@ -91,6 +96,9 @@ const insertGameRecord = async (data: Partial<GameRecord>) => {
   }
   if (data.gameName === "undercover") {
     return await new UndercoverRecordModel(data).save();
+  }
+  if (data.gameName === "werewolves") {
+    return await new WerewolvesRecordModel(data).save();
   }
   return await new GameRecordModel(data).save();
 };
