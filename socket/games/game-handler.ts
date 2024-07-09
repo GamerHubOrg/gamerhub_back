@@ -5,13 +5,15 @@ import UndercoverHandler from "./undercover/undercover.handler";
 import WerewolvesHandler from "./werewolves/werewolves.handler";
 
 export function getLiveGames(roomsDataMap: Map<string, IRoomData>) {
-  const rooms = Array.from(roomsDataMap.values());
-  return rooms.reduce((acc: any[], room: IRoomData) => {
+  const roomsIds = Array.from(roomsDataMap.keys());
+  return roomsIds.reduce((acc: any[], roomId: string) => {
+    const room = roomsDataMap.get(roomId) as IRoomData;
     if (room.gameState !== 'started') return acc;
     return [
       ...acc,
       {
-        users: room.users.length,
+        roomId,
+        users: room.users,
         config: room.config,
         gameName: room.gameName,
       }
@@ -26,6 +28,19 @@ const GameHandler = (io: IoType, socket: SocketType) => {
   WerewolvesHandler(io, socket);
 
   socket.on('games:get:live', () => {
+    const liveGames = getLiveGames(roomsDataMap);
+    io.emit('games:live:data', liveGames)
+  })
+
+  socket.on('games:delete', (roomId: string) => {
+    const roomData = roomsDataMap.get(roomId);
+    if (!roomData) return socket.emit("room:not-found", roomId);
+
+    io.in(roomId).emit("room:deleted", roomId);
+
+    roomsDataMap.delete(roomId);
+    io.sockets.adapter.rooms.delete(roomId);
+
     const liveGames = getLiveGames(roomsDataMap);
     io.emit('games:live:data', liveGames)
   })

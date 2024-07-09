@@ -13,50 +13,23 @@ const WerewolvesConfigSchema = new Schema<IWerewolvesConfig>(
   { _id: false }
 );
 
-const WerewolvesVoteSchema = new Schema(
+const WerewolvesTargetSchema = new Schema(
   {
     playerId: { type: String, ref : "Users", required: true },
-    vote: { type: String, required: true },
+    target: { type: String, required: true },
     turn: { type: Number, required: true },
-  },
-  { _id: false }
-);
-
-const WerewolvesSaveSchema = new Schema(
-  {
-    playerId: { type: String, ref : "Users", required: true },
-    save: { type: String, required: true },
-    turn: { type: Number, required: true },
-  },
-  { _id: false }
-);
-
-const WerewolvesKillSchema = new Schema(
-  {
-    playerId: { type: String, ref : "Users", required: true },
-    kill: { type: String, required: true },
-    turn: { type: Number, required: true },
-  },
-  { _id: false }
-);
-
-const WerewolvesWatchRoleSchema = new Schema(
-  {
-    playerId: { type: String, ref : "Users", required: true },
-    turn: { type: Number, required: true },
-    watch: { type: String, required: true },
   },
   { _id: false }
 );
 
 const WerewolvesRecordSchema = new Schema(
   {
-    wolfVotes: [WerewolvesVoteSchema],
-    villageVotes: [WerewolvesVoteSchema],
-    witchSaves: [WerewolvesSaveSchema],
-    witchKills: [WerewolvesKillSchema],
-    hunterKills: [WerewolvesKillSchema],
-    psychicWatch: [WerewolvesWatchRoleSchema],
+    wolfVotes: [WerewolvesTargetSchema],
+    villageVotes: [WerewolvesTargetSchema],
+    witchSaves: [WerewolvesTargetSchema],
+    witchKills: [WerewolvesTargetSchema],
+    hunterKills: [WerewolvesTargetSchema],
+    psychicWatch: [WerewolvesTargetSchema],
     roles: {
       type: Map,
       of: Schema.Types.Mixed,

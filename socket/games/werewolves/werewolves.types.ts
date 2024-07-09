@@ -23,13 +23,13 @@ export interface IWerewolvesConfig {
 export type ILinkedWerewolfRoles = Record<string, WerewolfRole>;
 
 export interface IWerewolvesGameData extends IGameData {
-  wolfVotes?: IWerewolvesVote[];
-  villageVotes?: IWerewolvesVote[];
-  tmpVotes?: Partial<IWerewolvesVote>[];
-  witchSaves?: IWerewolvesSave[];
-  witchKills?: IWerewolvesKill[];
-  hunterKills?: IWerewolvesKill[];
-  psychicWatch?: IWerewolvesWatchRole[];
+  wolfVotes?: IWerewolvesTarget[];
+  villageVotes?: IWerewolvesTarget[];
+  tmpVotes?: Partial<IWerewolvesTarget>[];
+  witchSaves?: IWerewolvesTarget[];
+  witchKills?: IWerewolvesTarget[];
+  hunterKills?: IWerewolvesTarget[];
+  psychicWatch?: IWerewolvesTarget[];
   roles: ILinkedWerewolfRoles;
   swapedRoles?: ILinkedWerewolfRoles;
   thiefUsers?: IWerewolvesPlayer[];
@@ -41,52 +41,16 @@ export interface IWerewolvesGameData extends IGameData {
   usersThatPlayed?: IWerewolvesPlayer[];
 }
 
-export interface IWerewolvesVote {
+export interface IWerewolvesTarget {
   playerId: string;
-  vote: string;
+  target: string;
   turn: number;
 }
 
-export interface IWerewolvesSave {
-  playerId: string;
-  save: string;
-  turn: number;
-}
-
-export interface IWerewolvesKill {
-  playerId: string;
-  kill: string;
-  turn: number;
-}
-
-export interface IWerewolvesSendVote {
+export interface IWerewolvesSendTarget {
   roomId: string;
-  vote: string;
+  target: string;
   userId: string;
-}
-
-export interface IWerewolvesSendSave {
-  roomId: string;
-  save: string;
-  userId: string;
-}
-
-export interface IWerewolvesSendKill {
-  roomId: string;
-  kill: string;
-  userId: string;
-}
-
-export interface IWerewolvesSendWatchRole {
-  roomId: string;
-  userId: string;
-  watch: string;
-}
-
-export interface IWerewolvesWatchRole {
-  playerId: string;
-  turn: number;
-  watch: string;
 }
 
 export type IWerewolvesCouple = string[];
@@ -94,12 +58,6 @@ export type IWerewolvesCouple = string[];
 export interface IWerewolvesSendCouple {
   roomId: string;
   couple: IWerewolvesCouple;
-}
-
-export interface IWerewolvesChooseRole {
-  roomId: string;
-  userId: string;
-  swap: string;
 }
 
 export const defaultWerewolvesGameData: IWerewolvesGameData = { state: 'day', turn: 0, roles: {} };
