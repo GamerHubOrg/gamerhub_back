@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import {
   ISpeedrundleAnswer,
-  ISpeedrundleGameData,
+  ISpeedrundleConfig,
   ISpeedrundleRoundData,
 } from "../../../socket/games/speedrundle/speedrundle.types";
 
@@ -44,7 +44,35 @@ const SpeedrundleAnswerSchema = new mongoose.Schema<ISpeedrundleAnswer>(
   { _id: false }
 );
 
-const SpeedrundleRecordSchema = new mongoose.Schema<ISpeedrundleGameData>(
+const SpeedrundleConfigSchema = new mongoose.Schema<ISpeedrundleConfig>(
+  {
+    maxPlayers: {
+      type: Number,
+      required: true,
+    },
+    mode: {
+      type: String,
+      required: true,
+    },
+    nbRounds: {
+      type: Number,
+      required: true,
+    },
+    theme: {
+      type: String,
+      enum: ["league_of_legends", "pokemon"],
+      required: true,
+    },
+    selectedGenerations: {
+      type: [Number],
+      enum: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+    },
+    selectedColumns: [String],
+  },
+  { _id: false }
+);
+
+const SpeedrundleRecordSchema = new mongoose.Schema(
   {
     columns: {
       type: [ColumnSchema],
@@ -59,6 +87,10 @@ const SpeedrundleRecordSchema = new mongoose.Schema<ISpeedrundleGameData>(
     ],
     usersAnswers: {
       type: [SpeedrundleAnswerSchema],
+      required: true,
+    },
+    config: {
+      type: SpeedrundleConfigSchema,
       required: true,
     },
   },

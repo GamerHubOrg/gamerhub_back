@@ -77,12 +77,12 @@ const removeUserFromRoom = (
 const RoomHandler = (io: IoType, socket: SocketType) => {
   const roomLogger = new RoomLogger();
 
-  const onRoomCreate = (game: string, user: User) => {
+  const onRoomCreate = (game: string, user: User, config: IRoomConfig) => {
     if (!user) return socket.emit("user:not-auth");
 
     const existingRoom = playingsUsersMap.get(user._id);
     if (existingRoom) {
-      onRoomUserKick(existingRoom.roomId, user._id)
+      onRoomUserKick(existingRoom.roomId, user._id);
     }
 
     const roomId = generateRoomId(io);
@@ -97,6 +97,7 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
       logs: roomLogger.onRoomCreate(roomId, socketUser),
       gameState: "lobby",
       gameName: game,
+      config: config,
     };
 
     if (!existingRoom) {
@@ -115,7 +116,7 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
 
     const existingRoom = playingsUsersMap.get(user._id);
     if (existingRoom && roomId !== existingRoom.roomId) {
-      onRoomUserKick(existingRoom.roomId, user._id)
+      onRoomUserKick(existingRoom.roomId, user._id);
     }
 
     if (!roomData.users.some((u) => u._id === user._id)) {
@@ -195,22 +196,31 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     }
 
     const minimumPlayers = getMinimumPlayers(roomData.gameName);
-    if(roomData.gameState !== "lobby" && roomData.users.length < minimumPlayers) {
+    if (
+      roomData.gameState !== "lobby" &&
+      roomData.users.length < minimumPlayers
+    ) {
       roomData.gameState = "lobby";
       io.in(roomId).emit("room:updated", roomData);
-      io.in(roomId).emit("room:notifications:error", "Il n y a plus assez de joueurs pour continuer la partie.")
+      io.in(roomId).emit(
+        "room:notifications:error",
+        "Il n y a plus assez de joueurs pour continuer la partie."
+      );
     }
 
     io.in(roomId).emit("room:updated", roomData);
   };
 
-  const onRoomUpdate = (roomId: string, config: IRoomConfig) => {
+  const onRoomUpdate = (
+    roomId: string,
+    { gameName, config }: Partial<IRoomData>
+  ) => {
     const roomData = roomsDataMap.get(roomId);
     if (!roomData) return socket.emit("room:not-found", roomId);
 
-    roomData.config = config;
+    if (gameName) roomData.gameName = gameName;
+    if (config) roomData.config = config;
     roomLogger.onRoomUpdate(roomData);
-
     io.in(roomId).emit("room:updated", roomData);
   };
 

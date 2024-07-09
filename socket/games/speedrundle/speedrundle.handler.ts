@@ -1,6 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-// import { getRandomIndex } from "../../../utils/functions";
-import charactersService from "../../../modules/characters/characters.service";
 import gameRecordsService from "../../../modules/gameRecords/gameRecords.service";
 import { RoomLogger, SpeedundleLogger } from "../../logs-handler";
 import { roomsDataMap } from "../../room-handler";
@@ -37,7 +35,7 @@ const calculateScore = (time: number, nbTries: number) => {
 };
 
 const saveGame = (roomData: ISpeedrundleRoomData) => {
-  const { gameData } = roomData;
+  const { gameData, config } = roomData;
   if (!gameData) return;
   const { columns, charactersToGuess, usersAnswers } = gameData;
   gameRecordsService.insertGameRecord({
@@ -46,6 +44,7 @@ const saveGame = (roomData: ISpeedrundleRoomData) => {
     columns,
     charactersToGuess: charactersToGuess.map(({ _id }) => _id),
     usersAnswers,
+    config,
   });
 };
 
@@ -82,7 +81,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     gameData.usersAnswers = roomData.users.map(({ _id }) => ({
       playerId: _id,
       currentRound: 1,
-      roundsData: Array.from({ length: nbRounds }, (_, i) => ({
+      roundsData: Array.from({ length: nbRounds }, () => ({
         guesses: [],
         score: 0,
         hasFound: false,
@@ -124,8 +123,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     thisRoundData.guesses = [...thisRoundData.guesses, characterId];
 
     const currentGuess = gameData.charactersToGuess[currentRound - 1];
-    if(!currentGuess) {
-      
+    if (!currentGuess) {
       return;
     }
     const hasGuessedRight = currentGuess._id.toString() === characterId;
