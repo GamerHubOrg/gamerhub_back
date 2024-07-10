@@ -10,7 +10,7 @@ import {
   speedrundleColumns,
 } from "./speedrundle.types";
 
-const calculateScore = (time: number, nbTries: number) => {
+export const calculateScore = (time: number, nbTries: number) => {
   const baseScore = 1000;
 
   let reduction = 0;

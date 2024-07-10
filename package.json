@@ -6,12 +6,14 @@
   "scripts": {
     "build": "tsc -p .",
     "start": "node build/index.js",
-    "dev": "nodemon -L index.ts"
+    "dev": "nodemon -L index.ts", 
+    "test": "jest"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@types/mocha": "^10.0.7",
     "@types/stripe": "^8.0.417",
     "axios": "^1.6.5",
     "cookie-parser": "^1.4.6",
