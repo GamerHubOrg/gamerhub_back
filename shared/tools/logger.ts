@@ -16,7 +16,7 @@ const initializeLogger = () => {
         json: true,
         format: format.json(),
         replaceTimestamp: true,
-        onConnectionError: (err) => console.error(err),
+        onConnectionError: (err) => console.debug(err),
       }),
       new transports.Console({
         format: format.combine(format.simple(), format.colorize()),

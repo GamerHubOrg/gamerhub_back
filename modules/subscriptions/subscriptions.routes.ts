@@ -41,7 +41,7 @@ export async function handleStripWebhook(req: Request, res: Response) {
   
     res.sendStatus(501);
   } catch(err: any) {
-    console.log(err.message);
+    console.debug(err.message);
     res.sendStatus(400);
   }
 }

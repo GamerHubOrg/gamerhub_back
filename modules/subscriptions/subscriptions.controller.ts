@@ -7,7 +7,7 @@ import { IStripeWebhookData } from './subscriptions.types';
 export async function handleCheckoutSessionCompleted(data: IStripeWebhookData) {
   const { customer } = data;
 
-  console.log("handleCheckoutSessionCompleted event received")
+  console.debug("handleCheckoutSessionCompleted event received")
   const user = await usersService.getOneByCustomerId(customer);
 
   if (!user) throw Error('User not found');
@@ -24,7 +24,7 @@ export async function handleCheckoutSessionCompleted(data: IStripeWebhookData) {
 export async function handleCheckoutSessionExpired(data: IStripeWebhookData) {
   const { customer } = data;
 
-  console.log("handleCheckoutSessionExpired event received")
+  console.debug("handleCheckoutSessionExpired event received")
   const user = await usersService.getOneByCustomerId(customer);
 
   if (!user) throw Error('User not found');
@@ -37,7 +37,7 @@ export async function handleCheckoutSessionExpired(data: IStripeWebhookData) {
 export async function handleInvoicePaid(data: IStripeWebhookData) {
   const { customer } = data;
 
-  console.log("handleInvoicePaid event received")
+  console.debug("handleInvoicePaid event received")
   const user = await usersService.getOneByCustomerId(customer);
 
   if (!user) throw Error('User not found');
@@ -50,7 +50,7 @@ export async function handleInvoicePaid(data: IStripeWebhookData) {
 export async function handleInvoicePaymentFailed(data: IStripeWebhookData) {
   const { customer } = data;
 
-  console.log("handleInvoicePaymentFailed event received")
+  console.debug("handleInvoicePaymentFailed event received")
   const user = await usersService.getOneByCustomerId(customer);
 
   if (!user) throw Error('User not found');
@@ -63,7 +63,7 @@ export async function handleInvoicePaymentFailed(data: IStripeWebhookData) {
 export async function handleCustomerSubscriptionDeleted(data: IStripeWebhookData) {
   const { customer } = data;
 
-  console.log("handleCustomerSubscriptionDeleted event received")
+  console.debug("handleCustomerSubscriptionDeleted event received")
   const user = await usersService.getOneByCustomerId(customer);
 
   if (!user) throw Error('User not found');

@@ -1,10 +1,12 @@
 import { NextFunction, Response } from "express";
 import { CustomRequest } from "../../shared/types/express";
 import * as usersService from "../users/users.service";
-import usersModel from "../users/users.model";
+import usersModel, { IStoredUser } from "../users/users.model";
 import moment from "moment";
 import GameRecordModel from "../gameRecords/models/gameRecords.model";
 import { getGamesThisYearQuery, getMonthsGamesData } from "./admin.functions";
+import stripe from "../../services/stripe";
+import { banishmentsModel } from "./admin.model";
 
 export async function GetUsers(
   req: CustomRequest,
@@ -80,6 +82,47 @@ export async function GetDashboardStats(
     }, {})
 
     res.json({ usersSinceCreation, usersLastMonth, usersThisMonth, gamesPlayedByMonth });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function BanUser(
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) {
+  const { userId } = req.params;
+  const { message } = req.body;
+
+  try {
+    const user = await usersService.findById(userId) as IStoredUser;
+
+    if (!user) {
+      res.status(400).send('User do not exist');
+      return;
+    }
+
+    if (user.bannedAt) {
+      res.status(400).send('User already banned');
+      return;
+    }
+
+    if (user.stripe.subscriptionId) {
+      await stripe.subscriptions.cancel(user.stripe.subscriptionId);
+    }
+
+    await usersService
+      .fromUserId(userId)
+      .setBanned(true);
+
+    await banishmentsModel.create({
+      email: user.email,
+      ip: user.address,
+      message,
+    })
+
+    res.sendStatus(200);
   } catch (err) {
     next(err);
   }

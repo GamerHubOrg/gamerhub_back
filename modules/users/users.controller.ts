@@ -237,10 +237,10 @@ export async function DeleteUser(req: CustomRequest, res: Response) {
   const {userId} = req.params
   const {password} = req.body
 
-  const user: IStoredUser | null = await usersService.findById(userId);
+  const user = await usersService.findById(userId) as IStoredUser;
 
   if (!user) {
-    res.status(400).send('Credentials incorrect');
+    res.status(400).send('User do not exist');
     return;
   }
 

@@ -29,7 +29,7 @@ const fetchPokemonApi = async (
         .map(async ({ name, url }) => {
           const { data }: { data: IPokemonApiResponse } = await axios.get(url);
           const pokemon = await formatPokemon(data);
-          console.log(name);
+          console.debug(name);
           return PokemonCharacterModel.updateOne(
             { apiId: pokemon.apiId },
             { $set: pokemon },
@@ -37,7 +37,7 @@ const fetchPokemonApi = async (
           );
         })
     )
-      .then(() => console.log("All pokemons have been added."))
+      .then(() => console.debug("All pokemons have been added."))
       .catch(next);
 
     res.send("Pokemon API data are being added.");

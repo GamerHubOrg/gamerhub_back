@@ -28,6 +28,7 @@ interface ICreateUser {
   stripe: {
     customerId: string;
   };
+  address?: string;
 }
 
 export function create({ username, email, password, stripe }: ICreateUser) {
@@ -38,6 +39,18 @@ export function fromUserId(userId: string) {
   return {
     setRefreshToken(refresh_token?: string) {
       return usersModel.updateOne({ _id: userId }, { $set: { refresh_token } });
+    },
+    setIpAddress(address?: string) {
+      return usersModel.updateOne({ _id: userId }, { $set: { address } });
+    },
+    setBanned(isBanned: boolean) {
+      const updatePayload = isBanned ? { $set: { bannedAt: new Date() } } : { $unset: { bannedAt: '' } };
+
+      return usersModel.findOneAndUpdate(
+        { _id: userId },
+        { ...updatePayload },
+        { new: true }
+      )
     },
     setSubscribed(isSubscribed: boolean) {
       const updatePayload = isSubscribed ? { $set: { subscribedAt: new Date() } } : { $unset: { subscribedAt: '' } };

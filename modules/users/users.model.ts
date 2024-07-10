@@ -16,9 +16,11 @@ export interface IStoredUser {
   picture: string;
   refresh_token?: string;
   roles: string[];
-  xp: number
-  subscribedAt?: Date,
-  stripe: IUserStripeConfig
+  xp: number;
+  subscribedAt?: Date;
+  bannedAt?: Date;
+  address?: string;
+  stripe: IUserStripeConfig;
 }
 
 const UserStripeConfig = new mongoose.Schema({
@@ -59,7 +61,13 @@ const UserSchema = new Schema<IStoredUser>({
     type: Number,
     default: 0,
   },
+  address: {
+    type: String,
+  },
   subscribedAt: {
+    type: Date,
+  },
+  bannedAt: {
     type: Date,
   },
   stripe: UserStripeConfig,

@@ -13,7 +13,7 @@ export const errorHandler = (
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   _next: NextFunction
 ) => {
-  console.log("ERROR :", new Date().toLocaleString(), error);
+  console.debug("ERROR :", new Date().toLocaleString(), error);
 
   if (res.headersSent) return;
 
