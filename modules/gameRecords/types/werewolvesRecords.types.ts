@@ -1,8 +1,5 @@
 import {
-  IWerewolvesVote,
-  IWerewolvesSave,
-  IWerewolvesKill,
-  IWerewolvesWatchRole,
+  IWerewolvesTarget,
   ILinkedWerewolfRoles,
   IWerewolvesCamp,
   IWerewolvesConfig,
@@ -10,12 +7,12 @@ import {
 import { IGameRecord } from "./gameRecords.types";
 
 export interface IWerewolvesRecord extends IGameRecord {
-  wolfVotes?: IWerewolvesVote[];
-  villageVotes?: IWerewolvesVote[];
-  witchSaves?: IWerewolvesSave[];
-  witchKills?: IWerewolvesKill[];
-  hunterKills?: IWerewolvesKill[];
-  psychicWatch?: IWerewolvesWatchRole[];
+  wolfVotes?: IWerewolvesTarget[];
+  villageVotes?: IWerewolvesTarget[];
+  witchSaves?: IWerewolvesTarget[];
+  witchKills?: IWerewolvesTarget[];
+  hunterKills?: IWerewolvesTarget[];
+  psychicWatch?: IWerewolvesTarget[];
   roles: ILinkedWerewolfRoles;
   swapedRoles?: ILinkedWerewolfRoles;
   thiefUsers?: string[];
