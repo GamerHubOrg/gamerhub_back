@@ -1,7 +1,8 @@
 import usersModel, { IStoredUser } from "./users.model";
 
-export async function getAll({ limit = 30, offset = 0 }: { limit?: number, offset?: number }) {
-  const list = await usersModel.find().skip(offset).limit(limit);
+export async function getAll({ limit = 30, offset = 0, banned = false }: { limit?: number, offset?: number, banned?: boolean }) {
+  const filters = banned === true ? {} : { $or: [{bannedAt: { $exists: false }}, {bannedAt: undefined}] };
+  const list = await usersModel.find(filters).skip(offset).limit(limit);
   const count = await usersModel.countDocuments();
   return {
     list,

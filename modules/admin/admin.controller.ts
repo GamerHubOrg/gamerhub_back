@@ -1,6 +1,7 @@
 import { NextFunction, Response } from "express";
 import { CustomRequest } from "../../shared/types/express";
 import * as usersService from "../users/users.service";
+import * as banishmentsService from "./banishments.service";
 import usersModel, { IStoredUser } from "../users/users.model";
 import moment from "moment";
 import GameRecordModel from "../gameRecords/models/gameRecords.model";
@@ -26,6 +27,55 @@ export async function GetUsers(
     next(err);
   }
 }
+
+export async function GetBanishments(
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) {
+  const { limit = 30, offset = 0 } = req.query;
+
+  try {
+    const banishments = await banishmentsService.getAll({
+      limit: limit as number,
+      offset: offset as number,
+    });
+
+    res.json(banishments);
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function DeleteBanishment(
+  req: CustomRequest,
+  res: Response,
+  next: NextFunction
+) {
+  const { banishmentId} = req.params;
+
+  try {
+    const banishment = await banishmentsService.fromBanishmentId(banishmentId).getOne();
+
+    if (!banishment) {
+      res.status(400).send('Banishment do not exist');
+      return;
+    }
+
+    await banishmentsService.fromBanishmentId(banishmentId).delete();
+    
+    const user = await usersService.findByEmail(banishment.email);
+
+    if (user) {
+      await usersService.fromUserId(user._id).setBanned(false);
+    }
+
+    res.sendStatus(200);
+  } catch (err) {
+    next(err);
+  }
+}
+
 
 export async function PatchUser(
   req: CustomRequest,
