@@ -9,6 +9,7 @@ import {
 import { generateRandomString } from "../utils/functions";
 import { RoomLogger } from "./logs-handler";
 import { defaultConfigs } from "./room.constants";
+import { getLiveGames } from "./games/game-handler";
 
 export const roomsDataMap: Map<string, IRoomData> = new Map();
 export const playingsUsersMap: Map<string, any> = new Map();
@@ -160,6 +161,9 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
       (a, b) => a.joinedAt.getTime() - b.joinedAt.getTime()
     );
     io.in(roomId).emit("room:started", roomData);
+
+    const liveGames = getLiveGames(roomsDataMap);
+    io.emit('games:live:data', liveGames)
   };
 
   const onRoomBackToLobby = (roomId: string) => {
@@ -181,6 +185,9 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
 
     deleteRoom(roomId);
     io.sockets.adapter.rooms.delete(roomId);
+
+    const liveGames = getLiveGames(roomsDataMap);
+    io.emit('games:live:data', liveGames)
   };
 
   const onRoomLeave = (roomId: string) => {
@@ -209,6 +216,9 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     }
 
     io.in(roomId).emit("room:updated", roomData);
+
+    const liveGames = getLiveGames(roomsDataMap);
+    io.emit('games:live:data', liveGames)
   };
 
   const onRoomUpdate = (
@@ -274,6 +284,9 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     playingsUsersMap.delete(user._id);
     socket.to(socket_id).emit("room:kicked");
     io.in(roomId).emit("room:updated", roomData);
+
+    const liveGames = getLiveGames(roomsDataMap);
+    io.emit('games:live:data', liveGames)
   };
 
   socket.on("room:create", onRoomCreate);

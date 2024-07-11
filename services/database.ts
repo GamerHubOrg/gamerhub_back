@@ -5,9 +5,9 @@ export default {
   async connect() {
     try {
       await mongoose.connect(config.database.url);
-      console.log('[mongo] Database connected');
+      console.debug('[mongo] Database connected');
     } catch(err) {
-      console.error(err);
+      console.debug(err);
     }
   }
 };

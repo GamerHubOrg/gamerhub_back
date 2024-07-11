@@ -8,14 +8,14 @@ const client = createClient({
 export async function connectRedis() {
     try {
         client.on("error", async (error): Promise<void> => {
-            console.error(`Error : ${error}`)
+            console.debug(`Error : ${error}`)
             await client.disconnect();
         });
 
         await client.connect();
-        console.log('[redis] Cache connected')
+        console.debug('[redis] Cache connected')
     } catch(err) {
-        console.error('[redis] Unable to connect => ', err);
+        console.debug('[redis] Unable to connect => ', err);
     }
 }
 

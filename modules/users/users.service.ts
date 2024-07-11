@@ -1,7 +1,8 @@
 import usersModel, { IStoredUser } from "./users.model";
 
-export async function getAll({ limit = 30, offset = 0 }: { limit?: number, offset?: number }) {
-  const list = await usersModel.find().skip(offset).limit(limit);
+export async function getAll({ limit = 30, offset = 0, banned = false }: { limit?: number, offset?: number, banned?: boolean }) {
+  const filters = banned === true ? {} : { $or: [{bannedAt: { $exists: false }}, {bannedAt: undefined}] };
+  const list = await usersModel.find(filters).skip(offset).limit(limit);
   const count = await usersModel.countDocuments();
   return {
     list,
@@ -28,6 +29,7 @@ interface ICreateUser {
   stripe: {
     customerId: string;
   };
+  address?: string;
 }
 
 export function create({ username, email, password, stripe }: ICreateUser) {
@@ -38,6 +40,18 @@ export function fromUserId(userId: string) {
   return {
     setRefreshToken(refresh_token?: string) {
       return usersModel.updateOne({ _id: userId }, { $set: { refresh_token } });
+    },
+    setIpAddress(address?: string) {
+      return usersModel.updateOne({ _id: userId }, { $set: { address } });
+    },
+    setBanned(isBanned: boolean) {
+      const updatePayload = isBanned ? { $set: { bannedAt: new Date() } } : { $unset: { bannedAt: '' } };
+
+      return usersModel.findOneAndUpdate(
+        { _id: userId },
+        { ...updatePayload },
+        { new: true }
+      )
     },
     setSubscribed(isSubscribed: boolean) {
       const updatePayload = isSubscribed ? { $set: { subscribedAt: new Date() } } : { $unset: { subscribedAt: '' } };

@@ -1,6 +1,7 @@
 import { NextFunction, Response } from "express";
 import { CustomRequest } from "../../shared/types/express";
 import * as usersService from './users.service';
+import * as banishmentsService from '../admin/banishments.service';
 import crypto from 'crypto';
 import { IStoredUser } from "./users.model";
 import config from "../../config";
@@ -24,6 +25,13 @@ export async function PostLogin(req: CustomRequest, res: Response, next: NextFun
 
     if (user.password !== checkHash) {
       res.status(400).send('Credentials incorrect');
+      return;
+    }
+
+    const banishment = await banishmentsService.getOneByEmail(user.email);
+
+    if (banishment) {
+      res.status(401).send('This account is permanently banned, please reach the support for any claims');
       return;
     }
 
@@ -58,6 +66,14 @@ export async function PostRegister(req: CustomRequest, res: Response, next: Next
 
     if (password !== confirmPassword) {
       res.status(400).send('Passwords not matching');
+      return;
+    }
+
+    const ip = (req.headers['x-forwarded-for'] || req.ip) as string;
+    const banishment = await banishmentsService.getOneByIp(ip);
+
+    if (banishment && banishment.type === 'ip') {
+      res.status(401).send('You are permanently banned from accessing this website, please reach the support for any claims');
       return;
     }
 
@@ -234,13 +250,20 @@ export async function UpdateUserPassword(req: CustomRequest, res: Response) {
 }
 
 export async function DeleteUser(req: CustomRequest, res: Response) {
+  const currentUser = req.user;
   const {userId} = req.params
   const {password} = req.body
 
-  const user: IStoredUser | null = await usersService.findById(userId);
-
+  
+  const user = await usersService.findById(userId) as IStoredUser;
+  
   if (!user) {
-    res.status(400).send('Credentials incorrect');
+    res.status(400).send('User do not exist');
+    return;
+  }
+  
+  if (user._id === currentUser?._id) {
+    res.status(401).send('Not allowed to delete this user');
     return;
   }
 

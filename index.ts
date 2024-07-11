@@ -4,6 +4,7 @@ import cookieParser from 'cookie-parser';
 import express, { Application } from "express";
 import cors from "cors";
 import http from "http";
+import compression from "compression";
 import { Server } from "socket.io";
 
 import { getLogger } from "./shared/tools/logger";
@@ -26,6 +27,7 @@ promClient.collectDefaultMetrics({ register });
 
 const app: Application = express();
 
+app.use(compression());
 app.use(cookieParser());
 app.use(express.json());
 app.use(
@@ -36,7 +38,7 @@ app.use(
   })
 );
 app.use((req, res, next) => {
-  console.log(req.originalUrl);
+  console.debug(req.originalUrl);
   next();
 });
 
@@ -75,8 +77,8 @@ const io = new Server(server, {
 io.use((socket, next) => {
   const token = socket.request.headers["Authorization"];
   verifyAuth(token as string)
-    .then((user) => console.log(user))
-    .catch((err) => console.log(err.message));
+    .then((user) => console.debug(user))
+    .catch((err) => console.debug(err.message));
   next();
 });
 io.on("connection", (socket) => SocketConnectionHandler(io, socket));
@@ -85,5 +87,5 @@ const PORT = process.env.PORT || 3000;
 server.listen(PORT, () =>
   logger
     ? logger.info(`[server] Running on port ${PORT}`)
-    : console.log(`[server] Running on port ${PORT}`)
+    : console.debug(`[server] Running on port ${PORT}`)
 );
