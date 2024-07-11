@@ -143,7 +143,7 @@ export async function BanUser(
   next: NextFunction
 ) {
   const { userId } = req.params;
-  const { message } = req.body;
+  const { message, type } = req.body;
 
   try {
     const user = await usersService.findById(userId) as IStoredUser;
@@ -168,8 +168,9 @@ export async function BanUser(
 
     await banishmentsModel.create({
       email: user.email,
-      ip: user.address,
+      ip: type === 'ip' ? user.address : undefined,
       message,
+      type,
     })
 
     res.sendStatus(200);

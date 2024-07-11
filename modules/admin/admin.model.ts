@@ -5,8 +5,9 @@ const { Schema } = mongoose;
 export interface IBanishment {
   _id: string;
   email: string;
-  ip: string;
+  ip?: string;
   message: string;
+  type: string;
 }
 
 const BanishmentSchema = new Schema<IBanishment>({
@@ -15,6 +16,9 @@ const BanishmentSchema = new Schema<IBanishment>({
     required: true,
   },
   ip: {
+    type: String,
+  },
+  type: {
     type: String,
     required: true,
   },
