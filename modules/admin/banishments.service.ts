@@ -9,6 +9,15 @@ export async function getAll({ limit = 30, offset = 0 }: { limit?: number, offse
   }
 }
 
+export function getOneByEmail(email: string) {
+  return banishmentsModel.findOne({ email });
+}
+
+export function getOneByIp(ip: string) {
+  return banishmentsModel.findOne({ ip });
+}
+
+
 export function fromBanishmentId(banishmentId: string) {
   return {
     getOne() {
