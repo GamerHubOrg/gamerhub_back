@@ -9,6 +9,10 @@ export async function getAll({ limit = 30, offset = 0 }: { limit?: number, offse
   }
 }
 
+export function getOneByEmailOrIp(email: string, ip: string) {
+  return banishmentsModel.findOne({ $or: [{ email }, { ip }] });
+}
+
 export function getOneByEmail(email: string) {
   return banishmentsModel.findOne({ email });
 }

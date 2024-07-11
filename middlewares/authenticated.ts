@@ -3,8 +3,8 @@ import jwt from "jsonwebtoken";
 import { CustomRequest } from "../shared/types/express";
 import config from "../config";
 import * as usersService from '../modules/users/users.service';
+import * as banishmentsService from '../modules/admin/banishments.service';
 import { IStoredUser } from "../modules/users/users.model";
-import { banishmentsModel } from "../modules/admin/admin.model";
 
 export const verifyAuth = async (token?: string) => {
   if (!token) {
@@ -38,13 +38,14 @@ const handler: RequestHandler = async (
       return res.status(401).send();
     }
 
-    const userBanishment = await banishmentsModel.findOne({ $or: [{ email: user.email }, { ip: user.address }] });
+    const ip = (req.headers['x-forwarded-for'] || req.ip) as string;
+    const banishment = await banishmentsService.getOneByEmailOrIp(user.email, user.address as string);
+    const isEmailBanned = banishment?.type === 'email' && banishment?.email === user.email;
+    const isIpBanned = banishment?.type === 'ip' && banishment?.ip === user.address;
 
-    if (userBanishment) {
+    if (isEmailBanned || isIpBanned) {
       return res.status(401).send("Votre compte est définitivement bannis.");
     }
-
-    const ip = (req.headers['x-forwarded-for'] || req.ip) as string;
 
     if (user.address !== ip) {
       await usersService.fromUserId(user._id).setIpAddress(ip);

@@ -28,10 +28,18 @@ export async function PostLogin(req: CustomRequest, res: Response, next: NextFun
       return;
     }
 
-    const banishment = await banishmentsService.getOneByEmail(user.email);
+    const ip = (req.headers['x-forwarded-for'] || req.ip) as string;
+    const banishment = await banishmentsService.getOneByEmailOrIp(user.email, ip);
+    const isEmailBanned = banishment?.type === 'email' && banishment?.email === user.email;
+    const isIpBanned = banishment?.type === 'ip' && banishment?.ip === ip;
 
-    if (banishment) {
+    if (isEmailBanned) {
       res.status(401).send('This account is permanently banned, please reach the support for any claims');
+      return;
+    }
+
+    if (isIpBanned) {
+      res.status(401).send('You are permanently banned from accessing this website, please reach the support for any claims');
       return;
     }
 
