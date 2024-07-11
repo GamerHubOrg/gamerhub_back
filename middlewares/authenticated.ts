@@ -44,7 +44,7 @@ const handler: RequestHandler = async (
       return res.status(401).send("Votre compte est définitivement bannis.");
     }
 
-    const ip = req.ip as string;
+    const ip = req.headers['x-forwarded-for'] as string;
 
     if (user.address !== ip) {
       await usersService.fromUserId(user._id).setIpAddress(ip);
