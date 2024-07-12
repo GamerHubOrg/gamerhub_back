@@ -5,14 +5,14 @@ import configsModel from "./configs.model";
 interface IGetConfigs {
     filters: any,
     sort: any,
-    skip: any,
+    offset: any,
     limit: any,
 }
 
-export async function getConfigs({ filters, sort, skip, limit }: IGetConfigs) {
+export async function getConfigs({ filters, sort, offset, limit }: IGetConfigs) {
     const $sort = { $sort: { ...convertObjectValuesToNumbers(sort) } };
     const $match = filters ? { $match: { ...convertObjectValuesToMongooseQuery(filters) } } : undefined;
-    const $skip = { $skip: Number(skip) };
+    const $skip = { $skip: Number(offset) };
     const $limit = { $limit: Number(limit) };
 
     const query = [
@@ -32,11 +32,9 @@ export async function getConfigs({ filters, sort, skip, limit }: IGetConfigs) {
     ]);
     
     const nbTotalConfigs = aggregateCount[0]?.nbTotalConfigs || 0;
-    const nbConfigsLeft = nbTotalConfigs - configs.length;
     
     return {
         list: configs,
-        hasMore: nbConfigsLeft > 0,
         total: nbTotalConfigs,
     };
 }
