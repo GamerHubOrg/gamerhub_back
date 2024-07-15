@@ -9,6 +9,7 @@ import Witch from "./roles/Witch";
 import Wolf from "./roles/Wolf";
 import { nightRolesOrder } from "./werewolves.constants";
 import { defaultWerewolvesGameData, ILinkedWerewolfRoles, IWerewolvesComposition, IWerewolvesGameData, IWerewolvesGameState, IWerewolvesPlayer, IWerewolvesRoomData } from "./werewolves.types";
+import gameRecordsService from "../../../modules/gameRecords/gameRecords.service";
 
 type RoleConstructor = new () => WerewolfRole;
 
@@ -177,3 +178,40 @@ export function getCoupleFromUser(roomData: IWerewolvesRoomData, userId: string)
 
     return [...new Set(users.map((u) => u._id))];
 }
+
+export const saveGame = (roomData: IWerewolvesRoomData) => {
+    const { gameData, config } = roomData;
+    if (!gameData) return;
+    const {
+      wolfVotes,
+      villageVotes,
+      witchSaves,
+      witchKills,
+      hunterKills,
+      psychicWatch,
+      roles,
+      swapedRoles,
+      thiefUsers,
+      couple,
+      campWin,
+      usersThatPlayed,
+    } = gameData;
+  
+    gameRecordsService.insertGameRecord({
+      gameName: "werewolves",
+      users: roomData.users.map(({ _id }) => _id),
+      wolfVotes,
+      villageVotes,
+      witchSaves,
+      witchKills,
+      hunterKills,
+      psychicWatch,
+      roles,
+      swapedRoles,
+      thiefUsers,
+      couple,
+      campWin,
+      usersThatPlayed: usersThatPlayed?.map(({ _id }) => _id),
+      config,
+    });
+  };
