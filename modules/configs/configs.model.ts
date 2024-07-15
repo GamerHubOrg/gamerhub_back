@@ -20,6 +20,24 @@ export interface IStoredGameConfig {
     userId: ObjectId;
 }
 
+export interface IStoredConfigUpvote {
+    userId: string;
+    configId: string;
+}
+
+const ConfigUpvoteSchema = new Schema<IStoredConfigUpvote>({
+    userId: {
+        type: String,
+        required: true,
+    },
+    configId: {
+        type: String,
+        required: true,
+    },
+}, { timestamps: true })
+
+export const configUpvoteModel = mongoose.model('ConfigUpvote', ConfigUpvoteSchema);
+
 const ConfigSchema = new Schema<IStoredGameConfig>({
     game: {
         type: String,

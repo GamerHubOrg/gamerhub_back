@@ -8,6 +8,8 @@ import GameRecordModel from "../gameRecords/models/gameRecords.model";
 import { getGamesThisYearQuery, getMonthsGamesData } from "./admin.functions";
 import stripe from "../../services/stripe";
 import { banishmentsModel } from "./admin.model";
+import cache from '../../services/redis';
+import config from "../../config";
 
 export async function GetUsers(
   req: CustomRequest,
@@ -21,6 +23,8 @@ export async function GetUsers(
       limit: limit as number,
       offset: offset as number,
     });
+
+    cache.setEx(req.originalUrl, config.database.redisTtl, JSON.stringify(users));
 
     res.json(users);
   } catch (err) {
@@ -40,6 +44,8 @@ export async function GetBanishments(
       limit: limit as number,
       offset: offset as number,
     });
+
+    cache.setEx(req.originalUrl, config.database.redisTtl, JSON.stringify(banishments));
 
     res.json(banishments);
   } catch (err) {
@@ -70,6 +76,9 @@ export async function DeleteBanishment(
       await usersService.fromUserId(user._id).setBanned(false);
     }
 
+    cache.del('/api/admin/banishments');
+    cache.del('/api/admin/banishments?*');
+
     res.sendStatus(200);
   } catch (err) {
     next(err);
@@ -93,6 +102,9 @@ export async function PatchUser(
       email,
       subscribedAt,
     });
+
+    cache.del('/api/admin/users');
+    cache.del('/api/admin/users?*');
 
     res.json(user);
   } catch (err) {
@@ -172,6 +184,9 @@ export async function BanUser(
       message,
       type,
     })
+
+    cache.del('/api/admin/users');
+    cache.del('/api/admin/users?*');
 
     res.sendStatus(200);
   } catch (err) {

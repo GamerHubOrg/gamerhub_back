@@ -22,6 +22,18 @@ const WerewolvesTargetSchema = new Schema(
   { _id: false }
 );
 
+const WerewolvesSwapRoleSchema = new Schema(
+  {
+    playerId: { type: String, ref : "Users", required: true },
+    roles: {
+      type: Map,
+      of: Schema.Types.Mixed
+    },
+    turn: { type: Number, required: true },
+  },
+  { _id: false }
+);
+
 const WerewolvesRecordSchema = new Schema(
   {
     wolfVotes: [WerewolvesTargetSchema],
@@ -36,16 +48,20 @@ const WerewolvesRecordSchema = new Schema(
       required: true,
     },
     swapedRoles: {
-      type: Map,
-      of: Schema.Types.Mixed,
+      type: [WerewolvesSwapRoleSchema],
     },
     thiefUsers: {
+      type: Object,
+      default: {}
+    },
+    playersTurn: {
       type: [Schema.Types.ObjectId],
       ref: "Users",
     },
     couple: {
-      type: [Schema.Types.ObjectId],
-      ref: "Users",
+      type: Map,
+      of: Schema.Types.Mixed,
+      default: {},
     },
     campWin: {
       type: String,

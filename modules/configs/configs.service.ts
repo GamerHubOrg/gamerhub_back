@@ -1,6 +1,6 @@
 import { PipelineStage } from "mongoose";
 import { convertObjectValuesToNumbers, convertObjectValuesToMongooseQuery } from "../../utils/functions";
-import configsModel from "./configs.model";
+import configsModel, { configUpvoteModel } from "./configs.model";
 
 interface IGetConfigs {
     filters: any,
@@ -52,5 +52,12 @@ export function create({ game, name, config, userId }: ICreateConfig) {
         name,
         options: config,
         userId
+    })
+}
+
+export function upvoteConfig(userId: string, configId: string) {
+    return configUpvoteModel.create({
+        userId,
+        configId
     })
 }

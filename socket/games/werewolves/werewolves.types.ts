@@ -22,18 +22,26 @@ export interface IWerewolvesConfig {
 
 export type ILinkedWerewolfRoles = Record<string, WerewolfRole>;
 
+export interface IWerewolvesSwapedRoles {
+  playerId: string;
+  target: string;
+  turn: number;
+  roles: ILinkedWerewolfRoles;
+}
+
 export interface IWerewolvesGameData extends IGameData {
   wolfVotes?: IWerewolvesTarget[];
   villageVotes?: IWerewolvesTarget[];
   tmpVotes?: Partial<IWerewolvesTarget>[];
   witchSaves?: IWerewolvesTarget[];
   witchKills?: IWerewolvesTarget[];
+  witchSkips?: IWerewolvesTarget[];
   hunterKills?: IWerewolvesTarget[];
   psychicWatch?: IWerewolvesTarget[];
   roles: ILinkedWerewolfRoles;
-  swapedRoles?: ILinkedWerewolfRoles;
-  thiefUsers?: IWerewolvesPlayer[];
-  couple?: IWerewolvesCouple;
+  swapedRoles?: IWerewolvesSwapedRoles[];
+  thiefUsers?: Record<string, string[]>;
+  couple?: Record<string, IWerewolvesCouple>;
   roleTurn?: string;
   state: IWerewolvesGameState;
   campWin?: IWerewolvesCamp;
@@ -57,6 +65,7 @@ export type IWerewolvesCouple = string[];
 
 export interface IWerewolvesSendCouple {
   roomId: string;
+  playerId: string;
   couple: IWerewolvesCouple;
 }
 
