@@ -179,7 +179,8 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     if (!roomData) return socket.emit("room:not-found", roomId);
 
     const { users } = roomData;
-    for (const { socket_id } of users) {
+    for (const { socket_id, _id: userId } of users) {
+      playingsUsersMap.delete(userId);
       io.to(socket_id).emit("room:deleted", roomId);
     }
 

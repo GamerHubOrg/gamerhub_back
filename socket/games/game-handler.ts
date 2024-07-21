@@ -31,19 +31,6 @@ const GameHandler = (io: IoType, socket: SocketType) => {
     const liveGames = getLiveGames(roomsDataMap);
     io.emit('games:live:data', liveGames)
   })
-
-  socket.on('games:delete', (roomId: string) => {
-    const roomData = roomsDataMap.get(roomId);
-    if (!roomData) return socket.emit("room:not-found", roomId);
-
-    io.in(roomId).emit("room:deleted", roomId);
-
-    roomsDataMap.delete(roomId);
-    io.sockets.adapter.rooms.delete(roomId);
-
-    const liveGames = getLiveGames(roomsDataMap);
-    io.emit('games:live:data', liveGames)
-  })
 };
 
 export default GameHandler;
