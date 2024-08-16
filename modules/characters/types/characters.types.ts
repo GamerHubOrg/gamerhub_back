@@ -7,6 +7,10 @@ export interface ICharacterData extends Record<string, any> {
 export interface ICharacter {
   _id: string;
   name: string;
+  names?: {
+    fr?: string;
+    en?: string;
+  };
   lang: string;
   apiId: string;
   data: ICharacterData;
