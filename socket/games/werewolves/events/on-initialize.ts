@@ -25,7 +25,7 @@ const onInitialize = (io: IoType, socket: SocketType) => {
     gameData.psychicWatch = [];
     gameData.swapedRoles = undefined;
     gameData.thiefUsers = {};
-    gameData.couple = {};
+    gameData.couple = [];
     gameData.roleTurn = undefined;
     gameData.campWin = undefined;
     gameData.roles = handleGiveUsersRoles(
