@@ -9,6 +9,7 @@ import Witch from "./roles/Witch";
 import Wolf from "./roles/Wolf";
 import { nightRolesOrder } from "./werewolves.constants";
 import { defaultWerewolvesGameData, ILinkedWerewolfRoles, IWerewolvesComposition, IWerewolvesGameData, IWerewolvesGameState, IWerewolvesPlayer, IWerewolvesRoomData } from "./werewolves.types";
+import gameRecordsService from "../../../modules/gameRecords/gameRecords.service";
 
 type RoleConstructor = new () => WerewolfRole;
 
@@ -35,7 +36,7 @@ export function getAvailableRolesInstance(composition: IWerewolvesComposition, g
 
             return [
                 ...acc,
-                ...Array(composition[role]).fill(new werewolvesRoles[role]())
+                ...Array.from({ length: composition[role] }, () => new werewolvesRoles[role]()),
             ];
         }
     , [])
@@ -49,7 +50,7 @@ export function getAvailableRoles(composition: IWerewolvesComposition, gameData:
             if (gameData.turn > 1 && isFirstRoundOnlyRole) return acc;
             return [
                 ...acc,
-                ...Array(composition[role]).fill(werewolvesRoles[role])
+                ...Array.from({ length: composition[role] }, () => werewolvesRoles[role]),
             ]
         }
     , [])
@@ -66,12 +67,21 @@ export function handleGiveUsersRoles(users: IWerewolvesPlayer[], composition: IW
     }, {})
 }
 
-export function getThiefUsersIds(roomData: IWerewolvesRoomData) {
+export function getThiefUsersIds(roomData: IWerewolvesRoomData, thieves: string[]) {
     const gameData: IWerewolvesGameData = roomData.gameData || defaultWerewolvesGameData;
     const usersKey = Object.keys(gameData.roles);
 
-    const availableUsers = usersKey.filter((userId) => !(gameData.roles[userId] instanceof Thief))
-    return getRandomElement(availableUsers, 2, true);
+    const result = thieves.reduce((acc: Record<string, string[]>, thiefId) => {
+        const alreadyPickedUsers: string[] = Object.values(acc).reduce((acc, users) => ([...acc, ...users]), []);
+        const availableUsers = usersKey.filter((userId) => !(gameData.roles[userId] instanceof Thief) && !alreadyPickedUsers.some((uid) => uid === userId))
+
+        return {
+            ...acc,
+            [thiefId]: getRandomElement(availableUsers, 2, true),
+        }
+    }, {})
+
+    return result;
 }
 
 export function getNextPlayingRole(roomData: IWerewolvesRoomData): { state: IWerewolvesGameState, roleTurn: string } {
@@ -89,9 +99,10 @@ export function getNextPlayingRole(roomData: IWerewolvesRoomData): { state: IWer
 
     if (playerRoleToPlay) {
         const roleTurn = roles.find((role) => role instanceof playerRoleToPlay);
+
         return {
             state: gameData.state,
-            roleTurn: roleTurn!.name
+            roleTurn: roleTurn!.name,
         }
     }
 
@@ -155,3 +166,40 @@ export function getIsGameEnded(roomData: IWerewolvesRoomData): Partial<IWerewolv
 
     return undefined;
 }
+
+export const saveGame = (roomData: IWerewolvesRoomData) => {
+    const { gameData, config } = roomData;
+    if (!gameData) return;
+    const {
+      wolfVotes,
+      villageVotes,
+      witchSaves,
+      witchKills,
+      hunterKills,
+      psychicWatch,
+      roles,
+      swapedRoles,
+      thiefUsers,
+      couple,
+      campWin,
+      usersThatPlayed,
+    } = gameData;
+  
+    gameRecordsService.insertGameRecord({
+      gameName: "werewolves",
+      users: roomData.users.map(({ _id }) => _id),
+      wolfVotes,
+      villageVotes,
+      witchSaves,
+      witchKills,
+      hunterKills,
+      psychicWatch,
+      roles,
+      swapedRoles,
+      thiefUsers,
+      couple,
+      campWin,
+      usersThatPlayed: usersThatPlayed?.map(({ _id }) => _id),
+      config,
+    });
+  };

@@ -5,14 +5,14 @@ import cache from '../../services/redis';
 import config from "../../config";
 
 export async function GetConfigs(req: CustomRequest, res: Response, next: NextFunction) {
-    const { filters, sort, skip = 0, limit = 20 } = req.query;
+    const { filters, sort, offset = 0, limit = 20 } = req.query;
 
     try {
-        const { list, hasMore, total } = await configsService.getConfigs({ filters, sort, skip, limit });
+        const { list, total } = await configsService.getConfigs({ filters, sort, offset, limit });
 
-        cache.setEx(req.originalUrl, config.database.redisTtl, JSON.stringify({ list, hasMore, total }));
+        cache.setEx(req.originalUrl, config.database.redisTtl, JSON.stringify({ list, total }));
 
-        res.json({ list, hasMore, total })
+        res.json({ list, total })
     } catch(err) {
         next(err);
     }

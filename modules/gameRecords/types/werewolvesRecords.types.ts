@@ -3,6 +3,8 @@ import {
   ILinkedWerewolfRoles,
   IWerewolvesCamp,
   IWerewolvesConfig,
+  IWerewolvesSwapedRoles,
+  IWerewolvesCouple,
 } from "../../../socket/games/werewolves/werewolves.types";
 import { IGameRecord } from "./gameRecords.types";
 
@@ -14,9 +16,9 @@ export interface IWerewolvesRecord extends IGameRecord {
   hunterKills?: IWerewolvesTarget[];
   psychicWatch?: IWerewolvesTarget[];
   roles: ILinkedWerewolfRoles;
-  swapedRoles?: ILinkedWerewolfRoles;
-  thiefUsers?: string[];
-  couple?: string[];
+  swapedRoles?: IWerewolvesSwapedRoles[];
+  thiefUsers?: Record<string, string[]>;
+  couple?: IWerewolvesCouple;
   campWin?: IWerewolvesCamp;
   usersThatPlayed?: string[];
   config: IWerewolvesConfig;
