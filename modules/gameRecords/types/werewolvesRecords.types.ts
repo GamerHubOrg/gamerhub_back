@@ -18,7 +18,7 @@ export interface IWerewolvesRecord extends IGameRecord {
   roles: ILinkedWerewolfRoles;
   swapedRoles?: IWerewolvesSwapedRoles[];
   thiefUsers?: Record<string, string[]>;
-  couple?: Record<string, IWerewolvesCouple>;
+  couple?: IWerewolvesCouple;
   campWin?: IWerewolvesCamp;
   usersThatPlayed?: string[];
   config: IWerewolvesConfig;

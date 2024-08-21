@@ -41,7 +41,7 @@ export interface IWerewolvesGameData extends IGameData {
   roles: ILinkedWerewolfRoles;
   swapedRoles?: IWerewolvesSwapedRoles[];
   thiefUsers?: Record<string, string[]>;
-  couple?: Record<string, IWerewolvesCouple>;
+  couple?: IWerewolvesCouple;
   roleTurn?: string;
   state: IWerewolvesGameState;
   campWin?: IWerewolvesCamp;
@@ -65,7 +65,6 @@ export type IWerewolvesCouple = string[];
 
 export interface IWerewolvesSendCouple {
   roomId: string;
-  playerId: string;
   couple: IWerewolvesCouple;
 }
 

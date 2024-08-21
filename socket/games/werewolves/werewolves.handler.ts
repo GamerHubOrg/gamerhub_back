@@ -27,7 +27,7 @@ const WerewolvesHandler = (io: IoType, socket: SocketType) => {
   socket.on("game:werewolves:witch:skip", ({ roomId, playerId }: { roomId: string, playerId: string }) => onWitchSkip(io, socket)({ roomId, playerId }));
   socket.on("game:werewolves:hunter:kill", ({ roomId, userId, target } : IWerewolvesSendTarget) => onHunterKillPlayer(io, socket)({ roomId, userId, target }));
   socket.on("game:werewolves:psychic:watch", ({ roomId, userId, target }: IWerewolvesSendTarget) => onPsychicWatchRole(io, socket)({ roomId, userId, target }));
-  socket.on("game:werewolves:cupidon:couple", ({ roomId, playerId, couple }: IWerewolvesSendCouple) => onCupidonDefineCouple(io, socket)({ roomId, playerId, couple }));
+  socket.on("game:werewolves:cupidon:couple", ({ roomId, couple }: IWerewolvesSendCouple) => onCupidonDefineCouple(io, socket)({ roomId, couple }));
   socket.on("game:werewolves:thief:choose", ({ roomId, userId, target }: IWerewolvesSendTarget) => onThiefChooseRole(io, socket)({ roomId, userId, target }));
 };
 

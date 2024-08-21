@@ -3,7 +3,7 @@ import { GameState, IoType, SocketType } from "../../../types";
 import Hunter from "../roles/Hunter";
 import Witch from "../roles/Witch";
 import { nightRolesOrder } from "../werewolves.constants";
-import { getAvailableRoles, getCoupleFromUser, getIsGameEnded, saveGame } from "../werewolves.functions";
+import { getAvailableRoles, getIsGameEnded, saveGame } from "../werewolves.functions";
 import { defaultWerewolvesConfig, defaultWerewolvesGameData, IWerewolvesRoomData, IWerewolvesSendTarget, IWerewolvesTarget } from "../werewolves.types";
 
 const onWolfVote = (io: IoType, socket: SocketType) => {
@@ -70,14 +70,14 @@ const onWolfVote = (io: IoType, socket: SocketType) => {
       }
       gameData.roles[votedUser._id]?.setDeathTurn(gameTurn);
   
-      const otherCoupleUsers = getCoupleFromUser(roomData, votedUser._id);
-      const isPartOfCouple = otherCoupleUsers?.includes(votedUser._id);
-  
-      for (const coupleUserId of otherCoupleUsers) {
-        if (isPartOfCouple && !isWitchAlive) {
-          gameData.roles[coupleUserId]?.setIsAlive(false);
-          gameData.roles[coupleUserId]?.setDeathTurn(gameTurn);
-        }
+      const isPartOfCouple = gameData.couple?.includes(votedUser._id);
+      const otherCoupleUser = roomData.users.find(
+        (u) => gameData.couple?.includes(u._id) && u._id !== votedUser._id
+      );
+
+      if (isPartOfCouple && !isWitchAlive) {
+        gameData.roles[otherCoupleUser!._id]?.setIsAlive(false);
+        gameData.roles[otherCoupleUser!._id]?.setDeathTurn(gameTurn);
       }
   
       const compositionRoles = getAvailableRoles(config.composition, gameData);

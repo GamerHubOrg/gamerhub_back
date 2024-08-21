@@ -122,9 +122,7 @@ export function getIsGameEnded(roomData: IWerewolvesRoomData): Partial<IWerewolv
     const aliveUsers = roomData.users.filter((u) => linkedRoles[u._id]?.isAlive);
     const aliveVillagers = aliveUsers.filter((u) => linkedRoles[u._id]?.camp === 'village');
     const aliveWolves = aliveUsers.filter((u) => linkedRoles[u._id]?.camp === 'wolves');
-    const couples = gameData.couple || {};
-    const couplesUsers = aliveUsers.filter((u) => Object.values(couples).some((couple) => couple?.includes(u._id)));
-    const aliveCouple = [...new Set(couplesUsers.map((u) => u._id))];
+    const aliveCouple = aliveUsers.filter((u) => gameData.couple?.includes(u._id));
 
     if (aliveUsers.length === 0) {
         return {
@@ -167,16 +165,6 @@ export function getIsGameEnded(roomData: IWerewolvesRoomData): Partial<IWerewolv
     }
 
     return undefined;
-}
-
-export function getCoupleFromUser(roomData: IWerewolvesRoomData, userId: string) {
-    const gameData: IWerewolvesGameData = roomData.gameData || defaultWerewolvesGameData;
-    const couple = gameData.couple || {};
-
-    const users = roomData.users.filter(
-        (u) => Object.values(couple).some((couple) => couple?.includes(u._id) && u._id !== userId));
-
-    return [...new Set(users.map((u) => u._id))];
 }
 
 export const saveGame = (roomData: IWerewolvesRoomData) => {

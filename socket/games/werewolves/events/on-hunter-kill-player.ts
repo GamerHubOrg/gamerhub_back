@@ -2,7 +2,7 @@ import { GameState, IoType,SocketType } from "../../../types";
 import { defaultWerewolvesConfig, defaultWerewolvesGameData, IWerewolvesRoomData, IWerewolvesSendTarget } from "../werewolves.types";
 import { roomsDataMap } from "../../../room-handler";
 import Hunter from "../roles/Hunter";
-import { getAvailableRoles, getCoupleFromUser, getIsGameEnded, saveGame } from "../werewolves.functions";
+import { getAvailableRoles, getIsGameEnded, saveGame } from "../werewolves.functions";
 import { nightRolesOrder } from "../werewolves.constants";
 
 const onHunterKillPlayer = (io: IoType, socket: SocketType) => {
@@ -43,17 +43,14 @@ const onHunterKillPlayer = (io: IoType, socket: SocketType) => {
       }
       gameData.roles[userId]?.setDeathTurn(gameTurn);
   
-      const otherCoupleUsers = getCoupleFromUser(roomData, userId);
-      const isPartOfCouple = otherCoupleUsers?.includes(userId);
+      const otherCoupleUser = roomData.users.find(
+        (u) => gameData.couple?.includes(u._id) && u._id !== userId
+      );
+      const isPartOfCouple = gameData.couple?.includes(userId);
   
-      if (!isPartOfCouple) continue;
-  
-      for (const coupleUserId of otherCoupleUsers) {
-        const isCoupleHunter = gameData.roles[coupleUserId] instanceof Hunter;
-        if (!isCoupleHunter) {
-          gameData.roles[coupleUserId]?.setIsAlive(false);
-          gameData.roles[coupleUserId]?.setDeathTurn(gameTurn);
-        }
+      if (isPartOfCouple) {
+        gameData.roles[otherCoupleUser!._id]?.setIsAlive(false);
+        gameData.roles[otherCoupleUser!._id]?.setDeathTurn(gameTurn);
       }
     }
   

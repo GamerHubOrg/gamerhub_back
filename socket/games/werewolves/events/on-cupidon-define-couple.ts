@@ -5,15 +5,13 @@ import Cupidon from "../roles/Cupidon";
 import { getNextPlayingRole } from "../werewolves.functions";
 
 const onCupidonDefineCouple = (io: IoType, socket: SocketType) => {
-  return function ({ roomId, playerId, couple }: IWerewolvesSendCouple) {
+  return function ({ roomId, couple }: IWerewolvesSendCouple) {
     const roomData = roomsDataMap.get(roomId) as IWerewolvesRoomData;
     if (!roomData) return socket.emit("room:not-found", roomId);
   
     let gameData = roomData.gameData || defaultWerewolvesGameData;
-    const couples = gameData.couple || {};
   
-    couples[playerId] = couple;
-    gameData.couple = couples;
+    gameData.couple = couple;
   
     const currentTurnVotes = Object.values(gameData.couple);
     const cupidonUsers = roomData.users.filter(

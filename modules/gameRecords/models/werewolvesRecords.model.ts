@@ -59,9 +59,8 @@ const WerewolvesRecordSchema = new Schema(
       ref: "Users",
     },
     couple: {
-      type: Map,
-      of: Schema.Types.Mixed,
-      default: {},
+      type: [Schema.Types.ObjectId],
+      ref: "Users",
     },
     campWin: {
       type: String,

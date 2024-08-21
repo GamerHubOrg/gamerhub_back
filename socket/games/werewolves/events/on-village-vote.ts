@@ -1,7 +1,7 @@
 import { GameState, IoType,SocketType } from "../../../types";
 import { defaultWerewolvesConfig, defaultWerewolvesGameData, IWerewolvesRoomData, IWerewolvesSendTarget, IWerewolvesTarget } from "../werewolves.types";
 import { roomsDataMap } from "../../../room-handler";
-import { getAvailableRoles, getCoupleFromUser, getIsGameEnded, saveGame } from "../werewolves.functions";
+import { getAvailableRoles, getIsGameEnded, saveGame } from "../werewolves.functions";
 import Hunter from "../roles/Hunter";
 import { nightRolesOrder } from "../werewolves.constants";
 
@@ -55,21 +55,21 @@ const onVillageVote = (io: IoType, socket: SocketType) => {
     if (!isVoteTied && votedPlayer) {
       const isHunterVoted = gameData.roles[votedPlayer._id] instanceof Hunter;
   
-      const otherCoupleUsers = getCoupleFromUser(roomData, votedPlayer._id);
-      const isPartOfCouple = otherCoupleUsers?.includes(votedPlayer._id);
+      const isPartOfCouple = gameData.couple?.includes(votedPlayer._id);
+      const otherCoupleUser = roomData.users.find(
+        (u) => gameData.couple?.includes(u._id) && u._id !== votedPlayer._id
+      );
   
-      for (const coupleUserId of otherCoupleUsers) {
-        if (isHunterVoted) {
-          gameData.roles[votedPlayer._id]?.setIsBeingKilled(true);
-          if (isPartOfCouple) {
-            gameData.roles[coupleUserId]?.setIsBeingKilled(true);
-          }
-        } else {
-          gameData.roles[votedPlayer._id]?.setIsAlive(false);
-          if (isPartOfCouple) {
-            gameData.roles[coupleUserId]?.setIsAlive(false);
-            gameData.roles[coupleUserId]?.setDeathTurn(gameTurn);
-          }
+      if (isHunterVoted) {
+        gameData.roles[votedPlayer._id]?.setIsBeingKilled(true);
+        if (isPartOfCouple) {
+          gameData.roles[otherCoupleUser!._id]?.setIsBeingKilled(true);
+        }
+      } else {
+        gameData.roles[votedPlayer._id]?.setIsAlive(false);
+        if (isPartOfCouple) {
+          gameData.roles[otherCoupleUser!._id]?.setIsAlive(false);
+          gameData.roles[otherCoupleUser!._id]?.setDeathTurn(gameTurn);
         }
       }
   
