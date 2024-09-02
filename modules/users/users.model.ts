@@ -17,6 +17,7 @@ export interface IStoredUser {
   refresh_token?: string;
   roles: string[];
   xp: number;
+  friends?: IStoredUser[];
   subscribedAt?: Date;
   bannedAt?: Date;
   address?: string;
@@ -60,6 +61,10 @@ const UserSchema = new Schema<IStoredUser>({
   xp:{
     type: Number,
     default: 0,
+  },
+  friends: {
+    type: [Schema.Types.ObjectId],
+    default: [],
   },
   address: {
     type: String,
