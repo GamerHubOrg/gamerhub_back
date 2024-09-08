@@ -2,6 +2,7 @@ import mongoose from "mongoose";
 import SpeedrundleRecordSchema from "./speedrundleRecords.model";
 import UndercoverRecordSchema from "./undercoverRecords.model";
 import WerewolvesRecordSchema from "./werewolvesRecords.model";
+import { IGameRecord } from "../types/gameRecords.types";
 
 const GameRecordSchema = new mongoose.Schema(
   {
@@ -17,7 +18,7 @@ const GameRecordSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const GameRecordModel = mongoose.model("GameRecords", GameRecordSchema);
+const GameRecordModel = mongoose.model<IGameRecord>("GameRecords", GameRecordSchema);
 
 export const SpeedrundleRecordModel = GameRecordModel.discriminator(
   "speedrundle",

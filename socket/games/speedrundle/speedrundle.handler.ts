@@ -189,7 +189,7 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     const gameData = roomData.gameData;
     if (!gameData) return;
 
-    const userAnswers = gameData.usersAnswers.find(
+    const userAnswers = gameData.usersAnswers?.find(
       ({ playerId }) => playerId === userId
     );
 

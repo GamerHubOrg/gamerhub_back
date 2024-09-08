@@ -30,7 +30,7 @@ const getCharacterById = async (_id: string): Promise<ICharacter | null> => {
 const getAllCharactersByTheme = async <T extends ICharacter = ICharacter>(
   dataType: CharacterDataType | string
 ): Promise<T[]> => {
-  return await CharacterModel.find({ "data.dataType": dataType }).lean();
+  return await CharacterModel.find({ "data.dataType": dataType }).lean<T[]>();
 };
 
 const insertCharacters = async (datas: ICharacter[]) => {
@@ -46,7 +46,7 @@ const updateCharacter = async (_id: string, data: Partial<ICharacter>) => {
 };
 
 const deleteCharacters = async (ids: string[]) => {
-  return await CharacterModel.deleteMany(ids);
+  return await CharacterModel.deleteMany({ _id: { $in: ids } });
 };
 
 const deleteCharacter = async (_id: string) => {

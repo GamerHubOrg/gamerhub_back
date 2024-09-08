@@ -62,6 +62,10 @@ export const formatPokemon = async (
 
   return {
     name : capitalizeFirstLetter(name),
+    names : {
+      fr : name,
+      en : names.find(({language}) => language.name === "en")?.name
+    },
     lang: "en_US",
     apiId: `pokemon-${id.toString()}`,
     data: {

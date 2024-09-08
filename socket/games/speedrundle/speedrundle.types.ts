@@ -60,7 +60,7 @@ const LEAGUE_OF_LEGENDS_COLUMNS: IColumn[] = [
   { name: "Species", key: "species" },
   { name: "Combat", key: "tags" },
   { name: "Ressource", key: "ressource" },
-  { name: "Type", key: "range" },
+  { name: "Range", key: "range" },
   { name: "Position", key: "position" },
   { name: "Region", key: "region" },
   { name: "Release year", key: "releaseYear", type: "comparison" },
