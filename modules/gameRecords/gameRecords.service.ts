@@ -40,7 +40,7 @@ const getAllGameRecords = async (
 
   const recordsWithUsers: any[] = await Promise.all(
     gameRecords.map(async (record) => {
-      const users: IStoredUser = await usersModel
+      const users: IStoredUser[] = await usersModel
         .find(
           {
             _id: { $in: record.users },
