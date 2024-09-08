@@ -2,6 +2,8 @@ import mongoose, { Schema } from "mongoose";
 import LolSchema from "./lol-characters.model";
 import PokemonSchema from "./pokemon-characters.model";
 import { ICharacter } from "../types/characters.types";
+import { IPokemonCharacter } from "../types/pokemon.types";
+import { ILolCharacter } from "../types/lol.types";
 
 const NameSchema = new mongoose.Schema(
   {
@@ -36,13 +38,11 @@ const CharacterSchema = new Schema(
 
 const CharacterModel = mongoose.model<ICharacter>("Character", CharacterSchema);
 
-export const LolCharacterModel = CharacterModel.discriminator(
+export const LolCharacterModel = CharacterModel.discriminator<ILolCharacter>(
   "league_of_legends",
   LolSchema
 );
-export const PokemonCharacterModel = CharacterModel.discriminator(
-  "pokemon",
-  PokemonSchema
-);
+export const PokemonCharacterModel =
+  CharacterModel.discriminator<IPokemonCharacter>("pokemon", PokemonSchema);
 
 export default CharacterModel;
