@@ -30,7 +30,7 @@ const getCharacterById = async (_id: string): Promise<ICharacter | null> => {
 const getAllCharactersByTheme = async <T extends ICharacter = ICharacter>(
   dataType: CharacterDataType | string
 ): Promise<T[]> => {
-  return await CharacterModel.find({ "data.dataType": dataType }).lean();
+  return await CharacterModel.find({ "data.dataType": dataType }).lean<ICharacter>();
 };
 
 const insertCharacters = async (datas: ICharacter[]) => {
