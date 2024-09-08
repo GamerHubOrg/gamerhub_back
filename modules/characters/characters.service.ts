@@ -46,7 +46,7 @@ const updateCharacter = async (_id: string, data: Partial<ICharacter>) => {
 };
 
 const deleteCharacters = async (ids: string[]) => {
-  return await CharacterModel.deleteMany(ids);
+  return await CharacterModel.deleteMany({ _id: { $in: ids } });
 };
 
 const deleteCharacter = async (_id: string) => {

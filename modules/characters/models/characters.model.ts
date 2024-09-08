@@ -1,6 +1,7 @@
 import mongoose, { Schema } from "mongoose";
 import LolSchema from "./lol-characters.model";
 import PokemonSchema from "./pokemon-characters.model";
+import { ICharacter } from "../types/characters.types";
 
 const NameSchema = new mongoose.Schema(
   {
@@ -33,7 +34,7 @@ const CharacterSchema = new Schema(
   { timestamps: true }
 );
 
-const CharacterModel = mongoose.model("Character", CharacterSchema);
+const CharacterModel = mongoose.model<ICharacter>("Character", CharacterSchema);
 
 export const LolCharacterModel = CharacterModel.discriminator(
   "league_of_legends",
