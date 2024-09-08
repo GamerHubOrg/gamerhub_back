@@ -1,6 +1,6 @@
 import CharacterModel from "../characters/models/characters.model";
 import { ICharacter } from "../characters/types/characters.types";
-import usersModel from "../users/users.model";
+import usersModel, { IStoredUser } from "../users/users.model";
 import GameRecordModel, {
   SpeedrundleRecordModel,
   UndercoverRecordModel,
@@ -11,14 +11,8 @@ import { ISpeedrundleRecord } from "./types/speedrundleRecords.types";
 import { IUndercoverRecord } from "./types/undercoverRecords.types";
 import { IWerewolvesRecord } from "./types/werewolvesRecords.types";
 
-interface IUserData {
-  _id: string;
-  username: string;
-  picture: string;
-}
-
 interface IGameRecordWithUsers extends IGameRecord {
-  usersData: IUserData[];
+  usersData: IStoredUser[];
 }
 
 interface ISpeedrundleRecordWithUsers extends ISpeedrundleRecord, IGameRecordWithUsers {
@@ -46,7 +40,7 @@ const getAllGameRecords = async (
 
   const recordsWithUsers: any[] = await Promise.all(
     gameRecords.map(async (record) => {
-      const users: IUserData = await usersModel
+      const users: IStoredUser = await usersModel
         .find(
           {
             _id: { $in: record.users },
@@ -58,7 +52,6 @@ const getAllGameRecords = async (
       if (record.gameName === "speedrundle") {
         characters = await CharacterModel.find(
           {
-            // @ts-expect-error: if gameName === "speedrundle", record is a ISpeedrundleRecord
             _id: { $in: (record as ISpeedrundleRecord).charactersToGuess },
           },
           "_id name data.sprite"
@@ -108,7 +101,7 @@ const updateGameRecord = async (_id: string, data: Partial<GameRecord>) => {
 };
 
 const deleteGameRecords = async (ids: string[]) => {
-  return await GameRecordModel.deleteMany(ids);
+  return await GameRecordModel.deleteMany({_id : {$in : ids}});
 };
 
 const deleteGameRecord = async (_id: string) => {
