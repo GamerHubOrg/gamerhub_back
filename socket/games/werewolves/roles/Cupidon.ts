@@ -2,9 +2,9 @@ import { WerewolfRole, Power } from "./WerewolvePlayer";
 
 export default class Cupidon extends WerewolfRole {
     picture: string = 'cupidon';
-    power: Power = new Power("Flêche de l'amour", "Vous choisissez deux personnes qui vont tomber amoureux l'une de l'autre");
+    power: Power = new Power("games.werewolves.roles.cupidon.powerName", "games.werewolves.roles.cupidon.powerDescription");
 
     constructor() {
-        super("Cupidon", "Cupidon description", "village");
+        super("games.werewolves.roles.cupidon.name", "Cupidon description", "village");
     }
 }

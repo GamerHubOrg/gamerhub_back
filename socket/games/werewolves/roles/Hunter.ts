@@ -2,9 +2,9 @@ import { Power, WerewolfRole } from "./WerewolvePlayer";
 
 export default class Hunter extends WerewolfRole {
     picture: string = 'hunter';
-    power: Power = new Power('Après la mort', "Vous pouvez entrainer un autre joueur avec vous");
+    power: Power = new Power("games.werewolves.roles.hunter.powerName", "games.werewolves.roles.hunter.powerDescription");
 
     constructor() {
-        super("Chasseur", "Chasseur description", "village");
+        super("games.werewolves.roles.hunter.name", "Chasseur description", "village");
     }
 }

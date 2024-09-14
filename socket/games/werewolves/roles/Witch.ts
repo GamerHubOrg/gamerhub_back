@@ -5,7 +5,7 @@ class PotionPower extends Power {
     savePotionUsed: boolean;
 
     constructor() {
-        super("Potions", "Vous disposez d'une potion pouvant tuer un joueur et d'une potion pouvant ressuciter un joueur");
+        super("games.werewolves.roles.witch.powerName", "games.werewolves.roles.witch.powerDescription");
         this.killPotionUsed = false;
         this.savePotionUsed = false;
     }
@@ -24,7 +24,7 @@ export default class Witch extends WerewolfRole {
     power: PotionPower;
 
     constructor() {
-        super("Sorcière", "Sorcière description", "village");
+        super("games.werewolves.roles.witch.name", "Sorcière description", "village");
         this.power = new PotionPower();
     }
 }

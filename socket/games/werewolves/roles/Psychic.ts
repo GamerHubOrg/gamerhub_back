@@ -2,9 +2,9 @@ import { WerewolfRole, Power } from "./WerewolvePlayer";
 
 export default class Psychic extends WerewolfRole {
     picture: string = 'psychic';
-    power: Power = new Power("Omnisience", "Vous pouvez connaitre le rôle d'un joueur chaque tour");
+    power: Power = new Power("games.werewolves.roles.psychic.powerName", "games.werewolves.roles.psychic.powerDescription");
 
     constructor() {
-        super("Voyante", "Voyante description", "village");
+        super("games.werewolves.roles.psychic.name", "Voyante description", "village");
     }
 }
