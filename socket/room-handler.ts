@@ -124,13 +124,13 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
       if (roomData.gameState !== "lobby")
         return socket.emit(
           "room:notifications:error",
-          "Cette partie est déjà lancée, veuillez attendre la fin."
+          "gameStarted"
         );
 
       if (roomData.users.length === roomData.config?.maxPlayers)
         return socket.emit(
           "room:notifications:error",
-          "Cette partie a déjà atteint le nombre maximal de joueurs."
+          "alreadyFull"
         );
     }
 
@@ -212,7 +212,7 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
       io.in(roomId).emit("room:updated", roomData);
       io.in(roomId).emit(
         "room:notifications:error",
-        "Il n y a plus assez de joueurs pour continuer la partie."
+        "notEnoughPlayers"
       );
     }
 
@@ -254,19 +254,19 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     if (!user)
       return socket.emit(
         "room:notifications:error",
-        "Cet utilisateur n'est pas dans la room."
+        "userNotInRoom"
       );
     if (!currentOwner)
       return socket.emit(
         "room:notifications:error",
-        "Impossible de trouver l'owner actuel."
+        "ownerNotFound"
       );
     user.isOwner = true;
     currentOwner.isOwner = false;
     roomLogger.onUserPromoted(roomData, user);
     socket
       .to(user.socket_id)
-      .emit("room:notifications:success", "Tu as été promu owner de la room.");
+      .emit("room:notifications:success", "promoted");
     io.in(roomId).emit("room:updated", roomData);
   };
 
@@ -277,7 +277,7 @@ const RoomHandler = (io: IoType, socket: SocketType) => {
     if (!user)
       return socket.emit(
         "room:notifications:error",
-        "Cet utilisateur n'est pas dans la room."
+        "userNotInRoom"
       );
     const { socket_id } = user;
     roomLogger.onUserKicked(roomData, user);

@@ -63,13 +63,13 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
     if (!theme)
       return socket.emit(
         "room:notifications:error",
-        `Veuillez envoyer le thème de la partie.`
+        `selectTheme`
       );
 
     if (selectedColumnsLength < 1)
       return socket.emit(
         "room:notifications:error",
-        `Veuillez sélectionner au moins 2 indices.`
+        `selectClues`
       );
     const allCharacters = await getCharacters(roomData.config);
 
@@ -147,7 +147,8 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
 
     socket.emit(
       "room:notifications:success",
-      `Vous avez trouvé ${currentGuess.name} !`
+      "youGuessed",
+      {name : currentGuess.name}
     );
     socket.emit("game:speedrundle:find-character");
 
@@ -206,7 +207,8 @@ const SpeedrundleHandler = (io: IoType, socket: SocketType) => {
 
     socket.emit(
       "room:notifications:error",
-      `Vous avez abandonné ce tour, la réponse était ${currentGuess.name} !`
+      "giveUp",
+      {name : currentGuess.name}
     );
     socket.emit("game:speedrundle:give-up-character");
 
