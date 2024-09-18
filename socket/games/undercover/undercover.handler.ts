@@ -198,11 +198,11 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
 
       io.in(roomId).emit(
         "room:notifications:info",
-        "playerEliminated",
+        "undercover.playerEliminated",
         {username : user.username}
       );
       if (user.socket_id === socket.id) {
-        socket.emit("room:notifications:error", "youEliminated");
+        socket.emit("room:notifications:error", "undercover.youEliminated");
       }
 
       const notEliminatedPlayers = users.filter((u) => !u.isEliminated).length;
@@ -229,7 +229,7 @@ const UndercoverHandler = (io: IoType, socket: SocketType) => {
     if(isVoteTied){
       io.in(roomId).emit(
         "room:notifications:info",
-        "voteEqual"
+        "undercover.voteEqual"
       );
     }
     io.in(roomId).emit("game:undercover:new-round");
