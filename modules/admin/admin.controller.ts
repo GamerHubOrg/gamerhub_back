@@ -170,8 +170,8 @@ export async function BanUser(
       return;
     }
 
-    if (user.stripe.subscriptionId) {
-      await stripe.subscriptions.cancel(user.stripe.subscriptionId);
+    if (user.stripe?.subscriptionId) {
+      await stripe.subscriptions.cancel(user.stripe?.subscriptionId);
     }
 
     await usersService
