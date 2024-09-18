@@ -10,7 +10,7 @@ const onWolfVoteSelectPlayer = (io: IoType, socket: SocketType) => {
   }: IWerewolvesSendTarget) {
     const roomData = roomsDataMap.get(roomId) as IWerewolvesRoomData;
     if (!roomData) return socket.emit("room:not-found", roomId);
-  
+    console.log(userId, "want to vote for", target)
     const gameData = roomData.gameData || defaultWerewolvesGameData;
     const votes = gameData.tmpVotes?.filter((v) => v.playerId !== userId) || [];
   

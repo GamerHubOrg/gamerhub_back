@@ -14,6 +14,7 @@ const onWolfVote = (io: IoType, socket: SocketType) => {
     const gameData = roomData.gameData || defaultWerewolvesGameData;
     const config = roomData.config || defaultWerewolvesConfig;
     const votes = gameData.wolfVotes || [];
+    const tmpVotes = gameData.tmpVotes || [];
     const gameTurn = gameData.turn || 1;
   
     const usersThatCanVote = roomData.users.filter(
@@ -24,7 +25,7 @@ const onWolfVote = (io: IoType, socket: SocketType) => {
   
     votes.push({ playerId: userId, target, turn: gameTurn });
     gameData.wolfVotes = votes;
-    gameData.tmpVotes = votes.filter((v) => v.playerId !== userId);
+    gameData.tmpVotes = tmpVotes.filter((v) => v.playerId !== userId);
   
     const currentTurnVotes = votes.filter((v) => v.turn === gameTurn);
   
