@@ -24,7 +24,7 @@ interface IWerewolvesRecordWithUsers extends IWerewolvesRecord, IGameRecordWithU
 }
 
 type GameRecord = IGameRecord | ISpeedrundleRecord | IUndercoverRecord | IWerewolvesRecord;
-type GameRecordWithUsers = IGameRecordWithUsers | ISpeedrundleRecordWithUsers |IWerewolvesRecordWithUsers;
+type GameRecordWithUsers = IGameRecordWithUsers | ISpeedrundleRecordWithUsers | IWerewolvesRecordWithUsers;
 
 const getAllGameRecords = async (
   filters: Record<string, any> = {},
@@ -39,7 +39,7 @@ const getAllGameRecords = async (
   const gameRecords = await query.lean();
 
   const recordsWithUsers: any[] = await Promise.all(
-    gameRecords.map(async (record) => {
+    gameRecords.map(async (record: IGameRecord) => {
       const users: IStoredUser[] = await usersModel
         .find(
           {
@@ -101,7 +101,7 @@ const updateGameRecord = async (_id: string, data: Partial<GameRecord>) => {
 };
 
 const deleteGameRecords = async (ids: string[]) => {
-  return await GameRecordModel.deleteMany({_id : {$in : ids}});
+  return await GameRecordModel.deleteMany({ _id: { $in: ids } });
 };
 
 const deleteGameRecord = async (_id: string) => {

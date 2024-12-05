@@ -9,5 +9,5 @@ export interface ISpeedrundleRecord extends IGameRecord {
   columns: IColumn[];
   charactersToGuess: string[];
   usersAnswers: ISpeedrundleAnswer[];
-  config : ISpeedrundleConfig
+  config: ISpeedrundleConfig
 }
